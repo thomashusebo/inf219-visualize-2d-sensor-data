@@ -41,7 +41,7 @@ y = [(-1)**i*i**2 for i in x]
 linechart_data = go.Scatter(x=x,
                             y=y,
                             name="Close",
-                            line=dict(color="#707eff")
+                            line=dict(color=color_scale[0][1])
                             )
 linechart_layout = go.Layout(title=go.layout.Title(text="Line chart"))
 linechart_fig = {
