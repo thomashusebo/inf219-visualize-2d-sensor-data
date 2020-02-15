@@ -23,6 +23,26 @@ heatmap_fig = {
     'layout':heatmap_layout}
 ###################################################
 
+###########################################
+## Setup a line chart data
+x = [i for i in range(30)]
+y = [(-1)**i*i**2 for i in x]
+
+
+# Create line chart figure used in app from data and layout
+linechart_data = go.Scatter(x=x,
+                            y=y,
+                            name="Close",
+                            line=dict(color="#707eff")
+                            )
+linechart_layout = go.Layout(title=go.layout.Title(text="Line chart"))
+linechart_fig = {
+    'data':[linechart_data],
+    'layout':linechart_layout
+}
+###########################################
+
+
 app = dash.Dash()
 app.layout = html.Div([
     # Title
@@ -32,7 +52,11 @@ app.layout = html.Div([
     html.Div([
         dcc.Graph(id='heatmap',
                   figure=heatmap_fig
-                  )
+                  ),
+    html.Div([
+        dcc.Graph(id='linechart',
+                  figure=linechart_fig)
+    ])
     ])
 ])
 
