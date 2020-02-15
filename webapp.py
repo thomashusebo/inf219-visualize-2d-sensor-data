@@ -3,6 +3,8 @@ import dash_html_components as html
 import dash_core_components as dcc
 import plotly.graph_objects as go
 
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 ####################################################
 ## Setup a heatmap data
 n = 14                                  # number of columns
@@ -43,21 +45,30 @@ linechart_fig = {
 ###########################################
 
 
-app = dash.Dash()
+app = dash.Dash(external_stylesheets=external_stylesheets)
 app.layout = html.Div([
     # Title
-    html.Div(html.H1("INF219 Visualization of 2d sensor data")),
+    html.Div([
+        html.H1("INF219 Visualization of 2d sensor data")
+        ],
+    ),
 
     # Heatmap
     html.Div([
         dcc.Graph(id='heatmap',
                   figure=heatmap_fig
-                  ),
+                  )
+        ],
+        className='seven columns'
+    ),
+
+    # Line chart
     html.Div([
         dcc.Graph(id='linechart',
                   figure=linechart_fig)
-    ])
-    ])
+        ],
+        className='four columns'
+    )
 ])
 
 if __name__ =='__main__':
