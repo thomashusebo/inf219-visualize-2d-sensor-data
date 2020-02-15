@@ -1,6 +1,7 @@
 import dash
-import dash_html_components as html
+import dash_daq as daq
 import dash_core_components as dcc
+import dash_html_components as html
 import plotly.graph_objects as go
 
 from colorHandler import ColorHandler as colors
@@ -74,7 +75,21 @@ app.layout = html.Div([
                   figure=linechart_fig)
         ],
         className='four columns'
-    )
+    ),
+
+    # Slider
+    html.Div([
+        daq.Slider(
+            id='heatmap slider',
+            min=0,
+            value=50,
+            max=100,
+            color='black'
+        )
+        ],
+        className='seven columns'
+
+    ),
 ])
 
 if __name__ =='__main__':
