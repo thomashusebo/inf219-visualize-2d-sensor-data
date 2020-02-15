@@ -35,7 +35,7 @@ heatmap_fig = {
 ###########################################
 ## Setup a line chart data
 x = [i for i in range(30)]
-y = [(-1)**i*i**2 for i in x]
+y = [(-1)**i*i**2+i**2+(i/2)**2 for i in x]
 
 
 # Create line chart figure used in app from data and layout
