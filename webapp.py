@@ -3,6 +3,8 @@ import dash_html_components as html
 import dash_core_components as dcc
 import plotly.graph_objects as go
 
+from colorHandler import ColorHandler as colors
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 ####################################################
@@ -14,9 +16,13 @@ ys = [i for i in range(1, m+1)]         # Defines y's
 zs = [[i * j for i in xs] for j in ys]  # Defines plotted value in heatmap
 
 # Create heatmap figure used in app from data and layout
+color_scale = colors.getColorScale(max_value=max(max(zs)),
+                                   min_value=min(min(zs)))
+
 heatmap_data = go.Heatmap(x=xs,
                           y=ys,
                           z=zs,
+                          colorscale=color_scale
                           )
 heatmap_layout = go.Layout(title=go.layout.Title(text='Heatmap Title'))
 
