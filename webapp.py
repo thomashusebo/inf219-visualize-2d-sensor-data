@@ -1,9 +1,11 @@
+import datetime
 import dash
 import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objects as go
 
+from dash.dependencies import Input, Output
 from colorHandler import ColorHandler as colors
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -60,6 +62,16 @@ app.layout = html.Div([
         ],
     ),
 
+    # Time
+    html.Div([
+        html.Div(id='live-clock'),
+        dcc.Interval(
+           id='interval-component',
+           interval = 1*1000, #milliseconds
+           n_intervals = 0
+       )
+    ]),
+
     # Heatmap
     html.Div([
         dcc.Graph(id='heatmap',
@@ -91,6 +103,14 @@ app.layout = html.Div([
 
     ),
 ])
+
+@app.callback(Output('live-clock', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_metrics(n):
+    return [
+        html.Span(datetime.datetime.now().strftime("%H:%M:%S"))
+    ]
+
 
 if __name__ =='__main__':
     app.run_server(debug=True)
