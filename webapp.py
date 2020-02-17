@@ -75,6 +75,10 @@ app.layout = html.Div([
     # Heatmap
     html.Div([
         dcc.Graph(id='heatmap',
+                  config = {
+                      "displaylogo":False,
+                      "modeBarButtonsToRemove":['zoom2d']
+                  },
                   figure=heatmap_fig
                   )
         ],
@@ -84,6 +88,10 @@ app.layout = html.Div([
     # Line chart
     html.Div([
         dcc.Graph(id='linechart',
+                  config = {
+                      "displaylogo":False,
+                      "modeBarButtonsToRemove":[]
+                  },
                   figure=linechart_fig)
         ],
         className='four columns'
