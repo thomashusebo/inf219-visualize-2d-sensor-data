@@ -33,7 +33,7 @@ def update_metrics(n):
     [Output('heatmap', 'figure'),
      Output('linechart', 'figure')],
     [Input('heatmap-slider', 'value')])
-def update_figure(selected_iteration):
+def adjust_slider(selected_iteration):
     # Gather data
     thisData = data[selected_iteration]
 
@@ -46,6 +46,8 @@ def update_figure(selected_iteration):
     thisLineChartFig = FigureCreator.getLineChart(data, selected_iteration, coordinate, thisColorScale)
 
     return [thisHeatmapFig, thisLineChartFig]
+
+
 
 
 # Run the server
