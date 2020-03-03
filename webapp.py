@@ -27,15 +27,14 @@ color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
 heatmap_fig, color_scale = FigureCreator.getHeatMap(xs, ys, zs, color_scale)
 linechart_fig = FigureCreator.getLineChart(line_xs, line_ys, color_scale)
 
-# Setup HTML and CSS
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(external_stylesheets=external_stylesheets)
-
+# Setup the web application
 appContent = {'heatmap':heatmap_fig,
               'linechart':linechart_fig}
-
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(external_stylesheets=external_stylesheets)
 HtmlCreator.setup(app, appContent)
 
+# Define callbacks
 @app.callback(Output('live-clock', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_metrics(n):
@@ -43,6 +42,6 @@ def update_metrics(n):
         html.Span(datetime.datetime.now().strftime("%H:%M:%S"))
     ]
 
-
+# Run the server
 if __name__ == '__main__':
     app.run_server(debug=True)
