@@ -38,10 +38,10 @@ def updateFigures(selected_iteration, clickData):
     # Define coordinate
     if clickData is not None:
         clickData = clickData['points'][0]
-        thisCoordinate = {'x': clickData['x'] - 1,
+        coordinate = {'x': clickData['x'] - 1,
                           'y': clickData['y'] - 1}
     else:
-        thisCoordinate = {'x': 0, 'y': 0}
+        coordinate = {'x': 0, 'y': 0}
 
     # Define colormap
     zs = data[i]['zs']
@@ -49,7 +49,7 @@ def updateFigures(selected_iteration, clickData):
                                             min_value=min(min(zs)))
     # Update figures
     heatmapFig = FigureCreator.getHeatMap(data, i, colorScale)
-    lineChartFig = FigureCreator.getLineChart(data, i, thisCoordinate, colorScale)
+    lineChartFig = FigureCreator.getLineChart(data, i, coordinate, colorScale)
 
     return [heatmapFig, lineChartFig]
 
