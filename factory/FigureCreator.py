@@ -26,10 +26,6 @@ def getLineChart(data, iterationID, coordinate, color_scale):
     y = coordinate['y']
     ts = [i for i in range(len(data))]
     zs = [data[i]['zs'][y][x] for i in range(len(data))]
-    #linechart_data = px.line(
-    #                        x=ts,
-    #                        y=zs
-    #)
 
     keepTrackOfIteration = go.Scatter(x=[iterationID,iterationID],
                                       y=[0,zs[iterationID]],
@@ -41,9 +37,10 @@ def getLineChart(data, iterationID, coordinate, color_scale):
                                 y=zs,
                                 name="Resistivity",
                                 line=dict(color=color_scale[0][1])
-                               )
+                                )
 
-    linechart_layout = go.Layout(title=go.layout.Title(text="Temporal changes in coord:" + str(x+1) + " " + str(y+1)))
+    linechart_layout = go.Layout(
+        title=go.layout.Title(text="Temporal changes in coord:" + str(x + 1) + " " + str(y + 1)))
     linechart_fig = {
         'data': [linechart_data, keepTrackOfIteration],
         'layout': linechart_layout
