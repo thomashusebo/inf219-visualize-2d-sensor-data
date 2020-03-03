@@ -2,7 +2,6 @@ import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
 
-
 def setup(app, appContent):
     app.layout = html.Div([
         # Title
