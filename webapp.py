@@ -10,24 +10,20 @@ from factory import FigureCreator, HtmlCreator
 # Gather data
 data = DataCollector.getData()
 
-# Structure heatmap data
-iterationID = 5
-oneFrame = data[iterationID]
-xs = oneFrame['xs']
-ys = oneFrame['ys']
-zs = oneFrame['zs']
+# Define which measurement iteration to show in heatmap
+iterationID = 6
 
-# Structure linechart data
-line_xs = [i for i in range(len(data))]
-line_ys = [data[i]['zs'][0][0] for i in range(len(data))]
+# Define which coordinate to show data in linechart
+coordinate = {'x': 6, 'y': 6}
 
-# Define color scale
+# Define colormap
+zs = data[iterationID]['zs']
 color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
                                          min_value=min(min(zs)))
 
 # Define figures
-heatmap_fig = FigureCreator.getHeatMap(xs, ys, zs, color_scale)
-linechart_fig = FigureCreator.getLineChart(line_xs, line_ys, color_scale)
+heatmap_fig = FigureCreator.getHeatMap(data, iterationID, color_scale)
+linechart_fig = FigureCreator.getLineChart(data, iterationID, coordinate, color_scale)
 appContent = {'heatmap': heatmap_fig,
               'linechart': linechart_fig}
 
