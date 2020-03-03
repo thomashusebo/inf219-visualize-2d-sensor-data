@@ -11,9 +11,6 @@ from factory import FigureCreator, HtmlCreator
 # Gather data
 data = DataCollector.getData()
 
-# Define which coordinate to show data in linechart
-coordinate = {'x': 6, 'y': 6}
-
 # Setup the web application
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(external_stylesheets=external_stylesheets)
@@ -34,27 +31,27 @@ def update_metrics(n):
      Output('linechart', 'figure')],
     [Input('heatmap-slider', 'value'),
      Input('heatmap', 'clickData')])
-def adjust_slider(selected_iteration, clickData):
-    # Gather data
-    thisData = data[selected_iteration]
+def updateFigures(selected_iteration, clickData):
+    # Define iteration
+    i = selected_iteration
 
     # Define coordinate
     if clickData is not None:
         clickData = clickData['points'][0]
-        thisCoordinate = {'x': clickData['x']-1,
-                          'y': clickData['y']-1}
+        thisCoordinate = {'x': clickData['x'] - 1,
+                          'y': clickData['y'] - 1}
     else:
         thisCoordinate = {'x': 0, 'y': 0}
 
     # Define colormap
-    zs = thisData['zs']
-    thisColorScale = ColorHandler.getColorScale(max_value=max(max(zs)),
-                                                min_value=min(min(zs)))
+    zs = data[i]['zs']
+    colorScale = ColorHandler.getColorScale(max_value=max(max(zs)),
+                                            min_value=min(min(zs)))
     # Update figures
-    thisHeatmapFig = FigureCreator.getHeatMap(data, selected_iteration, thisColorScale)
-    thisLineChartFig = FigureCreator.getLineChart(data, selected_iteration, thisCoordinate, thisColorScale)
+    heatmapFig = FigureCreator.getHeatMap(data, i, colorScale)
+    lineChartFig = FigureCreator.getLineChart(data, i, thisCoordinate, colorScale)
 
-    return [thisHeatmapFig, thisLineChartFig]
+    return [heatmapFig, lineChartFig]
 
 
 # Run the server

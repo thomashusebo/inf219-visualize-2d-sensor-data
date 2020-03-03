@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 
 
-def getHeatMap(data, iterationID, color_scale):
+def getHeatMap(data, iterationID, colorScale):
     oneFrame = data[iterationID]
     xs = oneFrame['xs']
     ys = oneFrame['ys']
@@ -10,7 +10,7 @@ def getHeatMap(data, iterationID, color_scale):
     heatmap_data = go.Heatmap(x=xs,
                               y=ys,
                               z=zs,
-                              colorscale=color_scale
+                              colorscale=colorScale
                               )
     heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
 
@@ -27,8 +27,8 @@ def getLineChart(data, iterationID, coordinate, color_scale):
     ts = [i for i in range(len(data))]
     zs = [data[i]['zs'][y][x] for i in range(len(data))]
 
-    keepTrackOfIteration = go.Scatter(x=[iterationID,iterationID],
-                                      y=[0,zs[iterationID]],
+    keepTrackOfIteration = go.Scatter(x=[iterationID, iterationID],
+                                      y=[0, zs[iterationID]],
                                       name="Current iteration viewed in heatmap",
                                       line=dict(color=color_scale[10][1])
                                       )
