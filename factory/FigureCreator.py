@@ -1,5 +1,4 @@
 import plotly.graph_objects as go
-import plotly.express as px
 
 
 def getHeatMap(data, iterationID, color_scale):
@@ -26,7 +25,7 @@ def getLineChart(data, iterationID, coordinate, color_scale):
     x = coordinate['x']
     y = coordinate['y']
     ts = [i for i in range(len(data))]
-    zs = [data[i]['zs'][x][y] for i in range(len(data))]
+    zs = [data[i]['zs'][y][x] for i in range(len(data))]
     #linechart_data = px.line(
     #                        x=ts,
     #                        y=zs
@@ -44,7 +43,7 @@ def getLineChart(data, iterationID, coordinate, color_scale):
                                 line=dict(color=color_scale[0][1])
                                )
 
-    linechart_layout = go.Layout(title=go.layout.Title(text="Temporal changes in coord:" + str(x) + " " + str(y)))
+    linechart_layout = go.Layout(title=go.layout.Title(text="Temporal changes in coord:" + str(x+1) + " " + str(y+1)))
     linechart_fig = {
         'data': [linechart_data, keepTrackOfIteration],
         'layout': linechart_layout

@@ -32,10 +32,19 @@ def update_metrics(n):
 @app.callback(
     [Output('heatmap', 'figure'),
      Output('linechart', 'figure')],
-    [Input('heatmap-slider', 'value')])
-def adjust_slider(selected_iteration):
+    [Input('heatmap-slider', 'value'),
+     Input('heatmap', 'clickData')])
+def adjust_slider(selected_iteration, clickData):
     # Gather data
     thisData = data[selected_iteration]
+
+    # Define coordinate
+    if clickData is not None:
+        clickData = clickData['points'][0]
+        thisCoordinate = {'x': clickData['x']-1,
+                          'y': clickData['y']-1}
+    else:
+        thisCoordinate = {'x': 0, 'y': 0}
 
     # Define colormap
     zs = thisData['zs']
@@ -43,11 +52,9 @@ def adjust_slider(selected_iteration):
                                                 min_value=min(min(zs)))
     # Update figures
     thisHeatmapFig = FigureCreator.getHeatMap(data, selected_iteration, thisColorScale)
-    thisLineChartFig = FigureCreator.getLineChart(data, selected_iteration, coordinate, thisColorScale)
+    thisLineChartFig = FigureCreator.getLineChart(data, selected_iteration, thisCoordinate, thisColorScale)
 
     return [thisHeatmapFig, thisLineChartFig]
-
-
 
 
 # Run the server

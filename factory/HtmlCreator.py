@@ -56,6 +56,10 @@ def setup(app):
             className='seven columns'
 
         ),
+
+        html.Div([
+            html.H2(id='testoutput')
+        ])
     ])
 
     return None
