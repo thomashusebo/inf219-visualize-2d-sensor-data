@@ -29,8 +29,8 @@ def getLineChart(data, iterationID, coordinate, color_scale):
 
     keepTrackOfIteration = go.Scatter(x=[iterationID, iterationID],
                                       y=[0, zs[iterationID]],
-                                      name="Current iteration viewed in heatmap",
-                                      line=dict(color=color_scale[10][1])
+                                      name="Timestep",
+                                      line=dict(color=color_scale[10][1]),
                                       )
 
     linechart_data = go.Scatter(x=ts,
