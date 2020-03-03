@@ -39,7 +39,7 @@ def updateFigures(selected_iteration, clickData):
     if clickData is not None:
         clickData = clickData['points'][0]
         coordinate = {'x': clickData['x'] - 1,
-                          'y': clickData['y'] - 1}
+                      'y': clickData['y'] - 1}
     else:
         coordinate = {'x': 0, 'y': 0}
 
