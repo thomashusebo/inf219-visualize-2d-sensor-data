@@ -9,7 +9,8 @@ from factory import FigureCreator, HtmlCreator
 
 # Heatmap data
 data = DataCollector.getData()
-oneFrame = data[5]
+iterationID = 5
+oneFrame = data[iterationID]
 xs = oneFrame['xs']
 ys = oneFrame['ys']
 zs = oneFrame['zs']
@@ -17,11 +18,6 @@ zs = oneFrame['zs']
 # Linechart data
 line_xs = [i for i in range(len(data))]
 line_ys = [data[i]['zs'][0][0] for i in range(len(data))]
-
-print("ys:")
-print(line_ys)
-#line_xs = [i for i in range(30)]
-#line_ys = [(-1) ** i * i ** 2 + i ** 2 + (i / 2) ** 2 for i in line_xs]
 
 # Define color scale
 color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
