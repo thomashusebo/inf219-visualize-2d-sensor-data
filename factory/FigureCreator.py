@@ -14,7 +14,7 @@ def getHeatMap(xs, ys, zs, color_scale):
         'data': [heatmap_data],
         'layout': heatmap_layout}
 
-    return heatmap_fig, color_scale
+    return heatmap_fig
 
 
 def getLineChart(xs, ys, color_scale):

@@ -24,12 +24,12 @@ color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
                                          min_value=min(min(zs)))
 
 # Define figures
-heatmap_fig, color_scale = FigureCreator.getHeatMap(xs, ys, zs, color_scale)
+heatmap_fig = FigureCreator.getHeatMap(xs, ys, zs, color_scale)
 linechart_fig = FigureCreator.getLineChart(line_xs, line_ys, color_scale)
-
-# Setup the web application
 appContent = {'heatmap':heatmap_fig,
               'linechart':linechart_fig}
+
+# Setup the web application
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(external_stylesheets=external_stylesheets)
 HtmlCreator.setup(app, appContent)
