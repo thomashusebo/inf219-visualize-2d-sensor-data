@@ -3,13 +3,22 @@ import dash
 import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
-import plotly.graph_objects as go
 
 from dash.dependencies import Input, Output
+from colorHandler import ColorHandler
 from figureCreator import FigureCreator
 
+# Heatmap data
+n = 14  # number of columns
+m = 7  # number of rows
+xs = [i for i in range(1, n + 1)]  # Defines x's
+ys = [i for i in range(1, m + 1)]  # Defines y's
+zs = [[i * j for i in xs] for j in ys]  # Defines plotted value in heatmap, product of x and y
+color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
+                                         min_value=min(min(zs)))
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-heatmap_fig, color_scale = FigureCreator.getHeatMap()
+heatmap_fig, color_scale = FigureCreator.getHeatMap(xs, ys, zs, color_scale)
 linechart_fig = FigureCreator.getLineChart(color_scale)
 
 app = dash.Dash(external_stylesheets=external_stylesheets)

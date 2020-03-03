@@ -2,16 +2,7 @@ from colorHandler import ColorHandler
 import plotly.graph_objects as go
 
 
-def getHeatMap():
-    n = 14  # number of columns
-    m = 7  # number of rows
-    xs = [i for i in range(1, n + 1)]  # Defines x's
-    ys = [i for i in range(1, m + 1)]  # Defines y's
-    zs = [[i * j for i in xs] for j in ys]  # Defines plotted value in heatmap, product of x and y
-
-    color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
-                                       min_value=min(min(zs)))
-
+def getHeatMap(xs, ys, zs, color_scale):
     heatmap_data = go.Heatmap(x=xs,
                               y=ys,
                               z=zs,
