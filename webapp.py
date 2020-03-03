@@ -4,18 +4,24 @@ import dash_html_components as html
 
 from dash.dependencies import Input, Output
 from colorHandler import ColorHandler
+from dataCollector import DataCollector
 from factory import FigureCreator, HtmlCreator
 
 # Heatmap data
-n = 14  # number of columns
-m = 7  # number of rows
-xs = [i for i in range(1, n + 1)]  # Defines x's
-ys = [i for i in range(1, m + 1)]  # Defines y's
-zs = [[i * j for i in xs] for j in ys]  # Defines plotted value in heatmap, product of x and y
+data = DataCollector.getData()
+oneFrame = data[5]
+xs = oneFrame['xs']
+ys = oneFrame['ys']
+zs = oneFrame['zs']
 
 # Linechart data
-line_xs = [i for i in range(30)]
-line_ys = [(-1) ** i * i ** 2 + i ** 2 + (i / 2) ** 2 for i in line_xs]
+line_xs = [i for i in range(len(data))]
+line_ys = [data[i]['zs'][0][0] for i in range(len(data))]
+
+print("ys:")
+print(line_ys)
+#line_xs = [i for i in range(30)]
+#line_ys = [(-1) ** i * i ** 2 + i ** 2 + (i / 2) ** 2 for i in line_xs]
 
 # Define color scale
 color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
