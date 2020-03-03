@@ -12,28 +12,13 @@ from factory import FigureCreator, HtmlCreator
 # Gather data
 data = DataCollector.getData()
 
-# Define which measurement iteration to show in heatmap
-iterationID = 6
-
 # Define which coordinate to show data in linechart
 coordinate = {'x': 6, 'y': 6}
-
-# Define colormap
-zs = data[iterationID]['zs']
-color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
-                                         min_value=min(min(zs)))
-
-# Define figures
-heatmap_fig = FigureCreator.getHeatMap(data, iterationID, color_scale)
-linechart_fig = FigureCreator.getLineChart(data, iterationID, coordinate, color_scale)
-appContent = {'heatmap': heatmap_fig,
-              'linechart': linechart_fig}
 
 # Setup the web application
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(external_stylesheets=external_stylesheets)
-HtmlCreator.setup(app, appContent)
-
+HtmlCreator.setup(app)
 
 # Define callbacks
 @app.callback(Output('live-clock', 'children'),

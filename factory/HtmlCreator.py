@@ -3,7 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 
-def setup(app, appContent):
+def setup(app):
     app.layout = html.Div([
         # Title
         html.Div([
