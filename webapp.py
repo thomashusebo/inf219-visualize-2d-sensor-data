@@ -1,4 +1,6 @@
 import datetime
+from typing import Dict, List, Any, Union
+
 import dash
 import dash_html_components as html
 
@@ -41,6 +43,23 @@ def update_metrics(n):
         html.Span(datetime.datetime.now().strftime("%H:%M:%S"))
     ]
 
+@app.callback(
+    [Output('heatmap', 'figure'),
+     Output('linechart', 'figure')],
+    [Input('heatmap-slider', 'value')])
+def update_figure(selected_iteration):
+    # Gather data
+    thisData = data[selected_iteration]
+
+    # Define colormap
+    zs = thisData['zs']
+    thisColorScale = ColorHandler.getColorScale(max_value=max(max(zs)),
+                                                min_value=min(min(zs)))
+    # Update figures
+    thisHeatmapFig = FigureCreator.getHeatMap(data, selected_iteration, thisColorScale)
+    thisLineChartFig = FigureCreator.getLineChart(data, selected_iteration, coordinate, thisColorScale)
+
+    return [thisHeatmapFig, thisLineChartFig]
 
 # Run the server
 if __name__ == '__main__':

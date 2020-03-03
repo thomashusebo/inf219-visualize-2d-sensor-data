@@ -27,8 +27,7 @@ def setup(app, appContent):
                           "displaylogo": False,
                           "modeBarButtonsToRemove": ['zoom2d']
                       },
-                      figure=appContent['heatmap']
-                      )
+                      ),
         ],
             className='seven columns'
         ),
@@ -39,8 +38,7 @@ def setup(app, appContent):
                       config={
                           "displaylogo": False,
                           "modeBarButtonsToRemove": []
-                      },
-                      figure=appContent['linechart'])
+                      }),
         ],
             className='four columns'
         ),
@@ -48,10 +46,10 @@ def setup(app, appContent):
         # Slider
         html.Div([
             daq.Slider(
-                id='heatmap slider',
+                id='heatmap-slider',
                 min=0,
-                value=50,
-                max=100,
+                value=5,
+                max=6,
                 color='black'
             )
         ],
