@@ -16,7 +16,7 @@ n = 14  # number of columns
 m = 7  # number of rows
 xs = [i for i in range(1, n + 1)]  # Defines x's
 ys = [i for i in range(1, m + 1)]  # Defines y's
-zs = [[i * j for i in xs] for j in ys]  # Defines plotted value in heatmap
+zs = [[i * j for i in xs] for j in ys]  # Defines plotted value in heatmap, product of x and y
 
 # Create heatmap figure used in app from data and layout
 color_scale = colors.getColorScale(max_value=max(max(zs)),
