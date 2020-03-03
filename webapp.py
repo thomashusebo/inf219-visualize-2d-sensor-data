@@ -1,5 +1,4 @@
 import datetime
-from typing import Dict, List, Any, Union
 
 import dash
 import dash_html_components as html
@@ -20,6 +19,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(external_stylesheets=external_stylesheets)
 HtmlCreator.setup(app)
 
+
 # Define callbacks
 @app.callback(Output('live-clock', 'children'),
               [Input('interval-component', 'n_intervals')])
@@ -27,6 +27,7 @@ def update_metrics(n):
     return [
         html.Span(datetime.datetime.now().strftime("%H:%M:%S"))
     ]
+
 
 @app.callback(
     [Output('heatmap', 'figure'),
@@ -45,6 +46,7 @@ def update_figure(selected_iteration):
     thisLineChartFig = FigureCreator.getLineChart(data, selected_iteration, coordinate, thisColorScale)
 
     return [thisHeatmapFig, thisLineChartFig]
+
 
 # Run the server
 if __name__ == '__main__':
