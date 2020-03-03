@@ -17,13 +17,9 @@ def getHeatMap(xs, ys, zs, color_scale):
     return heatmap_fig, color_scale
 
 
-def getLineChart(color_scale):
-    x = [i for i in range(30)]
-    y = [(-1) ** i * i ** 2 + i ** 2 + (i / 2) ** 2 for i in x]
-
-    # Create line chart figure used in app from data and layout
-    linechart_data = go.Scatter(x=x,
-                                y=y,
+def getLineChart(xs, ys, color_scale):
+    linechart_data = go.Scatter(x=xs,
+                                y=ys,
                                 name="Close",
                                 line=dict(color=color_scale[0][1])
                                 )

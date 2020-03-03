@@ -14,12 +14,18 @@ m = 7  # number of rows
 xs = [i for i in range(1, n + 1)]  # Defines x's
 ys = [i for i in range(1, m + 1)]  # Defines y's
 zs = [[i * j for i in xs] for j in ys]  # Defines plotted value in heatmap, product of x and y
+
+# Linechart data
+line_xs = [i for i in range(30)]
+line_ys = [(-1) ** i * i ** 2 + i ** 2 + (i / 2) ** 2 for i in line_xs]
+
+# Define colorscale
 color_scale = ColorHandler.getColorScale(max_value=max(max(zs)),
                                          min_value=min(min(zs)))
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 heatmap_fig, color_scale = FigureCreator.getHeatMap(xs, ys, zs, color_scale)
-linechart_fig = FigureCreator.getLineChart(color_scale)
+linechart_fig = FigureCreator.getLineChart(line_xs, line_ys, color_scale)
 
 app = dash.Dash(external_stylesheets=external_stylesheets)
 app.layout = html.Div([
