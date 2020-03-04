@@ -1,5 +1,4 @@
 import datetime
-
 import dash
 import dash_html_components as html
 
@@ -9,7 +8,8 @@ from dataCollector import DataCollector
 from factory import FigureCreator, HtmlCreator
 
 # Gather data
-data = DataCollector.getData()
+data = []
+data = DataCollector.getData(data)
 
 # Setup the web application
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -21,6 +21,8 @@ HtmlCreator.setup(app)
 @app.callback(Output('live-clock', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_metrics(n):
+    global data
+    data = DataCollector.getData(data)
     return [
         html.Span(datetime.datetime.now().strftime("%H:%M:%S"))
     ]
