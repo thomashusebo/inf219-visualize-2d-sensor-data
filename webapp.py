@@ -9,7 +9,6 @@ from factory import FigureCreator, HtmlCreator
 
 # Gather data
 data = []
-data = DataCollector.getData(data)
 
 # Setup the web application
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -20,7 +19,7 @@ HtmlCreator.setup(app)
 # Define callbacks
 @app.callback(Output('live-clock', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_metrics(n):
+def collectData(n):
     global data
     data = DataCollector.getData(data)
     return [

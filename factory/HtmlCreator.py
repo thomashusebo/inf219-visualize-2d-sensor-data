@@ -48,7 +48,7 @@ def setup(app):
             daq.Slider(
                 id='heatmap-slider',
                 min=0,
-                value=5,
+                value=0,
                 max=6,
                 color='black'
             )
