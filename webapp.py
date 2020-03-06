@@ -18,17 +18,28 @@ HtmlCreator.setup(app)
 
 # Define callbacks
 @app.callback(
-    [Output('heatmap', 'figure'),
-     Output('linechart', 'figure'),
-     Output('live-clock', 'children')],
-    [Input('heatmap-slider', 'value'),
-     Input('heatmap', 'clickData'),
-     Input('interval-component', 'n_intervals')])
-def updateFigures(selected_iteration, clickData, n):
+    [
+        Output(component_id='heatmap', component_property='figure'),
+        Output(component_id='linechart', component_property='figure'),
+        Output(component_id='live-clock', component_property='children'),
+        Output(component_id='heatmap-slider', component_property='max'),
+    ],
+    [
+        Input('heatmap-slider', component_property='value'),
+        Input('heatmap', component_property='clickData'),
+        Input('interval-component', 'n_intervals')
+    ])
+def updateFigures(selectedIteration, clickData, n):
+    # Collect data
     global data
     data = DataCollector.getData(data)
+    numberOfFrames = len(data);
+
+    # Find slider position/iteration to display in heatmap
+    nextIteration = selectedIteration
+
     # Define iteration
-    i = selected_iteration
+    i = nextIteration
 
     # Define coordinate
     if clickData is not None:
@@ -48,7 +59,8 @@ def updateFigures(selected_iteration, clickData, n):
 
     return [heatmapFig,
             lineChartFig,
-            html.Span(datetime.datetime.now().strftime("%H:%M:%S"))]
+            html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+            numberOfFrames]
 
 
 # Run the server
