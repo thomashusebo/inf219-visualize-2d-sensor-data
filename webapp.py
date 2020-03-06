@@ -17,22 +17,16 @@ HtmlCreator.setup(app)
 
 
 # Define callbacks
-@app.callback(Output('live-clock', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def collectData(n):
-    global data
-    data = DataCollector.getData(data)
-    return [
-        html.Span(datetime.datetime.now().strftime("%H:%M:%S"))
-    ]
-
-
 @app.callback(
     [Output('heatmap', 'figure'),
-     Output('linechart', 'figure')],
+     Output('linechart', 'figure'),
+     Output('live-clock', 'children')],
     [Input('heatmap-slider', 'value'),
-     Input('heatmap', 'clickData')])
-def updateFigures(selected_iteration, clickData):
+     Input('heatmap', 'clickData'),
+     Input('interval-component', 'n_intervals')])
+def updateFigures(selected_iteration, clickData, n):
+    global data
+    data = DataCollector.getData(data)
     # Define iteration
     i = selected_iteration
 
@@ -52,7 +46,9 @@ def updateFigures(selected_iteration, clickData):
     heatmapFig = FigureCreator.getHeatMap(data, i, colorScale)
     lineChartFig = FigureCreator.getLineChart(data, i, coordinate, colorScale)
 
-    return [heatmapFig, lineChartFig]
+    return [heatmapFig,
+            lineChartFig,
+            html.Span(datetime.datetime.now().strftime("%H:%M:%S"))]
 
 
 # Run the server
