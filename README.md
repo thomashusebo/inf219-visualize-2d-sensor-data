@@ -4,7 +4,7 @@ This project is part of bachelor degree in Informatics, Data Science, at Univers
 ## About the project
 An ongoing collaboration between Department of Physics and Technology, Department of Earth Science, and Department of 
 Mathematics at UiB are currently working on creating the second iteration of a fluid-flow-rig. The fluid-flow-rig is a 
-physical tank used to study fluid flow and convection patterns, mainly focusing on CO2 storage in geological reservoirs. 
+physical tank used to study fluid flow and convection patterns.
 
 Sensors will be placed on the fluid-flow-rig, providing real-time resistivity readings. Because of the number of 
 sensors, frequency of data, and duration per intended fluid-flow-rig project, a visualization of the data is very 
