@@ -17,7 +17,14 @@ def getHeatMap(data, iterationID, colorScale):
                               z=zs,
                               colorscale=colorScale
                               )
-    heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
+    #heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
+    heatmap_layout = {
+        'title': 'Resistivity heatmap',
+        'yaxis':{
+            "scaleanchor": "x",
+            "scaleratio": 1,
+        }
+    }
 
     heatmap_fig = {
         'data': [heatmap_data],
@@ -27,11 +34,14 @@ def getHeatMap(data, iterationID, colorScale):
     return heatmap_fig
 
 
-def getLineChart(data, iterationID, coordinate, colorScale, minValue, maxValue):
+def getLineChart(data, iterationID, coordinate, colorScale):
     if iterationID < 0: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
     }
+
+    minValue = min(min(data[iterationID]['zs']))
+    maxValue = max(max(data[iterationID]['zs']))
 
     x = coordinate['x']
     y = coordinate['y']
