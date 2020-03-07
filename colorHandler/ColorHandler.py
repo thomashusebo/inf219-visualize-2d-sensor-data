@@ -14,18 +14,15 @@ colorblindsafe = {
 }
 
 
-def getColorScale(max_value, min_value):
+def getColorScale():
     # Get Colors
     n_colors = 11
     scaletype = 'divergent'
     colors = colorblindsafe[scaletype][n_colors][2]
 
-    # Define stepsize and return map from number (0.0 to 1.0) to color
-    # TODO Handle possible divide by zero error below
-    stepsize = (len(colors)-1)/(max_value-min_value)
+    # Define stepsize
+    stepsize = 1/(len(colors)-1)
+    colorMap = [[round(i*stepsize, 1), colors[i]] for i in range(len(colors))]
 
-    if(max_value-min_value<len(colors)):
-        # TODO Handle possible divide by zero error below
-        stepsize = 1/stepsize
-    return [[round(i*stepsize, 1), colors[i]] for i in range(len(colors))]
+    return colorMap
 
