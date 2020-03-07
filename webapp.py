@@ -37,14 +37,15 @@ def updateFigures(selectedIteration, clickData, n, playModeOn):
     data = DataCollector.getData(data)
     numberOfFrames = len(data)
 
+    # Ensures that we avoid index out of bounds exceptions when accessing data
+    if selectedIteration > numberOfFrames-1:
+        selectedIteration = -1
+
     # Find slider position/iteration to display in heatmap
     if playModeOn:
         nextIteration = numberOfFrames-1
     else:
         nextIteration = selectedIteration
-
-    # Define iteration idx
-    i = nextIteration
 
     # Define coordinate
     if clickData is not None:
@@ -55,12 +56,11 @@ def updateFigures(selectedIteration, clickData, n, playModeOn):
         coordinate = {'x': 0, 'y': 0}
 
     # Define colormap
-    zs = data[i]['zs']
     colorScale = ColorHandler.getColorScale()
 
     # Update figures
-    heatmapFig = FigureCreator.getHeatMap(data, i, colorScale)
-    lineChartFig = FigureCreator.getLineChart(data, i, coordinate, colorScale)
+    heatmapFig = FigureCreator.getHeatMap(data, nextIteration, colorScale)
+    lineChartFig = FigureCreator.getLineChart(data, nextIteration, coordinate, colorScale)
 
     return [
         heatmapFig,
