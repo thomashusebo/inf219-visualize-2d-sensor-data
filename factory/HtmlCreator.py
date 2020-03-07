@@ -45,17 +45,22 @@ def setup(app):
 
         # Slider
         html.Div([
-            daq.Slider(
-                id='heatmap-slider',
-                min=0,
-                value=0,
-                max=6,
-                color='black'
+            daq.BooleanSwitch(
+                id='play-button',
+                on=True
             ),
-            html.Button(id='play-button', className='btn'),
+                daq.Slider(
+                    id='heatmap-slider',
+                    min=0,
+                    value=0,
+                    max=6,
+                    color='black',
+                    handleLabel={"showCurrentValue": True, "label": "Iteration"},
+                    size=0,
+                ),
+
         ],
             className='seven columns'
-
         ),
     ])
 

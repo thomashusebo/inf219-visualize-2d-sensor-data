@@ -22,31 +22,26 @@ HtmlCreator.setup(app)
         Output(component_id='heatmap', component_property='figure'),
         Output(component_id='linechart', component_property='figure'),
         Output(component_id='live-clock', component_property='children'),
-        Output(component_id='heatmap-slider', component_property='max'),
-        Output(component_id='play-button', component_property='value')
+        Output(component_id='heatmap-slider', component_property='max')
     ],
     [
         Input('heatmap-slider', component_property='value'),
         Input('heatmap', component_property='clickData'),
         Input('interval-component', 'n_intervals'),
-        Input('play-button', 'n_clicks'),
+        Input('play-button', 'on'),
+
     ])
-def updateFigures(selectedIteration, clickData, n, playButtonClicks):
+def updateFigures(selectedIteration, clickData, n, playModeOn):
     # Collect data
     global data
     data = DataCollector.getData(data)
     numberOfFrames = len(data)
 
     # Find slider position/iteration to display in heatmap
-    playButtonText = 'Stop'
-    nextIteration = numberOfFrames-1
-    if playButtonClicks is None:
+    if playModeOn:
         nextIteration = numberOfFrames-1
-        playButtonText = 'Stop'
     else:
-        if playButtonClicks % 2 == 1:
-            nextIteration = selectedIteration
-            playButtonText = 'Play'
+        nextIteration = selectedIteration
 
     # Define iteration idx
     i = nextIteration
@@ -63,6 +58,8 @@ def updateFigures(selectedIteration, clickData, n, playButtonClicks):
     zs = data[i]['zs']
     colorScale = ColorHandler.getColorScale(max_value=max(max(zs)),
                                             min_value=min(min(zs)))
+
+    print(colorScale)
     # Update figures
     heatmapFig = FigureCreator.getHeatMap(data, i, colorScale)
     lineChartFig = FigureCreator.getLineChart(data, i, coordinate, colorScale)
@@ -72,7 +69,6 @@ def updateFigures(selectedIteration, clickData, n, playButtonClicks):
         lineChartFig,
         html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
         numberOfFrames,
-        playButtonText
         ]
 
 
