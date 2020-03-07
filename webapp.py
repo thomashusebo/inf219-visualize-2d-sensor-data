@@ -59,8 +59,11 @@ def updateFigures(selectedIteration, clickData, n, playModeOn):
     colorScale = ColorHandler.getColorScale()
 
     # Update figures
+    minValue = min(min(data[nextIteration]['zs']))
+    maxValue = max(max(data[nextIteration]['zs']))
+
     heatmapFig = FigureCreator.getHeatMap(data, nextIteration, colorScale)
-    lineChartFig = FigureCreator.getLineChart(data, nextIteration, coordinate, colorScale)
+    lineChartFig = FigureCreator.getLineChart(data, nextIteration, coordinate, colorScale, minValue, maxValue)
 
     return [
         heatmapFig,

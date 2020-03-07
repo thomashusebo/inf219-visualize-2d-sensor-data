@@ -27,7 +27,7 @@ def getHeatMap(data, iterationID, colorScale):
     return heatmap_fig
 
 
-def getLineChart(data, iterationID, coordinate, colorScale):
+def getLineChart(data, iterationID, coordinate, colorScale, minValue, maxValue):
     if iterationID < 0: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
@@ -47,8 +47,20 @@ def getLineChart(data, iterationID, coordinate, colorScale):
     linechart_data = go.Scatter(x=ts,
                                 y=zs,
                                 name="Resistivity",
-                                line=dict(color=colorScale[0][1]),
+                                line=dict(color='black'),
+                                mode='lines+markers',
+                                # TODO: Wanted to add colorbar to the line, but this is non-trival. Must implement myselft
+                                # if this is needed
+                                #marker=dict(
+                                #    color=[minValue, maxValue],
+                                #    colorscale=colorScale,
+                                #    colorbar=dict(thickness=10),
+                                #    showscale=True
+                                #),
                                 )
+
+    rangeOfZs = maxValue-minValue
+    yaxisPadding = rangeOfZs/100*20
 
     linechart_layout = {
         'title': "Temporal changes in coord:" + str(x + 1) + " " + str(y + 1),
@@ -59,11 +71,16 @@ def getLineChart(data, iterationID, coordinate, colorScale):
                 max(ts) - 60,
                 max(ts) + 1
             ],
+        },
+        'yaxis': {
+            "side": "bottom",
+            "type": "linear",
+            "range": [
+                minValue - yaxisPadding,
+                maxValue + yaxisPadding
+            ],
         }
     }
-    #    linechart_layout = go.Layout(
-    #        title=go.layout.Title(text="Temporal changes in coord:" + str(x + 1) + " " + str(y + 1))
-    #    )
 
     linechart_fig = {
         'data': [linechart_data, keepTrackOfIteration],
