@@ -17,12 +17,18 @@ def getHeatMap(data, iterationID, colorScale):
                               z=zs,
                               colorscale=colorScale
                               )
-    #heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
+    # heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
     heatmap_layout = {
         'title': 'Resistivity heatmap',
-        'yaxis':{
+        'yaxis': {
             "scaleanchor": "x",
             "scaleratio": 1,
+        },
+        'margin': {
+            'l': 40,
+            'r': 40,
+            't': 40,
+            'b': 25
         }
     }
 
@@ -61,16 +67,16 @@ def getLineChart(data, iterationID, coordinate, colorScale):
                                 mode='lines+markers',
                                 # TODO: Wanted to add colorbar to the line, but this is non-trival. Must implement myselft
                                 # if this is needed
-                                #marker=dict(
+                                # marker=dict(
                                 #    color=[minValue, maxValue],
                                 #    colorscale=colorScale,
                                 #    colorbar=dict(thickness=10),
                                 #    showscale=True
-                                #),
+                                # ),
                                 )
 
-    rangeOfZs = maxValue-minValue
-    yaxisPadding = rangeOfZs/100*20
+    rangeOfZs = maxValue - minValue
+    yaxisPadding = rangeOfZs / 100 * 20
 
     linechart_layout = {
         'title': "Temporal changes in coord:" + str(x + 1) + " " + str(y + 1),
