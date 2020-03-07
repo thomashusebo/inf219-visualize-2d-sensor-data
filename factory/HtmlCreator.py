@@ -51,7 +51,8 @@ def setup(app):
                 value=0,
                 max=6,
                 color='black'
-            )
+            ),
+            html.Button(id='play-button', className='btn'),
         ],
             className='seven columns'
 

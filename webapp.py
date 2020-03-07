@@ -23,22 +23,32 @@ HtmlCreator.setup(app)
         Output(component_id='linechart', component_property='figure'),
         Output(component_id='live-clock', component_property='children'),
         Output(component_id='heatmap-slider', component_property='max'),
+        Output(component_id='play-button', component_property='value')
     ],
     [
         Input('heatmap-slider', component_property='value'),
         Input('heatmap', component_property='clickData'),
-        Input('interval-component', 'n_intervals')
+        Input('interval-component', 'n_intervals'),
+        Input('play-button', 'n_clicks'),
     ])
-def updateFigures(selectedIteration, clickData, n):
+def updateFigures(selectedIteration, clickData, n, playButtonClicks):
     # Collect data
     global data
     data = DataCollector.getData(data)
-    numberOfFrames = len(data);
+    numberOfFrames = len(data)
 
     # Find slider position/iteration to display in heatmap
-    nextIteration = selectedIteration
+    playButtonText = 'Stop'
+    nextIteration = numberOfFrames-1
+    if playButtonClicks is None:
+        nextIteration = numberOfFrames-1
+        playButtonText = 'Stop'
+    else:
+        if playButtonClicks % 2 == 1:
+            nextIteration = selectedIteration
+            playButtonText = 'Play'
 
-    # Define iteration
+    # Define iteration idx
     i = nextIteration
 
     # Define coordinate
@@ -57,10 +67,13 @@ def updateFigures(selectedIteration, clickData, n):
     heatmapFig = FigureCreator.getHeatMap(data, i, colorScale)
     lineChartFig = FigureCreator.getLineChart(data, i, coordinate, colorScale)
 
-    return [heatmapFig,
-            lineChartFig,
-            html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
-            numberOfFrames]
+    return [
+        heatmapFig,
+        lineChartFig,
+        html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+        numberOfFrames,
+        playButtonText
+        ]
 
 
 # Run the server
