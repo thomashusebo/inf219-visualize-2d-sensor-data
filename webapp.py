@@ -9,6 +9,7 @@ from factory import FigureCreator, HtmlCreator
 
 # Gather data
 data = []
+projectName = "200308Test002SmallTankObstructedFlow"
 
 # Setup the web application
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -34,7 +35,7 @@ HtmlCreator.setup(app)
 def updateFigures(selectedIteration, clickData, n, playModeOn):
     # Collect data
     global data
-    data = DataCollector.getData(data)
+    data = DataCollector.getData(data, projectName)
     numberOfFrames = len(data)
 
     # Ensures that we avoid index out of bounds exceptions when accessing data

@@ -3,22 +3,26 @@ import os
 from os import listdir
 from os.path import isfile, join
 
+from factory import FigureCreator
+
 available = True
 myPath = "C:\\Users\\huseb\\PycharmProjects\\inf219-visualize-2d-sensor-data\\ignoreDir\\measurements"
 
 
-def getData(data):
-    files = [f for f in listdir(myPath) if isfile(join(myPath, f))]
+def getData(data, projectName):
+    path = myPath + "\\" + projectName
+    files = [f for f in listdir(path) if isfile(join(path, f))]
 
     for file in files:
         #print("\nAttempt reading file " + file)
         try:
-            with open('ignoreDir/measurements/' + file, 'r') as json_file:
+            with open('ignoreDir/measurements/' + projectName + "/" + file, 'r') as json_file:
                 data.append(json.load(json_file))
-                with open('ignoreDir/completedMeasurements/' + file + '.txt', 'w') as outfile:
-                    json.dump(data, outfile)
+                n = len(data)
+                with open('ignoreDir/completedMeasurements/' + projectName + file + '.txt', 'w') as outfile:
+                    json.dump(data[n-1], outfile)
             outfile.close()
-            os.remove(myPath + "\\" + file)
+            os.remove(path + "\\" + file)
             #print("...Reading Complete")
         except (FileNotFoundError, PermissionError):
             # Then file should've been read by another process
