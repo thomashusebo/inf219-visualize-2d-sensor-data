@@ -84,17 +84,17 @@ def getLineChart(data, iterationID, coordinate, colorScale):
             "side": "bottom",
             "type": "linear",
             "range": [
-                max(ts) - 60,
+                max(ts) - 30,
                 max(ts) + 1
             ],
         },
         'yaxis': {
             "side": "bottom",
             "type": "linear",
-            "range": [
-                minValue - yaxisPadding,
-                maxValue + yaxisPadding
-            ],
+            #"range": [
+            #    minValue - yaxisPadding,
+            #    maxValue + yaxisPadding
+            #],
         }
     }
 
