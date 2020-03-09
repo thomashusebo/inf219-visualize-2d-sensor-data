@@ -9,7 +9,7 @@ from factory import FigureCreator, HtmlCreator
 
 # Gather data
 data = []
-projectName = "200308Test002SmallTankObstructedFlow"
+projectName = "200308Test002SmallTankObstructedFlow_simulation"
 
 # Setup the web application
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -46,7 +46,7 @@ def updateFigures(selectedIteration, clickData, n, playModeOn):
     if playModeOn:
         nextIteration = numberOfFrames-1
     else:
-        nextIteration = selectedIteration
+        nextIteration = selectedIteration-1
 
     # Define coordinate
     if clickData is not None:
@@ -67,7 +67,7 @@ def updateFigures(selectedIteration, clickData, n, playModeOn):
         heatmapFig,
         lineChartFig,
         html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
-        numberOfFrames,
+        numberOfFrames-1,
         ]
 
 

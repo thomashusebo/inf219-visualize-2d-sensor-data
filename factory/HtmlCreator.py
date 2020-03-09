@@ -51,9 +51,9 @@ def setup(app):
             ),
                 daq.Slider(
                     id='heatmap-slider',
-                    min=0,
-                    value=0,
-                    max=6,
+                    min=1,
+                    value=1,
+                    max=1,
                     color='black',
                     handleLabel={"showCurrentValue": True, "label": "Iteration"},
                     size=0,

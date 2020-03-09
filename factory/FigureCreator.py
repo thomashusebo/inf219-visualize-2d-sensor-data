@@ -1,3 +1,5 @@
+import datetime
+
 import plotly.graph_objects as go
 
 
@@ -19,7 +21,7 @@ def getHeatMap(data, iterationID, colorScale):
                               )
     # heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
     heatmap_layout = {
-        'title': 'Resistivity heatmap',
+        'title': "Resistivity heatmap, measurement {:d}/{:d}".format(iterationID + 1, len(data)),
         'yaxis': {
             "scaleanchor": "x",
             "scaleratio": 1,
@@ -83,19 +85,20 @@ def getLineChart(data, iterationID, coordinate, colorScale):
         'xaxis': {
             "side": "bottom",
             "type": "linear",
-            "range": [
-                max(ts) - 30,
-                max(ts) + 1
-            ],
+            # "range": [
+            #    max(ts) - 30,
+            #    max(ts) + 1
+            # ],
         },
         'yaxis': {
             "side": "bottom",
             "type": "linear",
-            #"range": [
+            # "range": [
             #    minValue - yaxisPadding,
             #    maxValue + yaxisPadding
-            #],
-        }
+            # ],
+        },
+        'ylabel': 'Resistivity (Ohm)'
     }
 
     linechart_fig = {
@@ -103,3 +106,7 @@ def getLineChart(data, iterationID, coordinate, colorScale):
         'layout': linechart_layout
     }
     return linechart_fig
+
+
+def getTimeFormat(timeString):
+    return datetime.datetime.strptime(timeString, "%H:%M:%S")
