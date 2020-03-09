@@ -6,7 +6,7 @@ from os.path import isfile, join
 from factory import FigureCreator
 
 available = True
-myPath = "C:\\Users\\huseb\\PycharmProjects\\inf219-visualize-2d-sensor-data\\ignoreDir\\measurements"
+myPath = "C:\\Users\\huseb\\PycharmProjects\\inf219-visualize-2d-sensor-data\\ignoreDir\\tempDirMeasurements"
 
 
 def getData(data, projectName):
@@ -16,7 +16,7 @@ def getData(data, projectName):
     for file in files:
         #print("\nAttempt reading file " + file)
         try:
-            with open('ignoreDir/measurements/' + projectName + "/" + file, 'r') as json_file:
+            with open('ignoreDir/tempDirMeasurements/' + projectName + "/" + file, 'r') as json_file:
                 data.append(json.load(json_file))
                 n = len(data)
                 with open('ignoreDir/completedMeasurements/' + projectName + file + '.txt', 'w') as outfile:
