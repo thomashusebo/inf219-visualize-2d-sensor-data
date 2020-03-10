@@ -7,8 +7,33 @@ def setup(app):
     app.layout = html.Div([
         # Title
         html.Div([
-            html.H1("INF219 Visualization of 2d sensor data")
-        ]),
+            dcc.Markdown('''
+            ## Reconstruction of SmallTankTest001: Free Flow
+            #### One new measurement per second, regardless of measurement timestamp
+            ''')
+        ],
+        ),
+        html.Div([
+            dcc.Markdown('''
+            ##### Description
+            For this experiment we filled the tank only tapwater. 
+                        
+            ##### Logg
+            - Added tapwater 
+                -   then measurements (1-5)
+            - Added solution tapwater with conditor into (2.5, 1.5)
+                -   then measurements (6-11)
+            - Added solution tapwater w/0.23M NaCl, into (2.5, 1.5)
+                -   then measurements (12-20)
+            - Added solution tapwater w/0.90M NaCl, into (0.0, 1.5)
+                -   then measurements (21-27)
+            
+            
+            ''')
+        ],
+            className='four columns'
+        ),
+
 
         # Time
         html.Div([
@@ -29,7 +54,7 @@ def setup(app):
                       },
                       ),
         ],
-            className='seven columns'
+            className='three columns'
         ),
 
         # Line chart
@@ -60,7 +85,7 @@ def setup(app):
                 ),
 
         ],
-            className='seven columns'
+            className='three columns'
         ),
     ])
 

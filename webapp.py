@@ -9,7 +9,7 @@ from factory import FigureCreator, HtmlCreator
 
 # Gather data
 data = []
-projectName = "200308Test002SmallTankObstructedFlow_simulation"
+projectName = "200308Test001SmallTankFreeFlow_simulation"
 
 # Setup the web application
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -66,7 +66,8 @@ def updateFigures(selectedIteration, clickData, n, playModeOn):
     return [
         heatmapFig,
         lineChartFig,
-        html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+        "",
+        #html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
         numberOfFrames-1,
         ]
 

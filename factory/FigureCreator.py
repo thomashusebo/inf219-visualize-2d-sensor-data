@@ -21,7 +21,7 @@ def getHeatMap(data, iterationID, colorScale):
                               )
     # heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
     heatmap_layout = {
-        'title': "Resistivity heatmap, measurement {:d}/{:d}".format(iterationID + 1, len(data)),
+        'title': "Resistivity heatmap, {:d}/{:d}".format(iterationID + 1, len(data)),
         'yaxis': {
             "scaleanchor": "x",
             "scaleratio": 1,
@@ -31,6 +31,9 @@ def getHeatMap(data, iterationID, colorScale):
             'r': 40,
             't': 40,
             'b': 25
+        },
+        'colorbar': {
+            "title": "Resistivity (Ohm)"
         }
     }
 
@@ -56,25 +59,31 @@ def getLineChart(data, iterationID, coordinate, colorScale):
     ts = [i for i in range(len(data))]
     zs = [data[i]['zs'][y][x] for i in range(len(data))]
 
+    # TODO: Add timestamp to linechart
+    #firstTimeStamp = data[0]['ts'][0][0]
+    #projectStartTime = datetime.datetime.strptime(firstTimeStamp, "%H:%M:%S")
+
+    # ts = [getTimeFormat(data[i]['ts'][y][x]) - projectStartTime for i in range(len(data))]
+
     keepTrackOfIteration = go.Scatter(x=[iterationID, iterationID],
                                       y=[0, zs[iterationID]],
                                       name="Timestep",
-                                      line=dict(color=colorScale[10][1]),
+                                      line=dict(color='black'),
                                       )
 
     linechart_data = go.Scatter(x=ts,
                                 y=zs,
                                 name="Resistivity",
                                 line=dict(color='black'),
-                                mode='lines+markers',
+                                mode='markers',
                                 # TODO: Wanted to add colorbar to the line, but this is non-trival. Must implement myselft
                                 # if this is needed
-                                # marker=dict(
+                                #marker=dict(
                                 #    color=[minValue, maxValue],
                                 #    colorscale=colorScale,
                                 #    colorbar=dict(thickness=10),
                                 #    showscale=True
-                                # ),
+                                #),
                                 )
 
     rangeOfZs = maxValue - minValue
@@ -89,16 +98,17 @@ def getLineChart(data, iterationID, coordinate, colorScale):
             #    max(ts) - 30,
             #    max(ts) + 1
             # ],
+            "title": "Measurement",
         },
         'yaxis': {
             "side": "bottom",
             "type": "linear",
-            # "range": [
+            #"range": [
             #    minValue - yaxisPadding,
             #    maxValue + yaxisPadding
-            # ],
+             #],
+            "title":'Resistivity (Ohm)'
         },
-        'ylabel': 'Resistivity (Ohm)'
     }
 
     linechart_fig = {
