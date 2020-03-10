@@ -18,23 +18,23 @@
     "default": {
         "click": {
             "hashes": [
-                "sha256:2335065e6395b9e67ca716de5f7526736bfa6ceead690adf616d925bdc622b13",
-                "sha256:5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"
+                "sha256:8a18b4ea89d8820c5d0c7da8a64b2c324b4dabb695804dbfea19b9be9d88c0cc",
+                "sha256:e345d143d80bf5ee7534056164e5e112ea5e22716bbb1ce727941f4c8b471b9a"
             ],
-            "version": "==7.0"
+            "version": "==7.1.1"
         },
         "dash": {
             "hashes": [
-                "sha256:678884297afaae08a638cf1bda61c8f89f7cf2c8fd15f36ea29c43559684f4fa"
+                "sha256:6a488d380f02ba7c8e624a7c4d89f9e39368b8d9ed4a6f463364894a237f1fd8"
             ],
             "index": "pypi",
-            "version": "==1.9.0"
+            "version": "==1.9.1"
         },
         "dash-core-components": {
             "hashes": [
-                "sha256:6ed00e421e4ff5ebe1bb91b0add168ef89cf2afbdff1e0cef91633dd338569c8"
+                "sha256:9a8901b67d3a1038fb79153c17234d5713c2d7cca0382718c6376c786b280e63"
             ],
-            "version": "==1.8.0"
+            "version": "==1.8.1"
         },
         "dash-html-components": {
             "hashes": [
@@ -50,9 +50,9 @@
         },
         "dash-table": {
             "hashes": [
-                "sha256:d30cd8f2212134a576c131f00d403fc6b5ef54579106178fc8d6309500539f07"
+                "sha256:64905af3214b509a95769ba9dfc884677696c270a572ed06b52c57fdcf9d9c77"
             ],
-            "version": "==4.6.0"
+            "version": "==4.6.1"
         },
         "flask": {
             "hashes": [
@@ -127,10 +127,10 @@
         },
         "plotly": {
             "hashes": [
-                "sha256:a19ed783bcf094e6207b3699ab261465bf3c7d299403678801de634bf17e2559",
-                "sha256:bb5271f648913cf330a0de4ede3084cda848f8ad8b080330a0678e1b21df97b0"
+                "sha256:51d65748bb3ccd09d7b5cb1d15996edd126df695cb236f92cc1aded06e7c1611",
+                "sha256:622acbdfbde222ad798eeaa91bf72584fe10833dfbea1afcc18e866b98000ae1"
             ],
-            "version": "==4.5.0"
+            "version": "==4.5.3"
         },
         "retrying": {
             "hashes": [
