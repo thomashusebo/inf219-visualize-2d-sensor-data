@@ -1,6 +1,6 @@
-from webapp.apps.liveApp import LiveApp
-from webapp.apps.compareApp import CompareApp
-from webapp.apps.temporalApp import TemporalApp
+from webapp.apps.LiveApp import LiveApp
+from webapp.apps.CompareApp import CompareApp
+from webapp.apps.TemporalApp import TemporalApp
 import webbrowser as wb
 
 apps = []

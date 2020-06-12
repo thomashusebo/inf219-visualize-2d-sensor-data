@@ -2,11 +2,11 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 
-from webapp.apps.AppInterface import AppInterface
+from webapp.apps.App import Apps
 from webapp.terminateserver import shutdown_path, shutdown
 
 
-class TemporalApp(AppInterface):
+class TemporalApp(Apps):
     def setupOn(self, server):
         temporal_app = dash.Dash(__name__, server=server, url_base_pathname=self.url)
         temporal_app.layout = html.Div([

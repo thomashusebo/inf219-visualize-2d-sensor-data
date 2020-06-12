@@ -1,7 +1,8 @@
 from flask import Flask
 
 
-class AppInterface:
+class Apps:
+    """This is a super class for applications withtin the software"""
     def __init__(self, url, load_on_server_start):
         self.load_on_server_start = load_on_server_start
         self.url = url
@@ -13,5 +14,5 @@ class AppInterface:
         return self.url
 
     def setupOn(self, server: Flask) -> None:
-        """Creates the application on the server and defines its layout and callbacks"""
+        """Creates the application on the server, and defines its layout and callbacks"""
         raise Exception("Method not implemented")
