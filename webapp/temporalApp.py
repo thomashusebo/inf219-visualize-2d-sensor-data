@@ -4,6 +4,7 @@ import dash_core_components as dcc
 from webapp.terminateserver import shutdown_path, shutdown
 
 url = '/temporalview/'
+openonload = True
 
 
 def setupOn(server):
