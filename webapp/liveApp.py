@@ -7,7 +7,6 @@ url = '/liveview/'
 
 
 def setupOn(server):
-    print(__name__)
     live_app = dash.Dash(__name__, server=server, url_base_pathname=url)
     live_app.layout = html.Div([
         html.H1('Live View'),
@@ -17,7 +16,7 @@ def setupOn(server):
     ])
 
     @live_app.callback(dash.dependencies.Output("hidden_div", "children"),
-                    [dash.dependencies.Input('url', 'pathname')])
+                       [dash.dependencies.Input('url', 'pathname')])
     def shutdown_server(pathname):
         if pathname == shutdown_path:
             shutdown()

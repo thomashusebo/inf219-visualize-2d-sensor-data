@@ -7,7 +7,6 @@ url = '/compareview/'
 
 
 def setupOn(server):
-    print(__name__)
     compare_app = dash.Dash(__name__, server=server, url_base_pathname=url)
     compare_app.layout = html.Div([
         html.H1('Compare View'),

@@ -7,7 +7,6 @@ url = '/temporalview/'
 
 
 def setupOn(server):
-    print(__name__)
     temporal_app = dash.Dash(__name__, server=server, url_base_pathname=url)
     temporal_app.layout = html.Div([
         html.H1('Temporal View'),
