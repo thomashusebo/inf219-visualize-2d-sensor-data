@@ -1,7 +1,7 @@
 from webapp import server
-from setupapp import setupapp
+from setupapp.setupapp import SetupApp
 
 if __name__ == '__main__':
-    setupapp.SetupApp().run()
+    SetupApp().run()
 
 server.start()
