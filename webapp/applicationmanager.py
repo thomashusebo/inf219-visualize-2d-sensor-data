@@ -1,19 +1,29 @@
-from webapp import liveApp, compareApp, temporalApp
+from webapp.apps.liveApp import LiveApp
+from webapp.apps.compareApp import CompareApp
+from webapp.apps.temporalApp import TemporalApp
 import webbrowser as wb
 
 apps = []
 
 
 def setupAppsOn(server):
-    liveApp.setupOn(server)
-    apps.append(liveApp)
+    setup(
+        app=LiveApp(url='/liveapp/', load_on_server_start=True),
+        server=server)
 
-    compareApp.setupOn(server)
-    apps.append(compareApp)
+    setup(
+        app=CompareApp(url='/compareapp/', load_on_server_start=True),
+        server=server)
 
-    temporalApp.setupOn(server)
-    apps.append(temporalApp)
+    setup(
+        app=TemporalApp(url='/temporalapp/', load_on_server_start=True),
+        server=server)
+
+
+def setup(app, server):
+    app.setupOn(server)
+    apps.append(app)
 
 
 def openAllApps():
-    [wb.open('http://127.0.0.1:5000' + app.url) for app in apps if app.openonload]
+    [wb.open('http://127.0.0.1:5000' + app.get_url()) for app in apps if app.load_on_server_start]
