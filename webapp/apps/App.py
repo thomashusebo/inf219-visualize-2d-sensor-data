@@ -2,7 +2,7 @@ from flask import Flask
 
 
 class Apps:
-    """This is a super class for applications withtin the software"""
+    """This is a super class for applications within the software"""
     def __init__(self, url, load_on_server_start):
         self.load_on_server_start = load_on_server_start
         self.url = url
