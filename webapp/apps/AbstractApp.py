@@ -1,7 +1,7 @@
 from flask import Flask
 
 
-class Apps:
+class AbstractApp:
     """This is a super class for applications within the software"""
     def __init__(self, url, load_on_server_start):
         self.load_on_server_start = load_on_server_start

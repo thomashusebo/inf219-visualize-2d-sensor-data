@@ -1,11 +1,11 @@
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
-from webapp.apps.AbstractApp import Apps
+from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
 
 
-class CompareApp(Apps):
+class CompareApp(AbstractApp):
     def setupOn(self, server):
         compare_app = dash.Dash(__name__, server=server, url_base_pathname=self.url)
         compare_app.layout = html.Div([
