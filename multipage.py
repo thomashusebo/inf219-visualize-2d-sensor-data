@@ -4,8 +4,6 @@ from flask import Flask
 import webbrowser as wb
 
 # Source: https://stackoverflow.com/questions/57685505/how-to-create-multiple-dashoards-using-plotly-dash-in-single-flask-app
-from pywin.Demos.cmdserver import ServerThread
-
 
 def startServer():
     server = Flask(__name__)
