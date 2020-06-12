@@ -1,7 +1,7 @@
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
-from webapp.apps.App import Apps
+from webapp.apps.AbstractApp import Apps
 from webapp.terminateserver import shutdown_path, shutdown
 
 
