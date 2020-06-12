@@ -8,14 +8,15 @@ class ButtonWidget(Widget):
     def __init__(self, **kwargs):
         super(ButtonWidget, self).__init__(**kwargs)
         self.btn1 = kb.Button(text='Start Server')
-        self.btn1.bind(on_press=self.callback)
+        self.btn1.bind(on_press=callback)
         self.add_widget(self.btn1)
-
-    def callback(self, instance):
-        App.get_running_app().stop()
 
 
 class MyApp(App):
 
     def build(self):
         return ButtonWidget()
+
+
+def callback(instance):
+    App.get_running_app().stop()
