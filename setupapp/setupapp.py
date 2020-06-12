@@ -7,12 +7,12 @@ class ButtonWidget(Widget):
 
     def __init__(self, **kwargs):
         super(ButtonWidget, self).__init__(**kwargs)
-        self.btn1 = kb.Button(text='Start Server')
-        self.btn1.bind(on_press=callback)
-        self.add_widget(self.btn1)
+        self.ButtonStartServer = kb.Button(text='Start Server')
+        self.ButtonStartServer.bind(on_press=callback)
+        self.add_widget(self.ButtonStartServer)
 
 
-class MyApp(App):
+class SetupApp(App):
 
     def build(self):
         return ButtonWidget()

@@ -1,9 +1,9 @@
-import multipage
-import startupWindow
+from webapp import webapp
+from setupapp import setupapp
 
 if __name__ == '__main__':
-    startupWindow.MyApp().run()
+    setupapp.SetupApp().run()
 
 print("Widget done")
-multipage.startServer()
+webapp.startServer()
 print("done")
