@@ -8,4 +8,4 @@ def start():
     applicationmanager.setupAppsOn(server)
     applicationmanager.openAllApps()
 
-    server.run()
+    server.run(debug=False)

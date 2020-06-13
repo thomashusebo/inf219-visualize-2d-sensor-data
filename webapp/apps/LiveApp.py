@@ -1,13 +1,20 @@
+import datetime
+
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
-import dash_daq as daq
+from dash.dependencies import Output, Input
 
 from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
+from webapp.figures import heatmap
+from webapp.colorHandler import ColorHandler
+from webapp.dataCollector import DataCollector
 
 stylesheet = None
-#stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+# stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+projectName = "200308Test002SmallTankObstructedFlow_simulation"
+data = []
 
 
 class LiveApp(AbstractApp):
@@ -78,3 +85,31 @@ class LiveApp(AbstractApp):
             if pathname == shutdown_path:
                 shutdown()
                 return dcc.Location(pathname="/", id="someid_doesnt_matter")
+
+        # Define callbacks
+        @live_app.callback(
+            [
+                Output(component_id='heatmap', component_property='figure'),
+                Output(component_id='live-clock', component_property='children')
+            ],
+            [
+                Input('interval-component', 'n_intervals')
+            ])
+        def updateFigures(nIntervals):
+            # Collect data
+            global data
+            data = DataCollector.getData(data, projectName)
+
+            nextIteration = len(data) - 1
+
+            # Define colormap
+            colorScale = ColorHandler.getColorScale()
+
+            # Update figures
+            heatmapFig = heatmap.getHeatMap(data, nextIteration, colorScale)
+
+            return [
+                heatmapFig,
+                #"",
+                html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+            ]
