@@ -17,11 +17,10 @@ stylesheet = None
 #stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 projectName = "200308Test002SmallTankObstructedFlow_simulation"
-data = []
 
 
 class TemporalApp(AbstractApp):
-    def setupOn(self, server):
+    def setupOn(self, server, data_manager):
         temporal_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
         temporal_app.layout = html.Div([
             # Page header
@@ -116,8 +115,7 @@ class TemporalApp(AbstractApp):
             ])
         def updateFigures(selectedIteration, clickData, n, playModeOn):
             # Collect data
-            global data
-            data = DataCollector.getData(data, projectName)
+            data = data_manager.get_data()
             numberOfFrames = len(data)
 
             # Ensures that we avoid index out of bounds exceptions when accessing data

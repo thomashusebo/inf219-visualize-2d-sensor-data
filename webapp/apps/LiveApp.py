@@ -13,11 +13,10 @@ from webapp.data.DataManager import DataManager
 
 stylesheet = None
 # stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-project_name = "200308Test002SmallTankObstructedFlow_simulation"
-data_manager = DataManager(project_name)
+
 
 class LiveApp(AbstractApp):
-    def setupOn(self, server):
+    def setupOn(self, server, data_manager):
         live_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
         live_app.layout = html.Div([
             # Page Header

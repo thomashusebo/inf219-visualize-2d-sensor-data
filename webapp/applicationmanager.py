@@ -8,23 +8,27 @@ from webapp.data.DataManager import DataManager
 apps = []
 
 
-
 def setupAppsOn(server):
+    project_name = "200308Test002SmallTankObstructedFlow_simulation"
+    live_data = DataManager(project_name)
     setup(
         app=LiveApp(url='/liveapp/', load_on_server_start=True),
-        server=server)
+        server=server,
+        data_manager=live_data)
 
     setup(
         app=CompareApp(url='/compareapp/', load_on_server_start=True),
-        server=server)
+        server=server,
+        data_manager=live_data)
 
     setup(
         app=TemporalApp(url='/temporalapp/', load_on_server_start=True),
-        server=server)
+        server=server,
+        data_manager=live_data)
 
 
-def setup(app, server):
-    app.setupOn(server)
+def setup(app, server, data_manager):
+    app.setupOn(server, data_manager)
     apps.append(app)
 
 
