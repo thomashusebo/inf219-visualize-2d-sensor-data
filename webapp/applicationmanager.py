@@ -8,8 +8,7 @@ from webapp.data.DataManager import DataManager
 apps = []
 
 
-def setupAppsOn(server):
-    project_name = "200308Test002SmallTankObstructedFlow_simulation"
+def setupAppsOn(server, project_name):
     live_data = DataManager(project_name)
     setup(
         app=LiveApp(url='/liveapp/', load_on_server_start=True),
