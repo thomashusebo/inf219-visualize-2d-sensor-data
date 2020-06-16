@@ -2,12 +2,22 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_daq as daq
+from dash.dependencies import Output, Input
+
+from webapp.apps.AbstractApp import AbstractApp
+from webapp.terminateserver import shutdown_path, shutdown
+from webapp.figures import heatmap, linechart
+from webapp.colorHandler import ColorHandler
+from webapp.data import DataCollector
 
 from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
 
 stylesheet = None
 #stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+projectName = "200308Test002SmallTankObstructedFlow_simulation"
+data = []
 
 
 class TemporalApp(AbstractApp):
@@ -83,9 +93,62 @@ class TemporalApp(AbstractApp):
             ),
         ])
 
-        @temporal_app.callback(dash.dependencies.Output("hidden_div", "children"),
-                               [dash.dependencies.Input('url', 'pathname')])
+        @temporal_app.callback(Output("hidden_div", "children"),
+                               [Input('url', 'pathname')])
         def shutdown_server(pathname):
             if pathname == shutdown_path:
                 shutdown()
                 return dcc.Location(pathname="/", id="someid_doesnt_matter")
+
+        @temporal_app.callback(
+            [
+                Output(component_id='heatmap', component_property='figure'),
+                Output(component_id='linechart', component_property='figure'),
+                Output(component_id='live-clock', component_property='children'),
+                Output(component_id='heatmap-slider', component_property='max')
+            ],
+            [
+                Input('heatmap-slider', component_property='value'),
+                Input('heatmap', component_property='clickData'),
+                Input('interval-component', 'n_intervals'),
+                Input('play-button', 'on'),
+
+            ])
+        def updateFigures(selectedIteration, clickData, n, playModeOn):
+            # Collect data
+            global data
+            data = DataCollector.getData(data, projectName)
+            numberOfFrames = len(data)
+
+            # Ensures that we avoid index out of bounds exceptions when accessing data
+            if selectedIteration > numberOfFrames-1:
+                selectedIteration = -1
+
+            # Find slider position/iteration to display in heatmap
+            if playModeOn:
+                nextIteration = numberOfFrames-1
+            else:
+                nextIteration = selectedIteration-1
+
+            # Define coordinate
+            if clickData is not None:
+                clickData = clickData['points'][0]
+                coordinate = {'x': clickData['x'] - 1,
+                              'y': clickData['y'] - 1}
+            else:
+                coordinate = {'x': 0, 'y': 0}
+
+            # Define colormap
+            colorScale = ColorHandler.getColorScale()
+
+            # Update figures
+            heatmapFig = heatmap.getHeatMap(data, nextIteration, colorScale)
+            lineChartFig = linechart.getLineChart(data, nextIteration, coordinate, colorScale)
+
+            return [
+                heatmapFig,
+                lineChartFig,
+                "",
+                #html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+                numberOfFrames-1,
+                ]

@@ -9,13 +9,12 @@ from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
 from webapp.figures import heatmap
 from webapp.colorHandler import ColorHandler
-from webapp.dataCollector import DataCollector
+from webapp.data.DataManager import DataManager
 
 stylesheet = None
 # stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-projectName = "200308Test002SmallTankObstructedFlow_simulation"
-data = []
-
+project_name = "200308Test002SmallTankObstructedFlow_simulation"
+data_manager = DataManager(project_name)
 
 class LiveApp(AbstractApp):
     def setupOn(self, server):
@@ -97,8 +96,8 @@ class LiveApp(AbstractApp):
             ])
         def updateFigures(nIntervals):
             # Collect data
-            global data
-            data = DataCollector.getData(data, projectName)
+            data_manager.update()
+            data = DataManager.get_data(data_manager)
 
             nextIteration = len(data) - 1
 
@@ -110,6 +109,5 @@ class LiveApp(AbstractApp):
 
             return [
                 heatmapFig,
-                #"",
                 html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
             ]

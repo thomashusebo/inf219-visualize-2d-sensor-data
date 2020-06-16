@@ -3,7 +3,10 @@ from webapp.apps.CompareApp import CompareApp
 from webapp.apps.TemporalApp import TemporalApp
 import webbrowser as wb
 
+from webapp.data.DataManager import DataManager
+
 apps = []
+
 
 
 def setupAppsOn(server):
