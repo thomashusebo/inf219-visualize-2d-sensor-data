@@ -4,9 +4,12 @@ import dash_core_components as dcc
 from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
 
+#stylesheet = None
+stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 
 class CompareApp(AbstractApp):
-    def setupOn(self, server):
+    def setupOn(self, server, data_manager):
         compare_app = dash.Dash(__name__, server=server, url_base_pathname=self.url)
         compare_app.layout = html.Div([
             html.H1('Compare View'),

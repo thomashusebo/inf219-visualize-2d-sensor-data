@@ -2,10 +2,10 @@ from flask import Flask
 from webapp import applicationmanager
 
 
-def start():
+def start(project_name):
     server = Flask(__name__)
 
-    applicationmanager.setupAppsOn(server)
+    applicationmanager.setupAppsOn(server, project_name)
     applicationmanager.openAllApps()
 
-    server.run()
+    server.run(debug=False)
