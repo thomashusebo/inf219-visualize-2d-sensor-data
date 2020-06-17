@@ -1,14 +1,75 @@
-<Grid>
+WindowManager:
+    MainWindow:
+    NewProjectWindow:
+    LoadProjectWindow:
+
+<MainWindow>:
+    name: "main"
+
     GridLayout:
         cols: 1
-        size: root.width/2, root.height/2
-        pos: root.width/4, root.height/4
+        padding: 200
+
+        Button:
+            text: "Start New Live Project"
+            on_release:
+                app.root.current = "new_project"
+                root.manager.transition.direction = "left"
+        Button:
+            text: "Load Existing Project"
+            on_release:
+                app.root.current = "load_project"
+                root.manager.transition.direction = "left"
+        Button:
+            text: "Exit"
+            on_release: app.get_running_app().stop()
+
+<NewProjectWindow>:
+    name: "new_project"
+
+    project_name: project_name
+
+    GridLayout:
+        cols: 1
+        padding: 200
+
+        GridLayout:
+            cols: 2
+
+            Label:
+                text: "Project Name"
+
+            TextInput:
+                id: project_name
+                multiline: False
 
         Button:
             text: "Start New Project"
+            on_release:
+                root.start_new_project()
 
         Button:
-            text: "Load Existing Project"
+            text: "Go Back"
+            on_release:
+                app.root.current = "main"
+                root.manager.transition.direction = "right"
+
+<LoadProjectWindow>:
+    name: "load_project"
+
+    GridLayout:
+        cols: 1
+        padding: 200
 
         Button:
-            text: "Exit"
+            text: "Obstructed Flow"
+            on_release: root.select_project('200308Test002SmallTankObstructedFlow')
+
+        Button:
+            text: "Go Back"
+            on_release:
+                app.root.current = "main"
+                root.manager.transition.direction = "right"
+
+
+

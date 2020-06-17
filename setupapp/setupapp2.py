@@ -1,32 +1,44 @@
+import os
+
 from kivy.app import App
-from kivy.uix.widget import Widget
+from kivy.lang import Builder
+from kivy.uix.button import Button
+from kivy.uix.dropdown import DropDown
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.properties import ObjectProperty
 
 name = ''
-start_server = False
+projects = next(os.walk(os.getcwd() + '\\projects'))[1]
 
 
-class Grid(Widget):
+class MainWindow(Screen):
     pass
+
+
+class NewProjectWindow(Screen):
+    project_name = ObjectProperty(None)
+
+    def start_new_project(self):
+        global name
+        name = self.project_name.text
+        App.get_running_app().stop()
+
+
+class LoadProjectWindow(Screen):
+    def select_project(self, project):
+        global name
+        name = project
+        App.get_running_app().stop()
+
+
+class WindowManager(ScreenManager):
+    pass
+
+
+kv = Builder.load_file("setupapp\\setup.kv")
 
 
 class SetupApp(App):
 
     def build(self):
-        return Grid()
-
-
-def exit_setup(instance):
-    App.get_running_app().stop()
-
-
-def on_text(instance, value):
-    global name
-    global start_server
-    name = value
-    start_server = True
-
-    print(value, start_server)
-
-
-def on_enter(instance, value):
-    print('Enter textbox')
+        return kv
