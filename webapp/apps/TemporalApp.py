@@ -4,19 +4,13 @@ import dash_core_components as dcc
 import dash_daq as daq
 from dash.dependencies import Output, Input
 
-from webapp.apps.AbstractApp import AbstractApp
-from webapp.terminateserver import shutdown_path, shutdown
 from webapp.figures import heatmap, linechart
-from webapp.colorHandler import ColorHandler
-from webapp.data import DataCollector
-
+from webapp.colors import ColorHandler
 from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
 
-stylesheet = None
-#stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-projectName = "200308Test002SmallTankObstructedFlow_simulation"
+#stylesheet = None
+stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 
 class TemporalApp(AbstractApp):

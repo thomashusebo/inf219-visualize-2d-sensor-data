@@ -8,11 +8,11 @@ from dash.dependencies import Output, Input
 from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
 from webapp.figures import heatmap
-from webapp.colorHandler import ColorHandler
+from webapp.colors import ColorHandler
 from webapp.data.DataManager import DataManager
 
-stylesheet = None
-# stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+#stylesheet = None
+stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 
 class LiveApp(AbstractApp):

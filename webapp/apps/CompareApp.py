@@ -4,6 +4,9 @@ import dash_core_components as dcc
 from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
 
+#stylesheet = None
+stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 
 class CompareApp(AbstractApp):
     def setupOn(self, server, data_manager):
