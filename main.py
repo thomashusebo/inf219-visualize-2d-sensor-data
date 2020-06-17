@@ -1,6 +1,6 @@
-from setupapp import setupapp2
+from setupapp import setupapp
 from webapp import server
-from setupapp.setupapp2 import SetupApp
+from setupapp.setupapp import SetupApp
 
 
 def name_qualifies(name):
@@ -11,5 +11,5 @@ def name_qualifies(name):
 if __name__ == '__main__':
     SetupApp().run()
 
-if name_qualifies(setupapp2.name):
-    server.start(setupapp2.name)
+if name_qualifies(setupapp.name):
+    server.start(setupapp.name)

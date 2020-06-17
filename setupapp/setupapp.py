@@ -1,46 +1,42 @@
+import os
+
 from kivy.app import App
-import kivy.uix.button as kb
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
+from kivy.lang import Builder
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.properties import ObjectProperty
 
 name = ''
-start_server = False
+projects = next(os.walk(os.getcwd() + '\\projects'))[1]
+
+
+class MainWindow(Screen):
+    pass
+
+
+class NewProjectWindow(Screen):
+    project_name = ObjectProperty(None)
+
+    def start_new_project(self):
+        global name
+        name = self.project_name.text
+        App.get_running_app().stop()
+
+
+class LoadProjectWindow(Screen):
+    def select_project(self, project):
+        global name
+        name = project
+        App.get_running_app().stop()
+
+
+class WindowManager(ScreenManager):
+    pass
+
+
+kv = Builder.load_file("setupapp\\setup.kv")
 
 
 class SetupApp(App):
 
     def build(self):
-        root = BoxLayout(
-            orientation='vertical',
-            padding=[100, 75, 100, 75],
-            spacing=10,
-        )
-
-        project_name = TextInput(text='Input project name')
-        project_name.bind(on_text_validate=on_enter)
-        project_name.bind(text=on_text)
-
-        btn1 = kb.Button(text='Start server')
-        btn1.bind(on_press=exit_setup)
-
-        root.add_widget(project_name)
-        root.add_widget(btn1)
-
-        return root
-
-
-def exit_setup(instance):
-    App.get_running_app().stop()
-
-
-def on_text(instance, value):
-    global name
-    global start_server
-    name = value
-    start_server = True
-
-    print(value, start_server)
-
-
-def on_enter(instance, value):
-    print('Enter textbox')
+        return kv
