@@ -1,6 +1,6 @@
 from setupapp import setupapp
 from webapp import server
-from setupapp.setupapp import SetupApp
+from setupapp.setupapp2 import SetupApp
 
 #project_name = "200308Test002SmallTankObstructedFlow_simulation"
 #start_server = False
