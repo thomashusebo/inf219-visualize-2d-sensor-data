@@ -1,29 +1,27 @@
-import json
 import os
-from os import listdir
-from os.path import isfile, join
+import pandas as pd
 
 
-def getData(data, projectName):
-    path = os.getcwd() + '\\projects\\temp\\' + projectName
-    files = [f for f in listdir(path) if isfile(join(path, f))]
+class DataCollector:
+    def __init__(self, database, chunksize):
+        self.incoming_data_dir = os.getcwd() + '\\incoming_data'
+        print(self.incoming_data_dir)
+        self.database = database
+        self.chunksize = chunksize
 
-    for file in files:
-        #print("\nAttempt reading file " + file)
-        try:
-            with open('projects/temp/' + projectName + "/" + file, 'r') as json_file:
-                data.append(json.load(json_file))
-                n = len(data)
-                # with open('ignoreDir/completedMeasurements/' + projectName + file + '.txt', 'w') as outfile:
-                #    json.dump(data[n-1], outfile)
-            # outfile.close()
-            os.remove(path + "\\" + file)
-            #print("...Reading Complete")
-        except (FileNotFoundError, PermissionError):
-            # Then file should've been read by another process
-            # TODO: Assuming this can only happen when processes interfere with each other,
-            # TODO: Add a way to monitor this as it is a symptom of another problem: conflicting processes.
-            print("...Reading failed")
-            continue
+    @staticmethod
+    def update(self):
+        files = next(os.walk(self.incoming_data_dir))[2]
+        database_table = 'resistivity'
 
-    return data
+        for file in files:
+            file_dir = "{}\\{}".format(self.incoming_data_dir,file)
+            for df in pd.read_csv(file_dir, chunksize=self.chunksize, iterator=True):
+                df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
+                df.to_sql(database_table, self.database, if_exists='append')
+
+            os.remove(file_dir)
+
+    @staticmethod
+    def get_data():
+        return []

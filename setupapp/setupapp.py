@@ -6,7 +6,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty
 
 name = ''
-projects = next(os.walk(os.getcwd() + '\\projects'))[1]
+#projects = next(os.walk(os.getcwd() + '\\projects'))[1]
 
 
 class MainWindow(Screen):
