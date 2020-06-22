@@ -73,7 +73,7 @@ class LiveApp(AbstractApp):
                           },
                           ),
             ],
-                className='three columns'
+                className='seven columns'
             ),
         ])
 

@@ -51,7 +51,7 @@ class TemporalApp(AbstractApp):
                           },
                           ),
             ],
-                className='three columns'
+                className='seven columns'
             ),
 
             # Line chart
