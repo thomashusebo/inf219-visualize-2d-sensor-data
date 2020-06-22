@@ -109,7 +109,9 @@ class TemporalApp(AbstractApp):
             ])
         def updateFigures(selectedIteration, clickData, n, playModeOn):
             # Collect data
-            data = data_manager.get_data()
+
+            #data = data_manager.get_data()
+            data=[]
             numberOfFrames = len(data)
 
             # Ensures that we avoid index out of bounds exceptions when accessing data

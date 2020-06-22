@@ -25,11 +25,18 @@ class DataCollector:
 
             os.remove(file_dir)
 
+        #TODO: REMOVE AFTER TESTING
+        print("Heatmap data:")
+        print(self.get_heatmap_data(self=self, timestamp="18:31:08"))
+        print("Linechart data:")
+        print(self.get_linechart_data(self=self, cell_x=1,cell_y=1,start_time="18:30:00", end_time="21:00:00"))
+
+
     @staticmethod
     def get_heatmap_data(self, timestamp):
         heatmap_data = pd.read_sql_query(
-            'SELECT * FROM {} WHERE time = {}'.format(
-                self.resisitvity_table,
+            'SELECT * FROM {} WHERE time = \"{}\"'.format(
+                self.resistivity_table,
                 timestamp),
             self.database)
         print(heatmap_data)
@@ -37,10 +44,10 @@ class DataCollector:
 
     @staticmethod
     def get_linechart_data(self, cell_x, cell_y, start_time, end_time):
-        time_column = ""
+        time_column = "time"
         cell_column = "[{:02d},{:02d}]".format(cell_x, cell_y)
         linechart_data = pd.read_sql_query(
-            'SELECT {},{} FROM {} WHERE "time" BETWEEN {} AND {}'.format(
+            'SELECT \"{}\",\"{}\" FROM {} WHERE "time" BETWEEN \"{}\" AND \"{}\"'.format(
                 time_column, cell_column, self.resistivity_table, start_time, end_time),
             self.database)
         print(linechart_data)

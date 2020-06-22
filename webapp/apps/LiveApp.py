@@ -95,7 +95,7 @@ class LiveApp(AbstractApp):
             ])
         def updateFigures(nIntervals):
             # Collect data
-            data_manager.update()
+            data_manager.update(data_manager)
             #data = DataCollector.get_data(data_manager)
             data = []
 
