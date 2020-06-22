@@ -4,10 +4,9 @@ import os
 import time
 from os import listdir
 from os.path import isfile, join
-from random import random
 
-dir_existing_projects = '../../projects'
-dir_temp = ""
+relative_dir_existing_projects = '../../projects'
+dir_temp = '../incoming_data'
 files = []
 simulationStart = datetime.datetime.strptime(datetime.datetime.now().strftime("%H:%M:%S"), "%H:%M:%S")
 speedUp = 60
@@ -15,14 +14,15 @@ speedUp = 60
 print("Setup project...")
 
 while True:
-    print("\nEnter a unique project ID:")
+    print("\nEnter an existing project ID:")
     projectName = input()
 
-    dir_original_data = dir_existing_projects + '\\'+ projectName + '\\induvidual_measurements'
-    dir_temp = '../../projects/temp/' + projectName
+    dir_original_data = os.getcwd() + "\\projects\\" + projectName + "\\induvidual_measurements"
+    dir_temp = '../incoming_data'
 
     try:
         files = [f for f in listdir(dir_original_data) if isfile(join(dir_original_data, f))]
+        print(files)
         print("Found %d data files:" % len(files))
     except FileNotFoundError:
         print("--ERROR: Did not find data in existing project")
