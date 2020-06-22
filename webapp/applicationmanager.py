@@ -3,13 +3,13 @@ from webapp.apps.CompareApp import CompareApp
 from webapp.apps.TemporalApp import TemporalApp
 import webbrowser as wb
 
-from webapp.data.DataManager import DataManager
+from webapp.data.DataCollector import DataCollector
 
 apps = []
 
 
 def setupAppsOn(server, project_name):
-    live_data = DataManager(project_name)
+    live_data = DataCollector(project_name)
     setup(
         app=LiveApp(url='/liveapp/', load_on_server_start=True),
         server=server,

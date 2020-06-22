@@ -9,7 +9,7 @@ from webapp.apps.AbstractApp import AbstractApp
 from webapp.terminateserver import shutdown_path, shutdown
 from webapp.figures import heatmap
 from webapp.colors import ColorHandler
-from webapp.data.DataManager import DataManager
+from webapp.data.DataCollector import DataCollector
 
 #stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -96,7 +96,8 @@ class LiveApp(AbstractApp):
         def updateFigures(nIntervals):
             # Collect data
             data_manager.update()
-            data = DataManager.get_data(data_manager)
+            #data = DataCollector.get_data(data_manager)
+            data = []
 
             nextIteration = len(data) - 1
 

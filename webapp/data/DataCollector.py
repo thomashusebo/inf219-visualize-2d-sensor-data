@@ -1,13 +1,14 @@
 import os
 import pandas as pd
+from sqlalchemy import create_engine
 from webapp.data.datatypes import DataType
 
 
 class DataCollector:
-    def __init__(self, database, chunksize, project_name):
+    def __init__(self, project_name):
         self.incoming_data_dir = os.getcwd() + '\\incoming_data'
-        self.database = database
-        self.chunksize = chunksize
+        self.database = create_engine('sqlite:///fluid_flower_database.db')
+        self.chunksize = 100000
         self.project_name = project_name
         self.resistivity_table = "{}_{}".format(project_name, DataType.Resistivity.value)
 
@@ -31,6 +32,7 @@ class DataCollector:
                 self.resisitvity_table,
                 timestamp),
             self.database)
+        print(heatmap_data)
         return heatmap_data
 
     @staticmethod
@@ -41,4 +43,5 @@ class DataCollector:
             'SELECT {},{} FROM {} WHERE "time" BETWEEN {} AND {}'.format(
                 time_column, cell_column, self.resistivity_table, start_time, end_time),
             self.database)
+        print(linechart_data)
         return linechart_data
