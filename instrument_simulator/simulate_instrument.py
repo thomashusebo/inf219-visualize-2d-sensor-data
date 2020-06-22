@@ -39,6 +39,7 @@ while True:
         if input() == 'y':
             break
 
+
 print("\nReading data from " + dir_original_data)
 print("Project data will be stored in: " + dir_temp)
 
@@ -55,15 +56,15 @@ for file in files:
         data = json.load(json_file)
 
         # Find when project started, only for first file
-        if firstFile:
-            firstTimeStamp = data['ts'][0][0]
-            projectStartTime = datetime.datetime.strptime(firstTimeStamp, "%H:%M:%S")
-            firstFile = False
+        #if firstFile:
+        #    firstTimeStamp = data['ts'][0][0]
+        #    projectStartTime = datetime.datetime.strptime(firstTimeStamp, "%H:%M:%S")
+        #    firstFile = False
 
         # When was the file completed/how much time have elapsed in the project
-        lastTimeStamp = data['ts'][0][0]
-        then = datetime.datetime.strptime(lastTimeStamp, "%H:%M:%S")
-        timeIntoProject = then - projectStartTime
+        #lastTimeStamp = data['ts'][0][0]
+        #then = datetime.datetime.strptime(lastTimeStamp, "%H:%M:%S")
+        #timeIntoProject = then - projectStartTime
 
         # Simulate the original time series
         #
