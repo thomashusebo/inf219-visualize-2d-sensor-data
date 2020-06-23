@@ -135,12 +135,12 @@ class TemporalApp(AbstractApp):
             colorScale = ColorHandler.getColorScale()
 
             # Collect data
-            timestamp = "2020-03-08 18:31:08"
+            timestamp = "2020-03-08 19:41:27"
             timeline_start = "2020-03-08 18:30:00"
             timeline_end = "2020-03-08 21:00:00"
             timeline = {'start': timeline_start, 'end': timeline_end}
 
-            heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
+            _, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
             linechart_data = data_manager.get_linechart_data(data_manager, coordinate=coordinate, timeline=timeline)
 
             # Update figures

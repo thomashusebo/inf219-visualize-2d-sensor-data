@@ -34,16 +34,28 @@ class DataCollector:
         #print(self.get_linechart_data(self=self, cell_x=1, cell_y=1, start_time="18:30:00", end_time="21:00:00"))
 
     @staticmethod
-    def get_heatmap_data(self, timestamp):
-        height = 7  # TODO Get height and width from database
-        width = 13
+    def get_heatmap_data(self, timestamp="", live=False):
+        table=self.resistivity_table
+
+        if timestamp is "" and not live:
+            Exception("Illegal heatmap retrieval. No timestamp and not live")
+
+        if live:
+            query = "SELECT MAX(\"time\") FROM {}".format(table)
+            timestamp=pd.read_sql_query(query, self.database).values[0][0]
+
+        query="SELECT \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
+        dimensions=pd.read_sql_query(query,self.database)
+        width = dimensions.values[0][0]
+        height = dimensions.values[0][1]
+
         columns = "".join(["\"[{:02d},{:02d}]\",".format(x, y) for y in range(height) for x in range(width)])[:-1]
         sql_query = 'SELECT {} FROM {} WHERE time = \"{}\"'.format(
                 columns,
-                self.resistivity_table,
+                table,
                 timestamp)
         heatmap_data = pd.read_sql_query(sql_query, self.database)
-        return heatmap_data.values.reshape(height, width)
+        return timestamp, heatmap_data.values.reshape(height, width)
 
     @staticmethod
     def get_linechart_data(self, coordinate, timeline):

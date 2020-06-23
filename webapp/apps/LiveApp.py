@@ -94,9 +94,8 @@ class LiveApp(AbstractApp):
             ])
         def updateFigures(nIntervals):
             # Collect data
-            timestamp = "2020-03-08 18:31:08" # TODO Get this value via callback
             data_manager.update(data_manager)
-            heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
+            timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
 
             # Define colormap
             colorScale = ColorHandler.getColorScale()
