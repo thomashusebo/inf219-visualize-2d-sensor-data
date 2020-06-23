@@ -40,9 +40,10 @@ class DataCollector:
         if timestamp is "" and not live:
             Exception("Illegal heatmap retrieval. No timestamp and not live")
 
+        query = "SELECT MAX(\"time\") FROM {}".format(table)
+        last_timestamp = pd.read_sql_query(query, self.database).values[0][0]
         if live:
-            query = "SELECT MAX(\"time\") FROM {}".format(table)
-            timestamp=pd.read_sql_query(query, self.database).values[0][0]
+            timestamp=last_timestamp
 
         query="SELECT \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
         dimensions=pd.read_sql_query(query,self.database)
@@ -55,7 +56,7 @@ class DataCollector:
                 table,
                 timestamp)
         heatmap_data = pd.read_sql_query(sql_query, self.database)
-        return timestamp, heatmap_data.values.reshape(height, width)
+        return last_timestamp, heatmap_data.values.reshape(height, width)
 
     @staticmethod
     def get_linechart_data(self, coordinate, timeline):

@@ -4,7 +4,7 @@ import pandas as pd
 
 '''Change these parameters to alter the instrument simulator'''
 print_progress=True
-wait_between_measurements=False
+wait_between_measurements=True
 measurements_per_second = 2
 project_name = "ObsFlow0Days.csv"
 

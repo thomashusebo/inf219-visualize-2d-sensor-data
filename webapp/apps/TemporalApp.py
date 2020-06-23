@@ -140,7 +140,7 @@ class TemporalApp(AbstractApp):
             timeline_end = "2020-03-08 21:00:00"
             timeline = {'start': timeline_start, 'end': timeline_end}
 
-            _, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
+            latest_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
             linechart_data = data_manager.get_linechart_data(data_manager, coordinate=coordinate, timeline=timeline)
 
             # Update figures

@@ -95,13 +95,13 @@ class LiveApp(AbstractApp):
         def updateFigures(nIntervals):
             # Collect data
             data_manager.update(data_manager)
-            timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
+            last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
 
             # Define colormap
             colorScale = ColorHandler.getColorScale()
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale)
 
             return [
                 heatmapFig,
