@@ -1,25 +1,19 @@
 import plotly.graph_objects as go
 
 
-def getHeatMap(data, iterationID, colorScale):
+def getHeatMap(data, timestamp, colorScale):
     if len(data)==0: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
     }
 
-    oneFrame = data[iterationID]
-    xs = oneFrame['xs']
-    ys = oneFrame['ys']
-    zs = oneFrame['zs']
-
-    heatmap_data = go.Heatmap(x=xs,
-                              y=ys,
-                              z=zs,
+    heatmap_data = go.Heatmap(z=data,
                               colorscale=colorScale
                               )
+
     # heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
     heatmap_layout = {
-        'title': "Resistivity heatmap, {:d}/{:d}".format(iterationID + 1, len(data)),
+        'title': "Resistivity heatmap: {}".format(timestamp),
         'yaxis': {
             "scaleanchor": "x",
             "scaleratio": 1,

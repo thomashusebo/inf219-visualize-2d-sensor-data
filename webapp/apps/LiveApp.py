@@ -95,17 +95,15 @@ class LiveApp(AbstractApp):
             ])
         def updateFigures(nIntervals):
             # Collect data
+            timestamp = "18:31:08" # TODO Get this value via callback
             data_manager.update(data_manager)
-            #data = DataCollector.get_data(data_manager)
-            data = []
-
-            nextIteration = len(data) - 1
+            heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
 
             # Define colormap
             colorScale = ColorHandler.getColorScale()
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(data, nextIteration, colorScale)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale)
 
             return [
                 heatmapFig,
