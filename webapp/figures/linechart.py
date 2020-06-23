@@ -1,34 +1,25 @@
 import plotly.graph_objects as go
+import plotly.express as px
 
 
-def getLineChart(data, iterationID, coordinate, colorScale):
-    if iterationID < 0: return {
+def getLineChart(data, timestamp, coordinate, colorScale, timeline):
+    if len(data) < 1: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
     }
 
-    minValue = min(min(data[iterationID]['zs']))
-    maxValue = max(max(data[iterationID]['zs']))
-
-    x = coordinate['x']
+    '''x = coordinate['x']
     y = coordinate['y']
-    ts = [i for i in range(len(data))]
-    zs = [data[i]['zs'][y][x] for i in range(len(data))]
 
     # TODO: Add timestamp to linechart
-    #firstTimeStamp = data[0]['ts'][0][0]
-    #projectStartTime = datetime.datetime.strptime(firstTimeStamp, "%H:%M:%S")
-
-    # ts = [getTimeFormat(data[i]['ts'][y][x]) - projectStartTime for i in range(len(data))]
-
-    keepTrackOfIteration = go.Scatter(x=[iterationID, iterationID],
-                                      y=[0, zs[iterationID]],
+    keepTrackOfIteration = go.Scatter(x=[timestamp,timestamp],
+                                      y=[0,1000],
                                       name="Timestep",
                                       line=dict(color='black'),
                                       )
 
-    linechart_data = go.Scatter(x=ts,
-                                y=zs,
+    linechart_data = go.Scatter(x=data[data.columns[0]],
+                                y=data[data.columns[1]],
                                 name="Resistivity",
                                 line=dict(color='black'),
                                 mode='markers',
@@ -42,27 +33,19 @@ def getLineChart(data, iterationID, coordinate, colorScale):
                                 #),
                                 )
 
-    rangeOfZs = maxValue - minValue
-    yaxisPadding = rangeOfZs / 100 * 20
+    #rangeOfZs = maxValue - minValue
+    #yaxisPadding = rangeOfZs / 100 * 20
 
     linechart_layout = {
-        'title': "Temporal changes in coord:" + str(x + 1) + " " + str(y + 1),
+        'title': "Temporal changes in coord:" + str(x) + " " + str(y),
         'xaxis': {
             "side": "bottom",
             "type": "linear",
-            # "range": [
-            #    max(ts) - 30,
-            #    max(ts) + 1
-            # ],
             "title": "Measurement",
         },
         'yaxis': {
             "side": "bottom",
             "type": "linear",
-            #"range": [
-            #    minValue - yaxisPadding,
-            #    maxValue + yaxisPadding
-             #],
             "title":'Resistivity (Ohm)'
         },
     }
@@ -70,5 +53,26 @@ def getLineChart(data, iterationID, coordinate, colorScale):
     linechart_fig = {
         'data': [linechart_data, keepTrackOfIteration],
         'layout': linechart_layout
-    }
+    }'''
+
+    x = data.iloc[:, 0].values
+    y = data.iloc[:, 1].values
+    linechart_fig = go.Figure(data=go.Scatter(x=x, y=y,
+                                              mode='lines+markers'))
+    linechart_fig.update_layout(
+        title="Temporal changes in coord: " + str(coordinate['x']) + " " + str(coordinate['y']),
+        xaxis=dict(
+            rangeslider=dict(
+                visible=True
+            ),
+            range=[timeline['start'],timeline['end']],
+            type="date"
+        ),
+        yaxis=dict(
+            title='Resistivity (Ohm)',
+            rangemode='tozero'
+        ),
+        plot_bgcolor='white'
+    )
+
     return linechart_fig

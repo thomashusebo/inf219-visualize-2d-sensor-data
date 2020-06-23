@@ -11,7 +11,6 @@ def getHeatMap(data, timestamp, colorScale):
                               colorscale=colorScale
                               )
 
-    # heatmap_layout = go.Layout(title=go.layout.Title(text='Resistivity heatmap'))
     heatmap_layout = {
         'title': "Resistivity heatmap: {}".format(timestamp),
         'yaxis': {

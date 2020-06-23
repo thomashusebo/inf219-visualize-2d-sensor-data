@@ -21,6 +21,8 @@ class DataCollector:
             file_dir = "{}\\{}".format(self.incoming_data_dir, file)
             for df in pd.read_csv(file_dir, chunksize=self.chunksize, iterator=True):
                 df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
+
+                print(df.head)
                 df.to_sql(database_table, self.database, if_exists='append')
 
             os.remove(file_dir)
@@ -35,21 +37,20 @@ class DataCollector:
     def get_heatmap_data(self, timestamp):
         height = 7  # TODO Get height and width from database
         width = 13
-        columns = "".join(["\"[{:02d},{:02d}]\",".format(x, y) for x in range(height) for y in range(width)])[:-1]
-        heatmap_data = pd.read_sql_query(
-            'SELECT {} FROM {} WHERE time = \"{}\"'.format(
+        columns = "".join(["\"[{:02d},{:02d}]\",".format(x, y) for y in range(height) for x in range(width)])[:-1]
+        sql_query = 'SELECT {} FROM {} WHERE time = \"{}\"'.format(
                 columns,
                 self.resistivity_table,
-                timestamp),
-            self.database)
+                timestamp)
+        heatmap_data = pd.read_sql_query(sql_query, self.database)
         return heatmap_data.values.reshape(height, width)
 
     @staticmethod
-    def get_linechart_data(self, cell_x, cell_y, start_time, end_time):
+    def get_linechart_data(self, coordinate, timeline):
         time_column = "time"
-        cell_column = "[{:02d},{:02d}]".format(cell_x, cell_y)
+        cell_column = "[{:02d},{:02d}]".format(coordinate['x'], coordinate['y'])
         linechart_data = pd.read_sql_query(
             'SELECT \"{}\",\"{}\" FROM {} WHERE "time" BETWEEN \"{}\" AND \"{}\"'.format(
-                time_column, cell_column, self.resistivity_table, start_time, end_time),
+                time_column, cell_column, self.resistivity_table, timeline['start'], timeline['end']),
             self.database)
         return linechart_data

@@ -111,38 +111,46 @@ class TemporalApp(AbstractApp):
             # Collect data
 
             #data = data_manager.get_data()
-            data=[]
-            numberOfFrames = len(data)
+
+            #data=[]
+            #numberOfFrames = len(data)
 
             # Ensures that we avoid index out of bounds exceptions when accessing data
-            if selectedIteration > numberOfFrames-1:
-                selectedIteration = -1
+            #if selectedIteration > numberOfFrames-1:
+            #    selectedIteration = -1
 
             # Find slider position/iteration to display in heatmap
-            if playModeOn:
-                nextIteration = numberOfFrames-1
-            else:
-                nextIteration = selectedIteration-1
+            if not playModeOn:
+                raise Exception("Preventing callback to update figures")
 
             # Define coordinate
             if clickData is not None:
                 clickData = clickData['points'][0]
-                coordinate = {'x': clickData['x'] - 1,
-                              'y': clickData['y'] - 1}
+                coordinate = {'x': clickData['x'],
+                              'y': clickData['y']}
             else:
                 coordinate = {'x': 0, 'y': 0}
 
             # Define colormap
             colorScale = ColorHandler.getColorScale()
 
+            # Collect data
+            timestamp = "2020-03-08 18:31:08"
+            timeline_start = "2020-03-08 18:30:00"
+            timeline_end = "2020-03-08 21:00:00"
+            timeline = {'start': timeline_start, 'end': timeline_end}
+
+            heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
+            linechart_data = data_manager.get_linechart_data(data_manager, coordinate=coordinate, timeline=timeline)
+
             # Update figures
-            heatmapFig = heatmap.getHeatMap(data, nextIteration, colorScale)
-            lineChartFig = linechart.getLineChart(data, nextIteration, coordinate, colorScale)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale)
+            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinate, colorScale, timeline)
 
             return [
                 heatmapFig,
                 lineChartFig,
                 "",
                 #html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
-                numberOfFrames-1,
+                "test",
                 ]
