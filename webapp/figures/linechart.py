@@ -66,11 +66,15 @@ def getLineChart(data, timestamp, coordinate, colorScale, timeline):
                 visible=True
             ),
             range=[timeline['start'],timeline['end']],
-            type="date"
+            type="date",
+            linecolor='black',
+            gridcolor='LightGrey'
         ),
         yaxis=dict(
             title='Resistivity (Ohm)',
-            rangemode='tozero'
+            rangemode='tozero',
+            linecolor='black',
+            gridcolor='LightGrey'
         ),
         plot_bgcolor='white'
     )
