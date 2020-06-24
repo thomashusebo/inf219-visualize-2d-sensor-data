@@ -2,7 +2,7 @@ import os
 import time
 import pandas as pd
 from sqlalchemy import create_engine
-from data.datatypes import DataType
+from data.data_types import DataType
 
 
 def time_to_stop(stopping_dir):

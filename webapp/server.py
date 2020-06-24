@@ -1,12 +1,12 @@
 from flask import Flask
-from webapp import applicationmanager
+from webapp import application_manager
 
 
 def start(project_name):
     server = Flask(__name__)
 
-    applicationmanager.setupAppsOn(server, project_name)
-    applicationmanager.openAllApps()
+    application_manager.setupAppsOn(server, project_name)
+    application_manager.openAllApps()
 
     server.run(debug=False)
 

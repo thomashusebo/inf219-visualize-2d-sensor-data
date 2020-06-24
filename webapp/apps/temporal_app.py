@@ -7,9 +7,9 @@ import dash_daq as daq
 from dash.dependencies import Output, Input
 
 from webapp.figures import heatmap, linechart
-from webapp.colors import ColorHandler
-from webapp.apps.AbstractApp import AbstractApp
-from webapp.terminateserver import shutdown_path, shutdown
+from webapp.colors import color_manager
+from webapp.apps.abstract_app import AbstractApp
+from webapp.terminate_server import shutdown_path, shutdown
 
 #stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -134,7 +134,7 @@ class TemporalApp(AbstractApp):
                 coordinate = {'x': 0, 'y': 0}
 
             # Define colormap
-            colorScale = ColorHandler.getColorScale()
+            colorScale = color_manager.getColorScale()
 
             # Collect data
             timestamp = "2020-03-08 18:31:08"

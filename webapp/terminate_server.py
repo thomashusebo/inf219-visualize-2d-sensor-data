@@ -1,5 +1,5 @@
 from flask import request
-from data import DataCollector
+from data import data_collector
 
 shutdown_path = '/shutdown'
 
@@ -10,4 +10,4 @@ def shutdown():
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
 
-    DataCollector.tell_to_stop()
+    data_collector.tell_to_stop()

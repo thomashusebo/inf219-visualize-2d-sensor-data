@@ -5,10 +5,10 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input
 
-from webapp.apps.AbstractApp import AbstractApp
-from webapp.terminateserver import shutdown_path, shutdown
+from webapp.apps.abstract_app import AbstractApp
+from webapp.terminate_server import shutdown_path, shutdown
 from webapp.figures import heatmap
-from webapp.colors import ColorHandler
+from webapp.colors import color_manager
 
 #stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -97,7 +97,7 @@ class LiveApp(AbstractApp):
             last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
 
             # Define colormap
-            colorScale = ColorHandler.getColorScale()
+            colorScale = color_manager.getColorScale()
 
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale)

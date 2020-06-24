@@ -2,7 +2,7 @@ import multiprocessing as mp
 import os
 import time
 
-from data import DataCollector
+from data import data_collector
 from instrument_simulator import simulate_instrument_csv
 from setupapp import setupapp
 from webapp import server
@@ -26,7 +26,7 @@ if __name__ == '__main__':
             pool = mp.Pool(processes=num_of_cores)
 
             #jobs.append(pool.apply_async(simulate_instrument_csv.run, ()))
-            jobs.append(pool.apply_async(DataCollector.update, (setupapp.name,)))
+            jobs.append(pool.apply_async(data_collector.update, (setupapp.name,)))
             jobs.append(pool.apply_async(server.start, (setupapp.name,)))
 
             for job in jobs:

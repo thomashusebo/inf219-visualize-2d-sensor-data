@@ -1,8 +1,8 @@
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
-from webapp.apps.AbstractApp import AbstractApp
-from webapp.terminateserver import shutdown_path, shutdown
+from webapp.apps.abstract_app import AbstractApp
+from webapp.terminate_server import shutdown_path, shutdown
 
 #stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
