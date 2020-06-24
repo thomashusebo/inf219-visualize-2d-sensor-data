@@ -1,5 +1,5 @@
 .idea
 ignoreDir/
-incoming_data/*
-instrument_simulator/projects
+incoming_data/
+*/projects/
 fluid_flower_database.db
