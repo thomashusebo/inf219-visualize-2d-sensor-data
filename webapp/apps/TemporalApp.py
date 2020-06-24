@@ -36,7 +36,6 @@ class TemporalApp(AbstractApp):
 
             # Time
             html.Div([
-                html.H5('Time:'),
                 html.Div(id='live-clock'),
                 dcc.Interval(
                     id='interval-component',
@@ -153,7 +152,6 @@ class TemporalApp(AbstractApp):
             return [
                 heatmapFig,
                 lineChartFig,
-                "",
                 html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
-                #"test",
+                1,
                 ]
