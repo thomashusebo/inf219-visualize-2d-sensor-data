@@ -1,3 +1,5 @@
+import datetime
+
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
@@ -34,6 +36,7 @@ class TemporalApp(AbstractApp):
 
             # Time
             html.Div([
+                html.H5('Time:'),
                 html.Div(id='live-clock'),
                 dcc.Interval(
                     id='interval-component',
@@ -151,6 +154,6 @@ class TemporalApp(AbstractApp):
                 heatmapFig,
                 lineChartFig,
                 "",
-                #html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
-                "test",
+                html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+                #"test",
                 ]

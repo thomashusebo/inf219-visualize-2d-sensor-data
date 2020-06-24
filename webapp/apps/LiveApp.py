@@ -94,7 +94,6 @@ class LiveApp(AbstractApp):
             ])
         def updateFigures(nIntervals):
             # Collect data
-            data_manager.update(data_manager)
             last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
 
             # Define colormap
