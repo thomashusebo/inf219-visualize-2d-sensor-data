@@ -14,7 +14,8 @@ class DataCollector:
 
     @staticmethod
     def update(self):
-        while True:
+        i= 0
+        while i < 1:
             files = next(os.walk(self.incoming_data_dir))[2]
             database_table = self.resistivity_table
 
@@ -34,3 +35,4 @@ class DataCollector:
                     print("{} not accesible".format(file))
                     # Then directly interfering with another process
                     continue
+            i+=1

@@ -2,13 +2,13 @@ import os
 import time
 import pandas as pd
 
-if __name__ == "__main__":
 
-    '''Change these parameters to alter the instrument simulator'''
-    print_progress=True
-    wait_between_measurements=True
+def run():
+    """Change these parameters to alter the instrument simulator"""
+    print_progress = True
+    wait_between_measurements = False
     measurements_per_second = 1
-    project_name = "ObsFlow1Days.csv"
+    project_name = "ObsFlow0Days.csv"
 
     # Setting directories
     projectName = project_name
@@ -24,11 +24,11 @@ if __name__ == "__main__":
     # Produce individual measurements
     for i in range(df.shape[0]):
         out_df = pd.DataFrame(data=df.iloc[[i]])
-        filename=dir_temp+"/data{:09d}.csv".format(i)
+        filename = dir_temp + "/data{:09d}.csv".format(i)
         out_df.to_csv(filename, index=False)
         if print_progress:
             print("Created file {}".format(filename))
         if wait_between_measurements:
-            time.sleep(1/measurements_per_second)
+            time.sleep(1 / measurements_per_second)
     if print_progress:
         print("All files read, ending...")
