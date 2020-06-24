@@ -18,52 +18,78 @@ class DataCollector:
         database_table = self.resistivity_table
 
         for file in files:
-            file_dir = "{}\\{}".format(self.incoming_data_dir, file)
-            for df in pd.read_csv(file_dir, chunksize=self.chunksize, iterator=True):
-                df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
+            try:
+                file_dir = "{}\\{}".format(self.incoming_data_dir, file)
+                for df in pd.read_csv(file_dir, chunksize=self.chunksize, iterator=True):
+                    df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
+                    df.to_sql(database_table, self.database, if_exists='append')
 
-                print(df.head)
-                df.to_sql(database_table, self.database, if_exists='append')
-
-            os.remove(file_dir)
-
-        # TODO: REMOVE AFTER TESTING
-        #print("Heatmap data:")
-        #print(self.get_heatmap_data(self=self, timestamp="18:31:08"))
-        #print("Linechart data:")
-        #print(self.get_linechart_data(self=self, cell_x=1, cell_y=1, start_time="18:30:00", end_time="21:00:00"))
+                os.remove(file_dir)
+            except FileNotFoundError:
+                #If file not found then another process completed and deleted it
+                pass
+            except PermissionError:
+                # Then directly interfering with another process
+                return
 
     @staticmethod
     def get_heatmap_data(self, timestamp="", live=False):
-        table=self.resistivity_table
+        """
+        :param self:
+        :param timestamp: str
+             representing time, must be formatted as YYYY-MM-DD HH:MM:SS
+        :param live: bool
+            whether or not to show latest data
+        :return: numpy array
+            Returns a numpy array of heatmap. If live, will return the latest data. If a timestamp is given, will
+        return data for given heatmap if it exists.
+        """
+
+        # For now, there is only one table to choose from
+        table = self.resistivity_table
 
         if timestamp is "" and not live:
             Exception("Illegal heatmap retrieval. No timestamp and not live")
 
-        query = "SELECT MAX(\"time\") FROM {}".format(table)
-        last_timestamp = pd.read_sql_query(query, self.database).values[0][0]
+        # Selects for which timestamp to show a heatmap
+        last_timestamp = pd.read_sql_query("SELECT MAX(\"time\") FROM {}".format(table),
+                                           self.database).values[0][0]
         if live:
-            timestamp=last_timestamp
+            timestamp = last_timestamp
 
-        query="SELECT \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
-        dimensions=pd.read_sql_query(query,self.database)
+        # Finds dimensions of the data
+        query = "SELECT \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
+        dimensions = pd.read_sql_query(query, self.database)
         width = dimensions.values[0][0]
         height = dimensions.values[0][1]
 
+        # Collects a DataFrame of the heatmap
         columns = "".join(["\"[{:02d},{:02d}]\",".format(x, y) for y in range(height) for x in range(width)])[:-1]
         sql_query = 'SELECT {} FROM {} WHERE time = \"{}\"'.format(
-                columns,
-                table,
-                timestamp)
+            columns,
+            table,
+            timestamp)
         heatmap_data = pd.read_sql_query(sql_query, self.database)
-        return last_timestamp, heatmap_data.values.reshape(height, width)
+
+        # Return a numpy array of the heatmap, reshaped to width and height of the data
+        return last_timestamp, heatmap_data.values[0].reshape(height, width)
 
     @staticmethod
     def get_linechart_data(self, coordinate, timeline):
-        time_column = "time"
-        cell_column = "[{:02d},{:02d}]".format(coordinate['x'], coordinate['y'])
+        """
+        :param self:
+        :param coordinate: dict
+            {'x': x, 'y': y}. Used to select cell in heatmap
+        :param timeline: dict
+            {'start': "YYYY-MM-DD HH:MM:SS", 'end': "YYYY-MM-DD HH:MM:SS"}. Used to select range of x axis
+        :return: pandas DataFrame
+
+        """
+        # For now, there is only one table to choose from
+        table = self.resistivity_table
+        columns = "\"time\",\"[{:02d},{:02d}]\"".format(coordinate['x'], coordinate['y'])
         linechart_data = pd.read_sql_query(
-            'SELECT \"{}\",\"{}\" FROM {} WHERE "time" BETWEEN \"{}\" AND \"{}\"'.format(
-                time_column, cell_column, self.resistivity_table, timeline['start'], timeline['end']),
+            'SELECT {} FROM {} WHERE "time" BETWEEN \"{}\" AND \"{}\"'.format(
+                columns, table, timeline['start'], timeline['end']),
             self.database)
         return linechart_data
