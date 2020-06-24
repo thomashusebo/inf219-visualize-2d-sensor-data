@@ -33,4 +33,4 @@ def run():
     if print_progress:
         print("All files read, ending...")
 
-    return "All files read"
+    return "Instrument simulation complete"

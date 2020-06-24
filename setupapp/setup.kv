@@ -22,7 +22,7 @@ WindowManager:
                 root.manager.transition.direction = "left"
         Button:
             text: "Exit"
-            on_release: app.get_running_app().stop()
+            on_release: root.quit()
 
 <NewProjectWindow>:
     name: "new_project"

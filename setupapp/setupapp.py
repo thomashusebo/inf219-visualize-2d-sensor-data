@@ -1,16 +1,16 @@
-import os
-
+import multiprocessing
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty
 
 name = ''
-#projects = next(os.walk(os.getcwd() + '\\projects'))[1]
 
 
 class MainWindow(Screen):
-    pass
+    @staticmethod
+    def quit():
+        App.get_running_app().stop()
 
 
 class NewProjectWindow(Screen):
@@ -23,7 +23,8 @@ class NewProjectWindow(Screen):
 
 
 class LoadProjectWindow(Screen):
-    def select_project(self, project):
+    @staticmethod
+    def select_project(project):
         global name
         name = project
         App.get_running_app().stop()
@@ -37,6 +38,5 @@ kv = Builder.load_file("setupapp\\setup.kv")
 
 
 class SetupApp(App):
-
     def build(self):
         return kv

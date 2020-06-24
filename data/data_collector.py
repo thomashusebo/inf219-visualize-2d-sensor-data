@@ -5,6 +5,11 @@ from sqlalchemy import create_engine
 from data.data_types import DataType
 
 
+def tell_to_stop():
+    f = open("data/stopping_data_collector/stop.txt", 'w')
+    f.close()
+
+
 def time_to_stop(stopping_dir):
     files = next(os.walk(stopping_dir))[2]
     for file in files:
@@ -43,10 +48,3 @@ def update(project_name):
                 # Then directly interfering with another process
                 pass
         time.sleep(1)
-
-    return "DataCollector completed"
-
-
-def tell_to_stop():
-    f = open("data/stopping_data_collector/stop.txt", 'w')
-    f.close()
