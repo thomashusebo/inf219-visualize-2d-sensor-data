@@ -3,3 +3,4 @@ ignoreDir/
 incoming_data/
 instrument_simulator/
 fluid_flower_database.db
+separate_instrument.py

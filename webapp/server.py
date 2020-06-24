@@ -9,3 +9,5 @@ def start(project_name):
     applicationmanager.openAllApps()
 
     server.run(debug=False)
+
+    return "Server shut off"

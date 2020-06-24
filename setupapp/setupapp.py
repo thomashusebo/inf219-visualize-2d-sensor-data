@@ -39,5 +39,4 @@ kv = Builder.load_file("setupapp\\setup.kv")
 class SetupApp(App):
 
     def build(self):
-        print("Building app")
         return kv

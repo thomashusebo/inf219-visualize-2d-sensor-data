@@ -1,6 +1,8 @@
 import multiprocessing as mp
+import os
+import time
 
-from data.DataCollector import DataCollector
+from data import DataCollector
 from instrument_simulator import simulate_instrument_csv
 from setupapp import setupapp
 from webapp import server
@@ -13,22 +15,23 @@ def name_qualifies(name):
 
 
 if __name__ == '__main__':
-    print("running setup")
-    SetupApp().run()
-    simulate_instrument_csv.run()
-    data_collector = DataCollector(setupapp.name)
-    data_collector.update(data_collector)
-    server.start(setupapp.name)
-''' if name_qualifies(setupapp.name):
-    num_of_cores = 4
-    data_collector = 
-    jobs = []
-    print("Creating pool")
-    pool = mp.Pool(processes=num_of_cores)
-    jobs.append(pool.apply_async(server.start, (setupapp.name,)))
-    jobs.append(pool.apply_async(data_collector.update, (data_collector, setupapp.name)))
-    jobs.append(pool.apply_async(simulate_instrument_csv,()))
+    if setupapp.name == '':
 
-    for job in jobs:
-        job.get()'''
+        SetupApp().run()
 
+        if name_qualifies(setupapp.name):
+            num_of_cores = 4
+            # data_collector = DataCollector(setupapp.name)
+            jobs = []
+            pool = mp.Pool(processes=num_of_cores)
+
+            #jobs.append(pool.apply_async(simulate_instrument_csv.run, ()))
+            jobs.append(pool.apply_async(DataCollector.update, (setupapp.name,)))
+            jobs.append(pool.apply_async(server.start, (setupapp.name,)))
+
+            for job in jobs:
+                while not job.ready():
+                    time.sleep(2)
+                    pass
+                if job.successful():
+                    print(job.get())

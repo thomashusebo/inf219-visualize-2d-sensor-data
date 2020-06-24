@@ -1,38 +1,52 @@
 import os
+import time
 import pandas as pd
 from sqlalchemy import create_engine
 from data.datatypes import DataType
 
 
-class DataCollector:
-    def __init__(self, project_name):
-        self.incoming_data_dir = os.getcwd() + '\\incoming_data'
-        self.database = create_engine('sqlite:///fluid_flower_database.db')
-        self.chunksize = 100000
-        self.project_name = project_name
-        self.resistivity_table = "{}_{}".format(project_name, DataType.Resistivity.value)
+def time_to_stop(stopping_dir):
+    files = next(os.walk(stopping_dir))[2]
+    for file in files:
+        if file == 'stop.txt':
+            os.remove(stopping_dir + '\\stop.txt')
+            return True
+    return False
 
-    @staticmethod
-    def update(self):
-        i= 0
-        while i < 1:
-            files = next(os.walk(self.incoming_data_dir))[2]
-            database_table = self.resistivity_table
 
-            for file in files:
-                try:
-                    file_dir = "{}\\{}".format(self.incoming_data_dir, file)
-                    for df in pd.read_csv(file_dir, chunksize=self.chunksize, iterator=True):
-                        df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
-                        df.to_sql(database_table, self.database, if_exists='append')
+def update(project_name):
+    incoming_data_dir = os.getcwd() + '\\incoming_data'
+    stopping_dir = os.getcwd() + '\\data\\stopping_data_collector'
+    database = create_engine('sqlite:///fluid_flower_database.db')
+    chunksize = 100000
+    project_name = project_name
+    resistivity_table = "{}_{}".format(project_name, DataType.Resistivity.value)
+    database_table = resistivity_table
 
-                    os.remove(file_dir)
-                except FileNotFoundError:
-                    print("{} not found".format(file))
-                    #If file not found then another process completed and deleted it
-                    pass
-                except PermissionError:
-                    print("{} not accesible".format(file))
-                    # Then directly interfering with another process
-                    continue
-            i+=1
+    while True:
+        if time_to_stop(stopping_dir):
+            return "DataCollector Stopped"
+
+        files = next(os.walk(incoming_data_dir))[2]
+        for file in files:
+            try:
+                file_dir = "{}\\{}".format(incoming_data_dir, file)
+                for df in pd.read_csv(file_dir, chunksize=chunksize, iterator=True):
+                    df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
+                    df.to_sql(database_table, database, if_exists='append')
+
+                os.remove(file_dir)
+            except FileNotFoundError:
+                # If file not found then another process completed and deleted it
+                pass
+            except PermissionError:
+                # Then directly interfering with another process
+                pass
+        time.sleep(1)
+
+    return "DataCollector completed"
+
+
+def tell_to_stop():
+    f = open("data/stopping_data_collector/stop.txt", 'w')
+    f.close()

@@ -5,9 +5,9 @@ import pandas as pd
 
 def run():
     """Change these parameters to alter the instrument simulator"""
-    print_progress = True
-    wait_between_measurements = False
-    measurements_per_second = 1
+    print_progress = False
+    wait_between_measurements = True
+    measurements_per_second = 4
     project_name = "ObsFlow0Days.csv"
 
     # Setting directories
@@ -32,3 +32,5 @@ def run():
             time.sleep(1 / measurements_per_second)
     if print_progress:
         print("All files read, ending...")
+
+    return "All files read"
