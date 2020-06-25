@@ -7,7 +7,7 @@ def getHeatMap(data, timestamp, colorScale):
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
     }
 
-    heatmap_data = go.Heatmap(z=data,
+    heatmap_data = go.Contour(z=data,
                               colorscale=colorScale
                               )
 

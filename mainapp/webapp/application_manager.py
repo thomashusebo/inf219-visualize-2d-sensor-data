@@ -1,8 +1,8 @@
-from webapp.apps.live_app import LiveApp
-from webapp.apps.compare_app import CompareApp
-from webapp.apps.temporal_app import TemporalApp
+from mainapp.webapp.apps.live_app import LiveApp
+from mainapp.webapp.apps.compare_app import CompareApp
+from mainapp.webapp.apps.temporal_app import TemporalApp
+from mainapp.webapp.data_manager import DataManager
 import webbrowser as wb
-from data.data_manager import DataManager
 
 apps = []
 

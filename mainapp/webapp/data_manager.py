@@ -1,7 +1,7 @@
 import pandas as pd
 import sqlalchemy
 from sqlalchemy import create_engine
-from data.data_types import DataType
+from mainapp.data.data_types import DataType
 
 
 class DataManager:

@@ -6,10 +6,10 @@ import dash_core_components as dcc
 import dash_daq as daq
 from dash.dependencies import Output, Input
 
-from webapp.figures import heatmap, linechart
-from webapp.colors import color_manager
-from webapp.apps.abstract_app import AbstractApp
-from webapp.terminate_server import shutdown_path, shutdown
+from mainapp.webapp.figures import heatmap, linechart
+from mainapp.webapp.colors import color_manager
+from mainapp.webapp.apps.abstract_app import AbstractApp
+from mainapp.termination.termination import shutdown_path, shutdown_server
 
 #stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -90,9 +90,9 @@ class TemporalApp(AbstractApp):
 
         @temporal_app.callback(Output("hidden_div", "children"),
                                [Input('url', 'pathname')])
-        def shutdown_server(pathname):
+        def shutdown(pathname):
             if pathname == shutdown_path:
-                shutdown()
+                shutdown_server()
                 return dcc.Location(pathname="/", id="someid_doesnt_matter")
 
         @temporal_app.callback(

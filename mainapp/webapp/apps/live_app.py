@@ -5,10 +5,10 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input
 
-from webapp.apps.abstract_app import AbstractApp
-from webapp.terminate_server import shutdown_path, shutdown
-from webapp.figures import heatmap
-from webapp.colors import color_manager
+from mainapp.webapp.apps.abstract_app import AbstractApp
+from mainapp.termination.termination import shutdown_path, shutdown_server
+from mainapp.webapp.figures import heatmap
+from mainapp.webapp.colors import color_manager
 
 #stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -78,9 +78,9 @@ class LiveApp(AbstractApp):
 
         @live_app.callback(dash.dependencies.Output("hidden_div", "children"),
                            [dash.dependencies.Input('url', 'pathname')])
-        def shutdown_server(pathname):
+        def shutdown(pathname):
             if pathname == shutdown_path:
-                shutdown()
+                shutdown_server()
                 return dcc.Location(pathname="/", id="someid_doesnt_matter")
 
         # Define callbacks

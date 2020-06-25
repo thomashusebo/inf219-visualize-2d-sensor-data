@@ -1,10 +1,11 @@
 import time
 import multiprocessing as mp
-from data import data_collector
-from webapp import server
+from mainapp.data import data_collector
+from mainapp.webapp import server
 
 
 def start(project_name, cpu_cores=None, instrument_simulator=None):
+
     pool = mp.Pool(processes=cpu_cores)
     jobs = []
     if cpu_cores is None: cpu_cores = mp.cpu_count()
@@ -14,7 +15,7 @@ def start(project_name, cpu_cores=None, instrument_simulator=None):
             raise Exception("Need at least 3 cpu cores to run with simulating instrument. \n"
                             "1 for instrument, 1 for data collector, 1 for instrument simulator\n"
                             "Cores given access to: {}".format(cpu_cores))
-        jobs.append(pool.apply_async(instrument_simulator.run, ()))
+        jobs.append(pool.apply_async(instrument_simulator.run, (1,)))
 
     if cpu_cores < 2:
         raise Exception("Need at least 2 cpu cores run application. \n"

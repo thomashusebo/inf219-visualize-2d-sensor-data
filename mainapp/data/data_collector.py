@@ -2,26 +2,36 @@ import os
 import time
 import pandas as pd
 from sqlalchemy import create_engine
-from data.data_types import DataType
+from mainapp.data.data_types import DataType
 
 
 def tell_to_stop():
-    f = open("data/stopping_data_collector/stop.txt", 'w')
+    f = open("mainapp/termination/stop_dir/stop_data_collector.txt", 'w')
     f.close()
 
 
-def time_to_stop(stopping_dir):
+def time_to_stop(stopping_dir, stopping_file):
+    files = next(os.walk(stopping_dir))[2]
+    if stopping_file in files:
+        os.remove(stopping_dir + '\\' + stopping_file)
+        return True
+    return False
+
+
+def clean_up_stopping_dir(stopping_dir, stopping_file):
     files = next(os.walk(stopping_dir))[2]
     for file in files:
-        if file == 'stop.txt':
-            os.remove(stopping_dir + '\\stop.txt')
-            return True
-    return False
+        if file == stopping_file:
+            os.remove(stopping_dir + '\\' + stopping_file)
 
 
 def update(project_name):
     incoming_data_dir = os.getcwd() + '\\incoming_data'
-    stopping_dir = os.getcwd() + '\\data\\stopping_data_collector'
+
+    stopping_dir = os.getcwd() + '\\mainapp\\termination\\stop_dir'
+    stopping_file = 'stop_data_collector.txt'
+    clean_up_stopping_dir(stopping_dir, stopping_file)
+
     database = create_engine('sqlite:///fluid_flower_database.db')
     chunksize = 100000
     project_name = project_name
@@ -29,7 +39,7 @@ def update(project_name):
     database_table = resistivity_table
 
     while True:
-        if time_to_stop(stopping_dir):
+        if time_to_stop(stopping_dir, stopping_file):
             return "DataCollector Stopped"
 
         files = next(os.walk(incoming_data_dir))[2]

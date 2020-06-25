@@ -1,5 +1,5 @@
 from flask import Flask
-from webapp import application_manager
+from mainapp.webapp import application_manager
 
 
 def start(project_name):

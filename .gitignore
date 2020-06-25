@@ -1,6 +1,6 @@
 .idea
 ignoreDir/
 incoming_data/
-instrument_simulator/
+mainapp/instrument_simulator/projects
 fluid_flower_database.db
 separate_instrument.py
