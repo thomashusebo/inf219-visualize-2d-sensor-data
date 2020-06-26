@@ -4,7 +4,7 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_daq as daq
-from dash.dependencies import Output, Input
+from dash.dependencies import Output, Input, State
 
 from mainapp.webapp.figures import heatmap, linechart
 from mainapp.webapp.colors import color_manager
@@ -100,16 +100,15 @@ class TemporalApp(AbstractApp):
                 Output(component_id='heatmap', component_property='figure'),
                 Output(component_id='linechart', component_property='figure'),
                 Output(component_id='live-clock', component_property='children'),
-                Output(component_id='heatmap-slider', component_property='max')
-            ],
+                Output(component_id='heatmap-slider', component_property='max')],
             [
                 Input('heatmap-slider', component_property='value'),
                 Input('heatmap', component_property='clickData'),
                 Input('interval-component', 'n_intervals'),
-                Input('play-button', 'on'),
-
-            ])
-        def updateFigures(selectedIteration, clickData, n, playModeOn):
+                Input('play-button', 'on'),],
+            [
+                State('linechart','relayoutData')])
+        def updateFigures(selectedIteration, clickData, n, playModeOn, relayout_data):
             # Collect data
 
             #data = data_manager.get_data()
@@ -140,6 +139,12 @@ class TemporalApp(AbstractApp):
             timestamp = "2020-03-08 18:00:00"
             timeline_start = "2020-03-08 18:00:00"
             timeline_end = "2020-03-08 21:00:00"
+            if relayout_data:
+                print(relayout_data)
+                if 'xaxis.range[0]' in relayout_data:
+                    timeline_start = relayout_data['xaxis.range[0]']
+                    timeline_end = relayout_data['xaxis.range[1]']
+
             timeline = {'start': timeline_start, 'end': timeline_end}
 
             latest_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
