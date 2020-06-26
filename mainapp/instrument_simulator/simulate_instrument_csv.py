@@ -35,7 +35,7 @@ def run(measurements_per_second=None):
 
     relative_location = "\\mainapp\\instrument_simulator\\projects\\"
     dir = os.getcwd() + relative_location
-    project_name = "ObsFlow0Days.csv"
+    project_name = "ObsFlow1DaysFakeTime.csv"
 
     # Setting directories
     projectName = project_name

@@ -15,7 +15,7 @@ def start(project_name, cpu_cores=None, instrument_simulator=None):
             raise Exception("Need at least 3 cpu cores to run with simulating instrument. \n"
                             "1 for instrument, 1 for data collector, 1 for instrument simulator\n"
                             "Cores given access to: {}".format(cpu_cores))
-        jobs.append(pool.apply_async(instrument_simulator.run, (1,)))
+        jobs.append(pool.apply_async(instrument_simulator.run, (1000,)))
 
     if cpu_cores < 2:
         raise Exception("Need at least 2 cpu cores run application. \n"
