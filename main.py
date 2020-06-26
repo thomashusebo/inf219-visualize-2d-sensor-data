@@ -12,7 +12,7 @@ def main():
     setup.run()
 
     if name_qualifies(setupapp.name):
-        multiprocess_manager.start(project_name=setupapp.name)
+        multiprocess_manager.start(project_name=setupapp.name, instrument_simulator=simulate_instrument_csv)
 
 
 if __name__ == '__main__':
