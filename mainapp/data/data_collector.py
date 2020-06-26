@@ -39,11 +39,10 @@ def update(project_name):
     database_table = resistivity_table
 
     while True:
-        if time_to_stop(stopping_dir, stopping_file):
-            return "DataCollector Stopped"
-
         files = next(os.walk(incoming_data_dir))[2]
         for file in files:
+            if time_to_stop(stopping_dir, stopping_file):
+                return "DataCollector Stopped"
             try:
                 file_dir = "{}\\{}".format(incoming_data_dir, file)
                 for df in pd.read_csv(file_dir, chunksize=chunksize, iterator=True):
@@ -57,4 +56,4 @@ def update(project_name):
             except PermissionError:
                 # Then directly interfering with another process
                 pass
-        time.sleep(1)
+        time.sleep(0.1)
