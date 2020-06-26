@@ -109,18 +109,7 @@ class TemporalApp(AbstractApp):
             [
                 State('linechart','relayoutData')])
         def updateFigures(selectedIteration, clickData, n, playModeOn, relayout_data):
-            # Collect data
-
-            #data = data_manager.get_data()
-
-            #data=[]
-            #numberOfFrames = len(data)
-
-            # Ensures that we avoid index out of bounds exceptions when accessing data
-            #if selectedIteration > numberOfFrames-1:
-            #    selectedIteration = -1
-
-            # Find slider position/iteration to display in heatmap
+            # Stops autoUpdate
             if not playModeOn:
                 raise Exception("Preventing callback to update figures")
 
@@ -139,8 +128,8 @@ class TemporalApp(AbstractApp):
             timestamp = "2020-03-08 18:00:00"
             timeline_start = "2020-03-08 18:00:00"
             timeline_end = "2020-03-08 21:00:00"
+
             if relayout_data:
-                print(relayout_data)
                 if 'xaxis.range[0]' in relayout_data:
                     timeline_start = relayout_data['xaxis.range[0]']
                     timeline_end = relayout_data['xaxis.range[1]']
