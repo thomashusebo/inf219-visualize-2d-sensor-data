@@ -74,6 +74,17 @@ class LiveApp(AbstractApp):
             ],
                 className='seven columns'
             ),
+            dcc.RadioItems(
+                id='map_chooser',
+                options=[
+                    {'label': 'Heatmap', 'value': 'heatmap'},
+                    {'label': 'Contour', 'value': 'contour'},
+                    {'label': 'Surface', 'value': 'surface'}
+                ],
+                value='heatmap',
+                className ='seven columns',
+                labelStyle={'display': 'inline-block'}
+            )
         ])
 
         @live_app.callback(dash.dependencies.Output("hidden_div", "children"),
@@ -90,9 +101,10 @@ class LiveApp(AbstractApp):
                 Output(component_id='live-clock', component_property='children')
             ],
             [
-                Input('interval-component', 'n_intervals')
+                Input('interval-component', 'n_intervals'),
+                Input('map_chooser', 'value')
             ])
-        def updateFigures(nIntervals):
+        def updateFigures(nIntervals, plot_type):
             # Collect data
             last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
 
@@ -100,7 +112,7 @@ class LiveApp(AbstractApp):
             colorScale = color_manager.getColorScale()
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type)
 
             return [
                 heatmapFig,

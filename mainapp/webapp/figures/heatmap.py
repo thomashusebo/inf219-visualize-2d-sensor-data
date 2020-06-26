@@ -1,13 +1,19 @@
 import plotly.graph_objects as go
 
 
-def getHeatMap(data, timestamp, colorScale):
-    if len(data)==0: return {
+def getHeatMap(data, timestamp, colorScale, figure_type):
+    get_figure = {
+        'heatmap': go.Heatmap,
+        'contour': go.Contour,
+        'surface': go.Surface
+    }
+
+    if len(data) == 0: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
     }
 
-    heatmap_data = go.Contour(z=data,
+    heatmap_data = get_figure[figure_type](z=data,
                               colorscale=colorScale
                               )
 

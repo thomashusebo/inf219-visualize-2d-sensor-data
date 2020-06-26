@@ -11,7 +11,7 @@ from mainapp.webapp.colors import color_manager
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.termination.termination import shutdown_path, shutdown_server
 
-#stylesheet = None
+# stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 
@@ -86,6 +86,17 @@ class TemporalApp(AbstractApp):
             ],
                 className='three columns'
             ),
+            dcc.RadioItems(
+                id='map_chooser',
+                options=[
+                    {'label': 'Heatmap', 'value': 'heatmap'},
+                    {'label': 'Contour', 'value': 'contour'},
+                    {'label': 'Surface', 'value': 'surface'}
+                ],
+                value='heatmap',
+                className='seven columns',
+                labelStyle={'display': 'inline-block'}
+            )
         ])
 
         @temporal_app.callback(Output("hidden_div", "children"),
@@ -105,10 +116,11 @@ class TemporalApp(AbstractApp):
                 Input('heatmap-slider', component_property='value'),
                 Input('heatmap', component_property='clickData'),
                 Input('interval-component', 'n_intervals'),
-                Input('play-button', 'on'),],
+                Input('play-button', 'on'),
+                Input('map_chooser', 'value')],
             [
-                State('linechart','relayoutData')])
-        def updateFigures(selectedIteration, clickData, n, playModeOn, relayout_data):
+                State('linechart', 'relayoutData')])
+        def updateFigures(selectedIteration, clickData, n, playModeOn, map_type, relayout_data):
             # Stops autoUpdate
             if not playModeOn:
                 raise Exception("Preventing callback to update figures")
@@ -140,7 +152,7 @@ class TemporalApp(AbstractApp):
             linechart_data = data_manager.get_linechart_data(data_manager, coordinate=coordinate, timeline=timeline)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type)
             lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinate, colorScale, timeline)
 
             return [
@@ -148,4 +160,4 @@ class TemporalApp(AbstractApp):
                 lineChartFig,
                 html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
                 1,
-                ]
+            ]
