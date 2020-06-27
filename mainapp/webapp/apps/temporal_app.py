@@ -15,6 +15,13 @@ from mainapp.termination.termination import shutdown_path, shutdown_server
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 
+def check_for_coordinate(coordinates, coordinate):
+    for point in coordinates:
+        if point['x'] == coordinate['x'] and point['y'] == coordinate['y']:
+            return True
+    return False
+
+
 class TemporalApp(AbstractApp):
     def setupOn(self, server, data_manager):
         temporal_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
@@ -73,16 +80,6 @@ class TemporalApp(AbstractApp):
                     id='play-button',
                     on=True
                 ),
-                daq.Slider(
-                    id='heatmap-slider',
-                    min=1,
-                    value=1,
-                    max=1,
-                    color='black',
-                    handleLabel={"showCurrentValue": True, "label": "Iteration"},
-                    size=0,
-                ),
-
             ],
                 className='three columns'
             ),
@@ -110,28 +107,29 @@ class TemporalApp(AbstractApp):
             [
                 Output(component_id='heatmap', component_property='figure'),
                 Output(component_id='linechart', component_property='figure'),
-                Output(component_id='live-clock', component_property='children'),
-                Output(component_id='heatmap-slider', component_property='max')],
+                Output(component_id='live-clock', component_property='children'),],
             [
-                Input('heatmap-slider', component_property='value'),
                 Input('heatmap', component_property='clickData'),
                 Input('interval-component', 'n_intervals'),
                 Input('play-button', 'on'),
                 Input('map_chooser', 'value')],
             [
                 State('linechart', 'relayoutData')])
-        def updateFigures(selectedIteration, clickData, n, playModeOn, map_type, relayout_data):
+        def updateFigures(clickData, n, playModeOn, map_type, relayout_data):
             # Stops autoUpdate
             if not playModeOn:
-                raise Exception("Preventing callback to update figures")
+                raise Exception("Preventing callback that update figures")
+
+            coordinates = []
 
             # Define coordinate
             if clickData is not None:
-                clickData = clickData['points'][0]
-                coordinate = {'x': clickData['x'],
-                              'y': clickData['y']}
+                coordinate = clickData['points'][0]
+                coordinates.append(coordinate)
             else:
                 coordinate = {'x': 0, 'y': 0}
+
+            print(coordinates)
 
             # Define colormap
             colorScale = color_manager.getColorScale()
@@ -152,12 +150,12 @@ class TemporalApp(AbstractApp):
             linechart_data = data_manager.get_linechart_data(data_manager, coordinate=coordinate, timeline=timeline)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type, coordinates)
             lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinate, colorScale, timeline)
 
             return [
                 heatmapFig,
                 lineChartFig,
                 html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
-                1,
+
             ]
