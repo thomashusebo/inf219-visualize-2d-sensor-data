@@ -46,7 +46,7 @@ class TemporalApp(AbstractApp):
                 html.Div(id='live-clock'),
                 dcc.Interval(
                     id='interval-component',
-                    interval=1 * 1000,  # milliseconds
+                    interval=10 * 1000,  # milliseconds
                     n_intervals=0
                 )
             ]),
@@ -109,27 +109,23 @@ class TemporalApp(AbstractApp):
                 Output(component_id='linechart', component_property='figure'),
                 Output(component_id='live-clock', component_property='children'),],
             [
-                Input('heatmap', component_property='clickData'),
-                Input('interval-component', 'n_intervals'),
+                Input('heatmap', component_property='selectedData'),
                 Input('play-button', 'on'),
                 Input('map_chooser', 'value')],
             [
                 State('linechart', 'relayoutData')])
-        def updateFigures(clickData, n, playModeOn, map_type, relayout_data):
+        def updateFigures(selectedCells, playModeOn, map_type, relayout_data):
             # Stops autoUpdate
             if not playModeOn:
                 raise Exception("Preventing callback that update figures")
 
-            coordinates = []
-
             # Define coordinate
-            if clickData is not None:
-                coordinate = clickData['points'][0]
-                coordinates.append(coordinate)
+            if selectedCells is not None:
+                coordinates = selectedCells['points']
+                coordinate = selectedCells['points'][0]
             else:
+                coordinates = []
                 coordinate = {'x': 0, 'y': 0}
-
-            print(coordinates)
 
             # Define colormap
             colorScale = color_manager.getColorScale()

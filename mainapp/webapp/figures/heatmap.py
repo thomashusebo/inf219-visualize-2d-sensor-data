@@ -16,6 +16,17 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None):
 
     heatmap_fig = go.Figure()
 
+    height, width = data.shape
+
+    heatmap_fig.add_trace(go.Scatter(
+        x=[i for i in range(width) for j in range(height)],
+        y=[j for i in range(width) for j in range(height)],
+        mode='markers',
+        marker=dict(
+            size=2,
+            color='black'
+        )))
+
     heatmap_fig.add_trace(get_figure[figure_type](z=data, colorscale=colorScale))
 
     if coordinates:
@@ -29,9 +40,14 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None):
 
     heatmap_fig.update_layout(
         title="Resistivity heatmap: {}".format(timestamp),
+        dragmode='lasso',
+        xaxis=dict(
+            fixedrange=True
+        ),
         yaxis=dict(
             scaleanchor = "x",
-            scaleratio=1
+            scaleratio=1,
+            fixedrange=True
         ),
         margin=dict(
             l=40,
