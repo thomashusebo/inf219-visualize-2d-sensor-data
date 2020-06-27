@@ -60,7 +60,7 @@ class TemporalApp(AbstractApp):
                           },
                           ),
             ],
-                className='seven columns'
+                className='five columns'
             ),
 
             # Line chart
@@ -71,7 +71,7 @@ class TemporalApp(AbstractApp):
                               "modeBarButtonsToRemove": []
                           }),
             ],
-                className='four columns'
+                className='six columns'
             ),
 
             # Slider
@@ -137,7 +137,7 @@ class TemporalApp(AbstractApp):
             # Collect data
             timestamp = "2020-03-08 18:00:00"
             timeline_start = "2020-03-08 18:00:00"
-            timeline_end = "2020-03-08 21:00:00"
+            timeline_end = "2020-03-08 18:01:00"
 
             if relayout_data:
                 if 'xaxis.range[0]' in relayout_data:
@@ -147,11 +147,11 @@ class TemporalApp(AbstractApp):
             timeline = {'start': timeline_start, 'end': timeline_end}
 
             latest_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
-            linechart_data = data_manager.get_linechart_data(data_manager, coordinate=coordinate, timeline=timeline)
+            linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
 
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type, coordinates)
-            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinate, colorScale, timeline)
+            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline)
 
             return [
                 heatmapFig,

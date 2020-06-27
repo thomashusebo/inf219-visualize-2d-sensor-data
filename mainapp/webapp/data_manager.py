@@ -57,7 +57,7 @@ class DataManager:
         return last_timestamp, heatmap_data.values[0].reshape(height, width)
 
     @staticmethod
-    def get_linechart_data(self, coordinate, timeline):
+    def get_linechart_data(self, coordinates, timeline):
         """
         :param self:
         :param coordinate: dict
@@ -69,7 +69,13 @@ class DataManager:
         """
         # For now, there is only one table to choose from
         table = self.resistivity_table
-        columns = "\"time\",\"[{:02d},{:02d}]\"".format(coordinate['x'], coordinate['y'])
+
+        columns = "\"time\""
+        for coordinate in coordinates:
+            columns += "".join(",\"[{:02d},{:02d}]\"".format(coordinate['x'],coordinate['y']))
+
+        #columns = "".join(["\"[{:02d},{:02d}]\",".format(x, y) for y in range(height) for x in range(width)])[:-1]
+        #columns = "\"time\",\"[{:02d},{:02d}]\"".format(coordinate['x'], coordinate['y'])
 
         try:
             linechart_data = pd.read_sql_query(
