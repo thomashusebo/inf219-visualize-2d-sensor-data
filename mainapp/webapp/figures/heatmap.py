@@ -13,30 +13,23 @@ def getHeatMap(data, timestamp, colorScale, figure_type):
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
     }
 
-    heatmap_data = get_figure[figure_type](z=data,
+    heatmap_fig = go.Figure(data=get_figure[figure_type](z=data,
                               colorscale=colorScale
-                              )
-
-    heatmap_layout = {
-        'title': "Resistivity heatmap: {}".format(timestamp),
-        'yaxis': {
-            "scaleanchor": "x",
-            "scaleratio": 1,
-        },
-        'margin': {
-            'l': 40,
-            'r': 40,
-            't': 40,
-            'b': 25
-        },
-        'colorbar': {
-            "title": "Resistivity (Ohm)"
-        }
-    }
-
-    heatmap_fig = {
-        'data': [heatmap_data],
-        'layout': heatmap_layout
-    }
-
+                              ),
+                            )
+    heatmap_fig.update_layout(
+        title="Resistivity heatmap: {}".format(timestamp),
+        yaxis=dict(
+            scaleanchor = "x",
+            scaleratio=1
+        ),
+        margin=dict(
+            l=40,
+            r=40,
+            t=40,
+            b=25,
+        ),
+    )
     return heatmap_fig
+
+
