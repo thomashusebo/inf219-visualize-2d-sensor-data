@@ -110,22 +110,26 @@ class TemporalApp(AbstractApp):
                 Output(component_id='live-clock', component_property='children'),],
             [
                 Input('heatmap', component_property='selectedData'),
+                Input('heatmap', component_property='clickData'),
                 Input('play-button', 'on'),
                 Input('map_chooser', 'value')],
             [
                 State('linechart', 'relayoutData')])
-        def updateFigures(selectedCells, playModeOn, map_type, relayout_data):
+        def updateFigures(selectedCells, clickedCell, playModeOn, map_type, relayout_data):
             # Stops autoUpdate
             if not playModeOn:
                 raise Exception("Preventing callback that update figures")
 
             # Define coordinate
+            coordinate = {'x': 0, 'y': 0}
+            coordinates = []
+            if clickedCell is not None:
+                coordinate = clickedCell['points'][0]
+                coordinates = [coordinate]
+
             if selectedCells is not None:
-                coordinates = selectedCells['points']
-                coordinate = selectedCells['points'][0]
-            else:
-                coordinates = []
-                coordinate = {'x': 0, 'y': 0}
+                if len(selectedCells['points']) > 0:
+                    coordinates = selectedCells['points']
 
             # Define colormap
             colorScale = color_manager.getColorScale()

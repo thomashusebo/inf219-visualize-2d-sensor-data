@@ -42,9 +42,11 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None):
         title="Resistivity heatmap: {}".format(timestamp),
         dragmode='lasso',
         xaxis=dict(
+            range=[-0.5, width-0.5],
             fixedrange=True
         ),
         yaxis=dict(
+            range=[-0.5, height-0.5],
             scaleanchor = "x",
             scaleratio=1,
             fixedrange=True
