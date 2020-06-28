@@ -17,7 +17,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
 
     # Add continuous error bars to the plot
     error_colors = ['#d9d9d9', '#bdbdbd', '#969696']
-    for i in reversed(range(1, 2)):
+    for i in reversed(range(1, 4)):
         fill_color = error_colors[i-1]
         if data.shape[1] > 2:
             linechart_fig.add_trace(go.Scatter(
@@ -48,10 +48,11 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
             mode='lines+markers',
             line=dict(
                 width=1,
-                color='#e3e3e3'),
+                color='#f0f0f0'),
             marker=dict(
                 size=2,
-                color='#e3e3e3'),
+                color='#f0f0f0'),
+            showlegend=False
         ))'''
 
     # Add central values to the plot
@@ -60,6 +61,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
             trace_name = 'Coordinate [{:d},{:d}]'.format(coordinates[0]['x'], coordinates[0]['y'])
         else:
             trace_name = 'Average'
+
         linechart_fig.add_trace(go.Scatter(
             name=trace_name,
             x=x,
@@ -76,11 +78,24 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
             showlegend=True
         ))
 
+    # Add vertical line representing selected timestamp
+    linechart_fig.add_shape(
+        # Line Vertical
+        dict(
+            type="line",
+            yref='paper',
+            x0=timestamp,
+            y0=0,
+            x1=timestamp,
+            y1=1,
+            line=dict(
+                color="black",
+                width=2
+            ),
+        ))
+
     linechart_fig.update_layout(
         xaxis=dict(
-            rangeslider=dict(
-                visible=True
-            ),
             range=[timeline['start'], timeline['end']],
             type="date",
             linecolor='black',

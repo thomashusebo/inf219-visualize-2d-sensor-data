@@ -57,6 +57,7 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None):
             t=40,
             b=25,
         ),
+        plot_bgcolor='white',
     )
     return heatmap_fig
 

@@ -35,8 +35,7 @@ class TemporalApp(AbstractApp):
             # Title
             html.Div([
                 dcc.Markdown('''
-                   ## Reconstruction of SmallTankTest001: Free Flow
-                   #### One new measurement per second, regardless of measurement timestamp
+                   ## Project name:
                    ''')
             ],
             ),
@@ -45,8 +44,8 @@ class TemporalApp(AbstractApp):
             html.Div([
                 html.Div(id='live-clock'),
                 dcc.Interval(
-                    id='interval-component',
-                    interval=10 * 1000,  # milliseconds
+                    id='update_figure_interval',
+                    interval=1 * 1000,  # milliseconds
                     n_intervals=0
                 )
             ]),
@@ -77,7 +76,9 @@ class TemporalApp(AbstractApp):
             # Slider
             html.Div([
                 daq.BooleanSwitch(
-                    id='play-button',
+                    id='live-mode-button',
+                    label="Update map to always show latest measurement: ",
+                    labelPosition="top",
                     on=True
                 ),
             ],
@@ -90,7 +91,7 @@ class TemporalApp(AbstractApp):
                     {'label': 'Contour', 'value': 'contour'},
                     {'label': 'Surface', 'value': 'surface'}
                 ],
-                value='heatmap',
+                value='contour',
                 className='seven columns',
                 labelStyle={'display': 'inline-block'}
             )
@@ -107,47 +108,58 @@ class TemporalApp(AbstractApp):
             [
                 Output(component_id='heatmap', component_property='figure'),
                 Output(component_id='linechart', component_property='figure'),
-                Output(component_id='live-clock', component_property='children'),],
+                Output(component_id='live-clock', component_property='children'),
+            ],
             [
+                Input('update_figure_interval', component_property='n_intervals'),
                 Input('heatmap', component_property='selectedData'),
                 Input('heatmap', component_property='clickData'),
-                Input('play-button', 'on'),
-                Input('map_chooser', 'value')],
+                Input('linechart', component_property='clickData'),
+                Input('live-mode-button', 'on'),
+                Input('map_chooser', 'value'),
+            ],
             [
-                State('linechart', 'relayoutData')])
-        def updateFigures(selectedCells, clickedCell, playModeOn, map_type, relayout_data):
-            # Stops autoUpdate
-            if not playModeOn:
-                raise Exception("Preventing callback that update figures")
-
-            # Define coordinate
-            coordinate = {'x': 0, 'y': 0}
-            coordinates = []
-            if clickedCell is not None:
-                coordinate = clickedCell['points'][0]
-                coordinates = [coordinate]
-
-            if selectedCells is not None:
-                if len(selectedCells['points']) > 0:
-                    coordinates = selectedCells['points']
-
-            # Define colormap
+                State('linechart', 'relayoutData'),
+            ])
+        def updateFigures(n, selected_cells_heatmap, clicked_cell_heatmap, click_data_linechart, live_mode, map_type, relayout_data):
+            # Define default values
+            default_timestamp = "2020-03-08 18:00:00"
+            default_timeline = {'start': "2020-03-08 18:00:00", 'end': "2020-03-08 18:01:00"}
+            default_coordinate = {'x': 0, 'y': 0}
             colorScale = color_manager.getColorScale()
 
-            # Collect data
-            timestamp = "2020-03-08 18:00:00"
-            timeline_start = "2020-03-08 18:00:00"
-            timeline_end = "2020-03-08 18:01:00"
+            # Choose coordinate
+            coordinates = [default_coordinate]
+            if clicked_cell_heatmap is not None:
+                coordinate = clicked_cell_heatmap['points'][0]
+                coordinates = [coordinate]
 
+            if selected_cells_heatmap is not None:
+                if len(selected_cells_heatmap['points']) > 0:
+                    coordinates = selected_cells_heatmap['points']
+
+            # Check for timestamp data from linechart
+            timestamp = default_timestamp
+            if click_data_linechart:
+                timestamp = click_data_linechart['points'][0]['x']
+
+            # Collect map data
+            latest_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp, live=live_mode)
+
+            # Check current timeline in linechart and keep zoom level
+            timeline = default_timeline
+            if live_mode:
+                latest_timestamp = datetime.datetime.strptime(latest_timestamp, "%Y-%m-%d %H:%M:%S")
+                timeline = {'start': latest_timestamp - datetime.timedelta(minutes=1), 'end':latest_timestamp+datetime.timedelta(seconds=2)}
             if relayout_data:
                 if 'xaxis.range[0]' in relayout_data:
-                    timeline_start = relayout_data['xaxis.range[0]']
-                    timeline_end = relayout_data['xaxis.range[1]']
+                    timeline = {'start': relayout_data['xaxis.range[0]'], 'end': relayout_data['xaxis.range[1]']}
 
-            timeline = {'start': timeline_start, 'end': timeline_end}
-
-            latest_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp)
+            # Collect linechart data
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
+
+            if live_mode:
+                timestamp = latest_timestamp
 
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type, coordinates)
@@ -157,5 +169,4 @@ class TemporalApp(AbstractApp):
                 heatmapFig,
                 lineChartFig,
                 html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
-
             ]
