@@ -1,9 +1,10 @@
 import datetime
+import hashlib
 
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
-from dash.dependencies import Output, Input
+from dash.dependencies import Output, Input, State
 
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.termination.termination import shutdown_path, shutdown_server
@@ -12,6 +13,8 @@ from mainapp.webapp.colors import color_manager
 
 #stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+log = ""
+encrypted_project_password = hashlib.sha256("passord123".encode()).hexdigest()
 
 
 class LiveApp(AbstractApp):
@@ -19,49 +22,44 @@ class LiveApp(AbstractApp):
         live_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
         live_app.layout = html.Div([
             # Page Header
-            html.H1('Live View'),
-            dcc.Location(id='url', refresh=False),
-            html.Div(id="hidden_div"),
-            dcc.Link('Shutdown server', href=shutdown_path),
-
-            # Title
             html.Div([
-                dcc.Markdown('''
-                    ## Reconstruction of SmallTankTest001: Free Flow
-                    #### One new measurement per second, regardless of measurement timestamp
-                    ''')
-            ],
-            ),
+                html.H1('Live View'),
+                dcc.Location(id='url', refresh=False),
+                html.Div(id="hidden_div"),
+                dcc.Link('Shutdown server', href=shutdown_path),
+
+                # Time
+                html.Div([
+                    html.Div(id='live-clock'),
+                    dcc.Interval(
+                        id='interval-component',
+                        interval=1 * 1000,  # milliseconds
+                        n_intervals=0
+                    )
+                ]),
+            ]),
+
+            # Log
             html.Div([
-                dcc.Markdown('''
-                    ##### Description
-                    For this experiment we filled the tank only tapwater. 
+                dcc.Markdown(
+                    id='log_markdown',
+                    children='''##### Log'''),
+                html.Div(id='log', style={'whiteSpace': 'pre-line'}),
+                dcc.Textarea(
+                    id='log-entry',
+                    value='Textarea content initialized\nwith multiple lines of text',
+                    style={'width': '100%', 'height': 50},
+                ),
+                dcc.Input(
+                    id="project-password",
+                    type='password',
+                    placeholder="Enter project password",
+                ),
+                html.Button('Submit', id='submit-log-entry', n_clicks=0),
 
-                    ##### Logg
-                    - Added tapwater 
-                        -   then measurements (1-5)
-                    - Added solution tapwater with conditor into (2.5, 1.5)
-                        -   then measurements (6-11)
-                    - Added solution tapwater w/0.23M NaCl, into (2.5, 1.5)
-                        -   then measurements (12-20)
-                    - Added solution tapwater w/0.90M NaCl, into (0.0, 1.5)
-                        -   then measurements (21-27)
-
-
-                    ''')
             ],
                 className='four columns'
             ),
-
-            # Time
-            html.Div([
-                html.Div(id='live-clock'),
-                dcc.Interval(
-                    id='interval-component',
-                    interval=1 * 1000,  # milliseconds
-                    n_intervals=0
-                )
-            ]),
 
             # Heatmap
             html.Div([
@@ -71,20 +69,20 @@ class LiveApp(AbstractApp):
                               "modeBarButtonsToRemove": ['zoom2d']
                           },
                           ),
+                dcc.RadioItems(
+                    id='map_chooser',
+                    options=[
+                        {'label': 'Heatmap', 'value': 'heatmap'},
+                        {'label': 'Contour', 'value': 'contour'},
+                        {'label': 'Surface', 'value': 'surface'}
+                    ],
+                    value='heatmap',
+                    className='seven columns',
+                    labelStyle={'display': 'inline-block'}
+                )
             ],
                 className='seven columns'
             ),
-            dcc.RadioItems(
-                id='map_chooser',
-                options=[
-                    {'label': 'Heatmap', 'value': 'heatmap'},
-                    {'label': 'Contour', 'value': 'contour'},
-                    {'label': 'Surface', 'value': 'surface'}
-                ],
-                value='heatmap',
-                className ='seven columns',
-                labelStyle={'display': 'inline-block'}
-            )
         ])
 
         @live_app.callback(dash.dependencies.Output("hidden_div", "children"),
@@ -111,6 +109,8 @@ class LiveApp(AbstractApp):
             # Define colormap
             colorScale = color_manager.getColorScale()
 
+
+
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type)
 
@@ -118,3 +118,28 @@ class LiveApp(AbstractApp):
                 heatmapFig,
                 html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
             ]
+
+        @live_app.callback(
+            [
+                Output('log', 'children'),
+                Output('log-entry', 'value')
+             ],
+            [
+                Input('submit-log-entry', 'n_clicks'),
+            ],
+            [
+                State('log-entry', 'value'),
+                State('project-password', 'value')
+            ]
+        )
+        def update_output(n_clicks, log_entry, password):
+            if n_clicks > 0:
+                global encrypted_project_password
+                global log
+                encrypted_password = hashlib.sha256(password.encode()).hexdigest()
+                if encrypted_password != encrypted_project_password:
+                    return[dcc.Markdown(log), log_entry]
+
+                if log_entry is not "":
+                    log += '\n --- \n **' + datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y") + '** \n\n' + log_entry
+                return [dcc.Markdown(log),""]
