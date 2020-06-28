@@ -11,7 +11,7 @@ from mainapp.termination.termination import shutdown_path, shutdown_server
 from mainapp.webapp.figures import heatmap
 from mainapp.webapp.colors import color_manager
 
-#stylesheet = None
+# stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 log = ""
 encrypted_project_password = hashlib.sha256("passord123".encode()).hexdigest()
@@ -42,18 +42,20 @@ class LiveApp(AbstractApp):
             # Log
             html.Div([
                 dcc.Markdown(
-                    id='log_markdown',
                     children='''##### Log'''),
-                html.Div(id='log', style={'whiteSpace': 'pre-line'}),
+                html.Div(
+                    id='log',
+                    style={'whiteSpace': 'pre-line'},
+                    children=dcc.Markdown(log)),
                 dcc.Textarea(
                     id='log-entry',
-                    value='Textarea content initialized\nwith multiple lines of text',
                     style={'width': '100%', 'height': 50},
+                    placeholder='Enter log entry...'
                 ),
                 dcc.Input(
                     id="project-password",
                     type='password',
-                    placeholder="Enter project password",
+                    placeholder="Enter project password...",
                 ),
                 html.Button('Submit', id='submit-log-entry', n_clicks=0),
 
@@ -109,8 +111,6 @@ class LiveApp(AbstractApp):
             # Define colormap
             colorScale = color_manager.getColorScale()
 
-
-
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type)
 
@@ -122,8 +122,10 @@ class LiveApp(AbstractApp):
         @live_app.callback(
             [
                 Output('log', 'children'),
-                Output('log-entry', 'value')
-             ],
+                Output('log-entry', 'value'),
+                Output('project-password', 'placeholder'),
+                Output('project-password', 'value')
+            ],
             [
                 Input('submit-log-entry', 'n_clicks'),
             ],
@@ -137,9 +139,12 @@ class LiveApp(AbstractApp):
                 global encrypted_project_password
                 global log
                 encrypted_password = hashlib.sha256(password.encode()).hexdigest()
-                if encrypted_password != encrypted_project_password:
-                    return[dcc.Markdown(log), log_entry]
 
-                if log_entry is not "":
-                    log += '\n --- \n **' + datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y") + '** \n\n' + log_entry
-                return [dcc.Markdown(log),""]
+                if log_entry is "":
+                    return [dcc.Markdown(log), "", "Enter project password...", ""]
+
+                if encrypted_password != encrypted_project_password:
+                    return [dcc.Markdown(log), log_entry, "Incorrect password...", ""]
+
+                log += '\n --- \n **' + datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y") + '** \n\n' + log_entry
+                return [dcc.Markdown(log), "", "Enter project password", ""]
