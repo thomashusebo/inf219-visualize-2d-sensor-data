@@ -13,52 +13,68 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
     linechart_fig = go.Figure()
 
     means = data.iloc[:, 1:].transpose().mean().transpose()
-    var=data.iloc[:,1:].transpose().std().transpose()
+    var = data.iloc[:, 1:].transpose().std().transpose()
 
-    up = means + var
-    down = means - var
+    # Add continuous error bars to the plot
+    error_colors = ['#d9d9d9', '#bdbdbd', '#969696']
+    for i in reversed(range(1, 2)):
+        fill_color = error_colors[i-1]
+        if data.shape[1] > 2:
+            linechart_fig.add_trace(go.Scatter(
+                x=x,
+                y=means - i * var,
+                mode='lines',
+                line=dict(width=1, color='black'),
+                showlegend=False
+            ))
 
+            linechart_fig.add_trace(go.Scatter(
+                name='{} standard deviation(s)'.format(i),
+                x=x,
+                y=means + i * var,
+                mode='lines',
+                marker=dict(color="#444"),
+                line=dict(width=1, color='black'),
+                fillcolor=fill_color,
+                fill='tonexty'))
 
-    if data.shape[1] > 1:
+    # Add induvidual traces to the plot
+    '''ys = data.shape[1]
+    for y in range(1, ys):
+        y = data.iloc[:, y].values
         linechart_fig.add_trace(go.Scatter(
+            x=x,
+            y=y,
+            mode='lines+markers',
+            line=dict(
+                width=1,
+                color='#e3e3e3'),
+            marker=dict(
+                size=2,
+                color='#e3e3e3'),
+        ))'''
+
+    # Add central values to the plot
+    if data.shape[1] > 1:
+        if data.shape[1] == 2:
+            trace_name = 'Coordinate [{:d},{:d}]'.format(coordinates[0]['x'], coordinates[0]['y'])
+        else:
+            trace_name = 'Average'
+        linechart_fig.add_trace(go.Scatter(
+            name=trace_name,
             x=x,
             y=means,
             mode='lines+markers',
             line=dict(
-                color=colorScale[0][1],
-                width=2
+                color='#292929',
+                width=1
             ),
             marker=dict(
-                color=colorScale[0][1],
-                size=2
-            )
+                color='#292929',
+                size=3
+            ),
+            showlegend=True
         ))
-
-    if data.shape[1] > 2:
-        linechart_fig.add_trace(go.Scatter(
-            x=x,
-            y=down,
-            mode='lines',
-            line=dict(width=1, color='black'),
-        ))
-
-        linechart_fig.add_trace(go.Scatter(
-            name='Upper Bound',
-            x=x,
-            y=up,
-            mode='lines',
-            marker=dict(color="#444"),
-            line=dict(width=1, color='black'),
-            fillcolor=colorScale[round(len(colorScale)/2)][1],
-            fill='tonexty'))
-
-    ys = data.shape[1]
-    for y in range(1, ys):
-        y = data.iloc[:, y].values
-        linechart_fig.add_trace(go.Scatter(x=x,
-                                           y=y,
-                                           mode='lines+markers',
-                                           line=dict(color='grey')))
 
     linechart_fig.update_layout(
         xaxis=dict(
