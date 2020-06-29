@@ -148,18 +148,16 @@ class TemporalApp(AbstractApp):
 
             # Check current timeline in linechart and keep zoom level
             timeline = default_timeline
-            if live_mode:
+            if live_mode and latest_timestamp is not None:
                 latest_timestamp = datetime.datetime.strptime(latest_timestamp, "%Y-%m-%d %H:%M:%S")
                 timeline = {'start': latest_timestamp - datetime.timedelta(minutes=1), 'end':latest_timestamp+datetime.timedelta(seconds=2)}
+                timestamp = latest_timestamp
             if relayout_data:
                 if 'xaxis.range[0]' in relayout_data:
                     timeline = {'start': relayout_data['xaxis.range[0]'], 'end': relayout_data['xaxis.range[1]']}
 
             # Collect linechart data
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
-
-            if live_mode:
-                timestamp = latest_timestamp
 
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type, coordinates)
