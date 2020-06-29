@@ -135,16 +135,17 @@ class LiveApp(AbstractApp):
             ]
         )
         def update_output(n_clicks, log_entry, password):
-            if n_clicks > 0:
-                global encrypted_project_password
-                global log
+            global encrypted_project_password
+            global log
+
+            if log_entry is "":
+                return [dcc.Markdown(log), "", "Enter project password...", ""]
+
+            if password is not None:
                 encrypted_password = hashlib.sha256(password.encode()).hexdigest()
-
-                if log_entry is "":
-                    return [dcc.Markdown(log), "", "Enter project password...", ""]
-
-                if encrypted_password != encrypted_project_password:
+                if encrypted_password == encrypted_project_password:
+                    log += '\n --- \n **' + datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y") + '** \n\n' + log_entry
+                else:
                     return [dcc.Markdown(log), log_entry, "Incorrect password...", ""]
 
-                log += '\n --- \n **' + datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y") + '** \n\n' + log_entry
-                return [dcc.Markdown(log), "", "Enter project password", ""]
+            return [dcc.Markdown(log), "", "Enter project password", ""]

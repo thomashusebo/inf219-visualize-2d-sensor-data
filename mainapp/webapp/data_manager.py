@@ -34,7 +34,7 @@ class DataManager:
             last_timestamp = pd.read_sql_query("SELECT MAX(\"time\") FROM {}".format(table),
                                                self.database).values[0][0]
         except sqlalchemy.exc.OperationalError:
-            return "",[]
+            return None,[]
 
         if live:
             timestamp = last_timestamp
