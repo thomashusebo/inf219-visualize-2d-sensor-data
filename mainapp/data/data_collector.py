@@ -33,99 +33,77 @@ def update(project_name):
     clean_up_stopping_dir(stopping_dir, stopping_file)
 
     database = create_engine('sqlite:///fluid_flower_database.db')
-    chunksize = 100000
+    chunksize = 1000
     project_name = project_name
     resistivity_table = "{}_{}".format(project_name, DataType.Resistivity.value)
     database_table = resistivity_table
 
     # Data for data collector report
-    debug = True
-    num_read_files = 0
-    num_deleted_files = 0
-    num_files_not_found = 0
-    num_files_with_permission_errors = 0
-    num_files_with_empty_data_errors = 0
-    if debug:
-        all_read_files = []
-        all_deleted_files = []
-        all_files_not_found = []
-        all_files_with_permission_errors = []
-        all_files_with_empty_data_errors = []
+    collection_statistics = {
+        "Files read: ": 0,
+        "Chunks of last file read: ": 0,
+        "Files deleted: ": 0,
+        "Failed deletions: ": 0,
+        "Files not found: ": 0,
+        "Permission errors: ": 0,
+        "Empty data errors: ": 0,
+        "Failed initialization errors: ": 0
+    }
 
     while True:
         files = next(os.walk(incoming_data_dir))[2]
+        if time_to_stop(stopping_dir, stopping_file):
+            return "DataCollector Stopped \n " + str(collection_statistics)
         for file in files:
             if time_to_stop(stopping_dir, stopping_file):
-                return "DataCollector Stopped. \n" \
-                       "\t# files read: {} \n" \
-                       "\t# files deleted: {} \n" \
-                       "\t# files not found: {} \n" \
-                       "\t# files with permission error: {} \n" \
-                       "\t# files with EmptyDataError: {}".format(num_read_files,
-                                                                num_deleted_files,
-                                                                num_files_not_found,
-                                                                num_files_with_permission_errors,
-                                                                num_files_with_empty_data_errors,)
+                return "DataCollector Stopped \n " + str(collection_statistics)
+
             try:
+                tic = time.process_time()
                 file_dir = "{}\\{}".format(incoming_data_dir, file)
                 for df in pd.read_csv(file_dir, chunksize=chunksize, iterator=True):
+                    if time_to_stop(stopping_dir, stopping_file):
+                        return "DataCollector Stopped \n " + str(collection_statistics)
                     df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
                     df.to_sql(database_table, database, if_exists='append')
-
-                num_read_files += 1
-                if debug:
-                    all_read_files.append(file_dir)
-
+                    toc = time.process_time()
+                    collection_statistics['Chunks of last file read: '] += chunksize
+                    collection_statistics['Time until last chunk: '] = toc-tic
+                toc = time.process_time()
+                collection_statistics['Time to read last file: '] = toc-tic
+                collection_statistics['Time until last chunk: '] = 0
+                collection_statistics['Chunks of last file read: '] = 0
+                collection_statistics['Files read: '] += 1
                 os.remove(file_dir)
+                toc = time.process_time()
+                collection_statistics['Time to read and delete last file'] = toc-tic
+                return str(collection_statistics)
 
-                num_deleted_files += 1
-                if debug:
-                    all_deleted_files.append(file_dir)
+                if file not in next(os.walk(incoming_data_dir))[2]:
+                    collection_statistics['Files deleted: '] += 1
+                else:
+                    collection_statistics['Failed deletions: '] += 1
 
             except FileNotFoundError:
                 # If file not found then another process completed and deleted it for the dir
-                num_files_not_found += 1
-                if debug:
-                    all_files_not_found.append(file_dir)
+                collection_statistics['Files not found: '] += 1
                 pass
+
             except PermissionError:
                 # Then directly interfering with another process
-                num_files_with_permission_errors += 1
-                if debug:
-                    all_files_with_permission_errors.append(file_dir)
+                collection_statistics['Permission errors: '] += 1
                 pass
+
             except pd.errors.EmptyDataError:
                 # Trying to read incomplete file. Pass for now, will read fine when instrument have completed the file
-                num_files_with_empty_data_errors += 1
-                if debug:
-                    all_files_with_empty_data_errors.append(file_dir)
+                collection_statistics['Empty data errors: '] += 1
+                pass
+
+            except OSError:
+                # Trying to read a file that has not been completely transferred to dir
+                collection_statistics['Failed initialization errors: '] += 1
                 pass
 
             except Exception as e:
-                if debug:
-                    return "Unexpected error: {}. \n" \
-                           "Trying to read file {}. \n\n" \
-                           "All files read({}): {} \n\n" \
-                           "All files deleted({}): {} \n\n" \
-                           "All files not found({}): {} \n\n" \
-                           "All files with permission error({}): {} \n\n" \
-                           "All files with EmptyDataError ({})".format(e, file_dir,
-                                                                       len(all_read_files), all_read_files,
-                                                                       len(all_deleted_files), all_deleted_files,
-                                                                       len(all_files_not_found),
-                                                                       all_files_not_found,
-                                                                       len(all_files_with_permission_errors),
-                                                                       all_files_with_permission_errors)
-                else:
-                    return "Unexpected error: {}. \n" \
-                           "Trying to read file {}. \n" \
-                           "# files read: {} \n" \
-                           "# files deleted: {} \n" \
-                           "# files not found: {} \n" \
-                           "# files with permission error: {} \n" \
-                           "# files with EmptyDataError: {}".format(e, file_dir,
-                                                                    num_read_files,
-                                                                    num_deleted_files,
-                                                                    num_files_not_found,
-                                                                    num_files_with_permission_errors,
-                                                                    num_files_with_empty_data_errors,)
+                return "Unexpected error: {}. \n" \
+                        "Trying to read file {}. \n".format(e, file_dir) + str(collection_statistics)
