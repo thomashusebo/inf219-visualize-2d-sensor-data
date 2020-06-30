@@ -44,6 +44,11 @@ class TemporalApp(AbstractApp):
             html.Div([
                 html.Div(id='live-clock'),
                 dcc.Interval(
+                    id='time-updater',
+                    interval = 1*1000,
+                    n_intervals=0
+                ),
+                dcc.Interval(
                     id='update_figure_interval',
                     interval=1 * 1000,  # milliseconds
                     n_intervals=0
@@ -104,14 +109,17 @@ class TemporalApp(AbstractApp):
                 shutdown_server()
                 return dcc.Location(pathname="/", id="someid_doesnt_matter")
 
+        @temporal_app.callback(Output(component_id='live-clock', component_property='children'),
+                               [Input('time-updater', 'n_intervals')])
+        def update_clock(n):
+            return html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+
         @temporal_app.callback(
             [
                 Output(component_id='heatmap', component_property='figure'),
                 Output(component_id='linechart', component_property='figure'),
-                Output(component_id='live-clock', component_property='children'),
             ],
             [
-                Input('update_figure_interval', component_property='n_intervals'),
                 Input('heatmap', component_property='selectedData'),
                 Input('heatmap', component_property='clickData'),
                 Input('linechart', component_property='clickData'),
@@ -121,7 +129,7 @@ class TemporalApp(AbstractApp):
             [
                 State('linechart', 'relayoutData'),
             ])
-        def updateFigures(n, selected_cells_heatmap, clicked_cell_heatmap, click_data_linechart, live_mode, map_type, relayout_data):
+        def updateFigures(selected_cells_heatmap, clicked_cell_heatmap, click_data_linechart, live_mode, map_type, relayout_data):
             # Define default values
             default_timestamp = "2020-03-08 18:00:00"
             default_timeline = {'start': "2020-03-08 18:00:00", 'end': "2020-03-08 18:01:00"}
@@ -166,5 +174,4 @@ class TemporalApp(AbstractApp):
             return [
                 heatmapFig,
                 lineChartFig,
-                html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
             ]
