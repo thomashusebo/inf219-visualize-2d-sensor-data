@@ -20,8 +20,11 @@ def start(project_name, cpu_cores=None, instrument_simulator=None):
         raise Exception("Need at least 2 cpu cores run application. \n"
                         "1 for instrument, 1 for data collector\n"
                         "Cores given access to: {}".format(cpu_cores))
+
+    # Append jobs
     jobs.append(pool.apply_async(data_collector.update, (project_name,)))
-    jobs.append(pool.apply_async(instrument_simulator.run, (1,)))
+    if instrument_simulator is not None:
+        jobs.append(pool.apply_async(instrument_simulator.run, (1,)))
     jobs.append(pool.apply_async(server.start, (project_name,)))
 
     for job in jobs:
