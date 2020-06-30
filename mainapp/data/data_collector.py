@@ -77,7 +77,6 @@ def update(project_name):
                 os.remove(file_dir)
                 toc = time.process_time()
                 collection_statistics['Time to read and delete last file'] = toc-tic
-                return str(collection_statistics)
 
                 if file not in next(os.walk(incoming_data_dir))[2]:
                     collection_statistics['Files deleted: '] += 1
