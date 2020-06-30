@@ -40,14 +40,16 @@ class DataManager:
             timestamp = last_timestamp
 
         # Finds dimensions of the data
-        query = "SELECT \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
+        query = "SELECT /*+ MAX_EXECUTION_TIME(1000) */ \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
         dimensions = pd.read_sql_query(query, self.database)
+        if dimensions.empty:
+            return None, []
         width = dimensions.values[0][0]
         height = dimensions.values[0][1]
 
         # Collects a DataFrame of the heatmap
         columns = "".join(["\"[{:02d},{:02d}]\",".format(x, y) for y in range(height) for x in range(width)])[:-1]
-        sql_query = 'SELECT {} FROM {} WHERE time = \"{}\"'.format(
+        sql_query = 'SELECT /*+ MAX_EXECUTION_TIME(1000) */ {} FROM {} WHERE time = \"{}\"'.format(
             columns,
             table,
             timestamp)
