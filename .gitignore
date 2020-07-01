@@ -3,5 +3,6 @@ ignoreDir/
 incoming_data/
 mainapp/instrument_simulator/projects/
 mainapp/termination/stop_dir/
+storage/databases/
 fluid_flower_database.db
 separate_instrument.py
