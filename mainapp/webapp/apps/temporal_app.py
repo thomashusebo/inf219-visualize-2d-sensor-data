@@ -24,7 +24,7 @@ def check_for_coordinate(coordinates, coordinate):
 
 
 class TemporalApp(AbstractApp):
-    def setupOn(self, server, data_manager):
+    def setupOn(self, server, data_manager, project_name):
         temporal_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
         temporal_app.layout = html.Div([
             # Page header
@@ -36,8 +36,8 @@ class TemporalApp(AbstractApp):
             # Title
             html.Div([
                 dcc.Markdown('''
-                   ## Project name:
-                   ''')
+                   ## Project name: {}
+                   '''.format(project_name))
             ],
             ),
 

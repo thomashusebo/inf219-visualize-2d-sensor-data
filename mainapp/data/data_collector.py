@@ -32,7 +32,7 @@ def update(project_name):
     stopping_file = 'stop_data_collector.txt'
     clean_up_stopping_dir(stopping_dir, stopping_file)
 
-    database = create_engine('sqlite:///fluid_flower_database.db')
+    database = create_engine('sqlite:///storage/databases/{}.db'.format(project_name))
     chunksize = 1000
     project_name = project_name
     resistivity_table = "{}_{}".format(project_name, DataType.Resistivity.value)

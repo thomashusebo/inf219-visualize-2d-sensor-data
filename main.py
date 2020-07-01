@@ -6,11 +6,10 @@ def main():
     setup = SetupApp()
     setup.run()
 
-    print("Projectname: {} \nCollect data: {} \n".format(setupapp.active_project, setupapp.datacollection))
-
-    multiprocess_manager.start(project_name=setupapp.active_project,
-                               datacollection = setupapp.datacollection,
-                               instrument_simulator=simulate_instrument_csv)
+    if setupapp.active_project is not "":
+        multiprocess_manager.start(project_name=setupapp.active_project,
+                                   datacollection = setupapp.datacollection,
+                                   instrument_simulator=simulate_instrument_csv)
 
 
 if __name__ == '__main__':
