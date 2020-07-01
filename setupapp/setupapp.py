@@ -1,10 +1,12 @@
-import multiprocessing
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty
+from sqlalchemy import create_engine, inspect
 
 name = ''
+inspector = inspect(create_engine('sqlite:///fluid_flower_database.db'))
 
 
 class MainWindow(Screen):
@@ -22,12 +24,23 @@ class NewProjectWindow(Screen):
         App.get_running_app().stop()
 
 
+class ContinueProjectWindow(Screen):
+    pass
+
+
 class LoadProjectWindow(Screen):
+
+
     @staticmethod
     def select_project(project):
         global name
         name = project
         App.get_running_app().stop()
+
+    @staticmethod
+    def print_all_projects():
+        print(inspector.get_table_names())
+        print("Projects")
 
 
 class WindowManager(ScreenManager):

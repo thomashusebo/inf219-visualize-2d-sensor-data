@@ -1,6 +1,7 @@
 WindowManager:
     MainWindow:
     NewProjectWindow:
+    ContinueProjectWindow:
     LoadProjectWindow:
 
 <MainWindow>:
@@ -11,15 +12,18 @@ WindowManager:
         padding: 200
 
         Button:
-            text: "Start New Live Project"
-            on_release:
-                app.root.current = "new_project"
-                root.manager.transition.direction = "left"
-        Button:
-            text: "Load Existing Project"
+            text: "Continue live project"
             on_release:
                 app.root.current = "load_project"
                 root.manager.transition.direction = "left"
+
+        Button:
+            text: "Load previous project"
+            on_release:
+                app.root.current = "load_project"
+                root.manager.transition.direction = "left"
+
+
         Button:
             text: "Exit"
             on_release: root.quit()
@@ -54,6 +58,22 @@ WindowManager:
                 app.root.current = "main"
                 root.manager.transition.direction = "right"
 
+<ContinueProjectWindow>:
+    name: "continue_project"
+
+    GridLayout:
+        cols: 1
+
+        Button:
+            text: "Continue Previous Project"
+            on_release: root.select_project('UpscaledObstructedFlow')
+
+        Button:
+            text: "Go Back"
+            on_release:
+                app.root.current = "main"
+                root.manager.transition.direction = "right"
+
 <LoadProjectWindow>:
     name: "load_project"
 
@@ -62,8 +82,8 @@ WindowManager:
         padding: 200
 
         Button:
-            text: "Obstructed Flow"
-            on_release: root.select_project('UpscaledObstructedFlow')
+            text: "Check existing projects...."
+            on_release: root.print_all_projects()
 
         Button:
             text: "Go Back"
