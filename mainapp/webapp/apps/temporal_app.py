@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import dash
 import dash_html_components as html
@@ -120,6 +121,7 @@ class TemporalApp(AbstractApp):
                 Output(component_id='linechart', component_property='figure'),
             ],
             [
+                Input('update_figure_interval', 'n_intervals'),
                 Input('heatmap', component_property='selectedData'),
                 Input('heatmap', component_property='clickData'),
                 Input('linechart', component_property='clickData'),
@@ -129,14 +131,20 @@ class TemporalApp(AbstractApp):
             [
                 State('linechart', 'relayoutData'),
             ])
-        def updateFigures(selected_cells_heatmap, clicked_cell_heatmap, click_data_linechart, live_mode, map_type, relayout_data):
+        def updateFigures(n, selected_cells_heatmap, clicked_cell_heatmap, click_data_linechart, live_mode, map_type, relayout_data):
+            timing = {}
+
             # Define default values
+            first_tic = tic = time.process_time()
             default_timestamp = "2020-03-08 18:00:00"
             default_timeline = {'start': "2020-03-08 18:00:00", 'end': "2020-03-08 18:01:00"}
             default_coordinate = {'x': 0, 'y': 0}
             colorScale = color_manager.getColorScale()
+            toc = time.process_time()
+            timing['set default values'] = toc-tic
 
             # Choose coordinate
+            tic = time.process_time()
             coordinates = [default_coordinate]
             if clicked_cell_heatmap is not None:
                 coordinate = clicked_cell_heatmap['points'][0]
@@ -145,16 +153,24 @@ class TemporalApp(AbstractApp):
             if selected_cells_heatmap is not None:
                 if len(selected_cells_heatmap['points']) > 0:
                     coordinates = selected_cells_heatmap['points']
+            toc = time.process_time()
+            timing['choose coordinates'] = toc-tic
 
             # Check for timestamp data from linechart
+            tic = time.process_time()
             timestamp = default_timestamp
             if click_data_linechart:
                 timestamp = click_data_linechart['points'][0]['x']
-
+            toc = time.process_time()
+            timing['evaluate timestamp'] = toc-tic
             # Collect map data
+            tic = time.process_time()
             latest_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp, live=live_mode)
+            toc = time.process_time()
+            timing['collect map data'] = toc-tic
 
             # Check current timeline in linechart and keep zoom level
+            tic = time.process_time()
             timeline = default_timeline
             if live_mode and latest_timestamp is not None:
                 latest_timestamp = datetime.datetime.strptime(latest_timestamp, "%Y-%m-%d %H:%M:%S")
@@ -163,14 +179,26 @@ class TemporalApp(AbstractApp):
             if relayout_data:
                 if 'xaxis.range[0]' in relayout_data:
                     timeline = {'start': relayout_data['xaxis.range[0]'], 'end': relayout_data['xaxis.range[1]']}
+            toc = time.process_time()
+            timing['final say in timestamp and timeline'] = toc-tic
 
             # Collect linechart data
+            tic = time.process_time()
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
+            timing['collect line data'] =  time.process_time() - tic
 
             # Update figures
+            tic = time.process_time()
             heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type, coordinates)
-            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline)
+            toc = time.process_time()
+            timing['update map fig'] = toc-tic
 
+            tic = time.process_time()
+            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline)
+            toc= time.process_time()
+            timing['update line fig'] = toc-tic
+            timing['full time'] = toc - first_tic
+            print("Linechart figure update: {}".format(str(timing)))
             return [
                 heatmapFig,
                 lineChartFig,
