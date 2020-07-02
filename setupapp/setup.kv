@@ -9,12 +9,18 @@ WindowManager:
 
     GridLayout:
         cols: 1
-        padding: 200
+        padding: [200,200,200,100]
+
+        Button:
+            text: "Start new live project"
+            on_release:
+                app.root.current = "new_project"
+                root.manager.transition.direction = "left"
 
         Button:
             text: "Continue live project"
             on_release:
-                app.root.current = "load_project"
+                app.root.current = "continue_project"
                 root.manager.transition.direction = "left"
 
         Button:
@@ -23,6 +29,11 @@ WindowManager:
                 app.root.current = "load_project"
                 root.manager.transition.direction = "left"
 
+        Button:
+            text: "Import project (NOT FUNCTIONAL)"
+
+        Button:
+            text: "Export project (NOT FUNCTIONAL)"
 
         Button:
             text: "Exit"
@@ -32,19 +43,41 @@ WindowManager:
     name: "new_project"
 
     project_name: project_name
+    password: password
+    confirm_password: confirm_password
+    status_label: my_status_label
 
     GridLayout:
         cols: 1
-        padding: 200
+        padding: [200,100,200,100]
+
+        Label:
+            id: my_status_label
+            text: ""
 
         GridLayout:
             cols: 2
+            height: 100
 
             Label:
                 text: "Project Name"
 
             TextInput:
                 id: project_name
+                multiline: False
+
+            Label:
+                text: "Project Password"
+
+            TextInput:
+                id: password
+                multiline: False
+
+            Label:
+                text: "Confirm Password"
+
+            TextInput:
+                id: confirm_password
                 multiline: False
 
         Button:
@@ -62,34 +95,28 @@ WindowManager:
     name: "continue_project"
 
     GridLayout:
+        size_hiny_y: None
+        height: sum(x.height for x in self.children)
         cols: 1
+        padding: [200,100,200,100]
+        spacing: 10
+        row_default_height: 40
 
-        Button:
-            text: "Continue Previous Project"
-            on_release: root.select_project('UpscaledObstructedFlow')
-
-        Button:
-            text: "Go Back"
-            on_release:
-                app.root.current = "main"
-                root.manager.transition.direction = "right"
 
 <LoadProjectWindow>:
     name: "load_project"
 
     GridLayout:
         cols: 1
-        padding: 200
+        padding: [200,100,200,100]
+        size_hiny_y: None
+        height: sum(x.height for x in self.children)
+        spacing: 10
 
-        Button:
-            text: "Check existing projects...."
-            on_release: root.print_all_projects()
 
-        Button:
-            text: "Go Back"
-            on_release:
-                app.root.current = "main"
-                root.manager.transition.direction = "right"
+
+
+
 
 
 

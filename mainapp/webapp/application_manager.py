@@ -12,21 +12,27 @@ def setupAppsOn(server, project_name):
     setup(
         app=LiveApp(url='/liveapp/', load_on_server_start=True),
         server=server,
-        data_manager=live_data)
+        data_manager=live_data,
+        project_name=project_name
+    )
 
     setup(
         app=CompareApp(url='/compareapp/', load_on_server_start=True),
         server=server,
-        data_manager=live_data)
+        data_manager=live_data,
+        project_name=project_name
+    )
 
     setup(
         app=TemporalApp(url='/temporalapp/', load_on_server_start=True),
         server=server,
-        data_manager=live_data)
+        data_manager=live_data,
+        project_name=project_name
+    )
 
 
-def setup(app, server, data_manager):
-    app.setupOn(server, data_manager)
+def setup(app, server, data_manager, project_name):
+    app.setupOn(server, data_manager, project_name)
     apps.append(app)
 
 

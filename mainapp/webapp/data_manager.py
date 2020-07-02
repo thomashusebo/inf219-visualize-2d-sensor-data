@@ -8,7 +8,7 @@ from mainapp.data.data_types import DataType
 
 class DataManager:
     def __init__(self, project_name):
-        self.database = create_engine('sqlite:///fluid_flower_database.db')
+        self.database = create_engine('sqlite:///storage/databases/{}.db'.format(project_name))
         self.project_name = project_name
         self.resistivity_table = "{}_{}".format(project_name, DataType.Resistivity.value)
 
