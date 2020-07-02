@@ -1,3 +1,4 @@
+import datetime
 import os
 import time
 import pandas as pd
@@ -43,11 +44,12 @@ def run(measurements_per_second=None):
     dir_temp = 'incoming_data'
 
     # Getting the project file
-    df = pd.read_csv(file)
+    df = pd.read_csv(file, index_col=False)
 
     # Produce individual measurements
     for i in range(df.shape[0]):
         out_df = pd.DataFrame(data=df.iloc[[i]])
+        out_df.at[i,'time'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         filename = dir_temp + "/data{:09d}.csv".format(i)
         out_df.to_csv(filename, index=False)
 
