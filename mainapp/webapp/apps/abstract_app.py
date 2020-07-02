@@ -13,6 +13,6 @@ class AbstractApp:
     def get_url(self) -> str:
         return self.url
 
-    def setupOn(self, server: Flask, data_manager) -> None:
+    def setupOn(self, server: Flask, data_manager, project_name) -> None:
         """Creates the application on the server, and defines its layout and callbacks"""
         raise Exception("Method not implemented")

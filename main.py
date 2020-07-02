@@ -1,12 +1,19 @@
-from setupapp import setupapp
-from webapp import server
-from setupapp.setupapp import SetupApp
+from mainapp import multiprocess_manager
+from mainapp.instrument_simulator import simulate_instrument_csv
 
-#project_name = "200308Test002SmallTankObstructedFlow_simulation"
-#start_server = False
+
+def main():
+    setup = SetupApp()
+    setup.run()
+
+    if setupapp.active_project is not "":
+        multiprocess_manager.start(project_name=setupapp.active_project,
+                                   datacollection = setupapp.datacollection,
+                                   instrument_simulator=simulate_instrument_csv)
+
 
 if __name__ == '__main__':
-    SetupApp().run()
-
-if setupapp.start_server:
-    server.start(setupapp.name)
+    # Imports are put here to avoid each process to open a kivy application window
+    from setupapp import setupapp
+    from setupapp.setupapp import SetupApp
+    main()

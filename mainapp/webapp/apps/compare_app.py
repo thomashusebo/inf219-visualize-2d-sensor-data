@@ -1,15 +1,15 @@
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
-from webapp.apps.AbstractApp import AbstractApp
-from webapp.terminateserver import shutdown_path, shutdown
+from mainapp.webapp.apps.abstract_app import AbstractApp
+from mainapp.termination.termination import shutdown_path, shutdown_server
 
 #stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 
 class CompareApp(AbstractApp):
-    def setupOn(self, server, data_manager):
+    def setupOn(self, server, data_manager, project_name):
         compare_app = dash.Dash(__name__, server=server, url_base_pathname=self.url)
         compare_app.layout = html.Div([
             html.H1('Compare View'),
@@ -20,7 +20,7 @@ class CompareApp(AbstractApp):
 
         @compare_app.callback(dash.dependencies.Output("hidden_div", "children"),
                         [dash.dependencies.Input('url', 'pathname')])
-        def shutdown_server(pathname):
+        def shutdown(pathname):
             if pathname == shutdown_path:
-                shutdown()
+                shutdown_server()
                 return dcc.Location(pathname="/", id="someid_doesnt_matter")
