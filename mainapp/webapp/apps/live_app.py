@@ -149,7 +149,7 @@ class LiveApp(AbstractApp):
                 return [dcc.Markdown(log), "", "Enter project password...", ""]
 
             if password is not None:
-                if database_manager.verfiy_password(project_name, password):
+                if database_manager.verify_password(project_name, password):
                     timestamp = datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y")
                     log_manager.insert_log_entry(timestamp, log_entry)
                     log = log_manager.retrieve_log()

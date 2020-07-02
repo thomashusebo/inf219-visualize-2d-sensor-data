@@ -12,7 +12,7 @@ from bcrypt import hashpw, gensalt
 import numpy as np
 
 active_project = ''
-database_manager = ProjectManager()
+project_manager = ProjectManager()
 datacollection = False
 
 
@@ -36,7 +36,7 @@ class NewProjectWindow(Screen):
                                      'Please try again'.format(project_name)
             return
 
-        if database_manager.try_to_add_new_project_name(project_name, password):
+        if project_manager.try_to_add_new_project_name(project_name, password):
             global active_project, datacollection
             active_project = project_name
             datacollection = True
@@ -51,6 +51,10 @@ class ContinueProjectWindow(Screen):
 
 
 class LoadProjectWindow(Screen):
+    pass
+
+
+class ExportProjectWindow(Screen):
     pass
 
 
@@ -76,6 +80,11 @@ def get_go_back_button():
     return go_back_button
 
 
+def export_project(project_name, instance):
+    project_manager.export_project(project_name)
+    pass
+
+
 class SetupApp(App):
 
     def build(self):
@@ -83,24 +92,34 @@ class SetupApp(App):
         load_screen = kv.get_screen("load_project")
         load_button_grid = GridLayout(cols=1, size_hint_y=None)
         load_button_grid.bind(minimum_height=load_button_grid.setter('height'))
-        load_scrollview = ScrollView(size_hint=(1,1), do_scroll_y=True)
+        load_scrollview = ScrollView(size_hint=(1, 1), do_scroll_y=True)
 
         continue_screen = kv.get_screen("continue_project")
         continue_button_grid = GridLayout(cols=1, size_hint_y=None)
         continue_button_grid.bind(minimum_height=continue_button_grid.setter('height'))
         continue_scrollview = ScrollView(size_hint=(1, 1), do_scroll_y=True)
 
-        projects = database_manager.get_projects()
+        export_screen = kv.get_screen("export_project")
+        export_button_grid = GridLayout(cols=1, size_hint_y=None)
+        export_button_grid.bind(minimum_height=export_button_grid.setter('height'))
+        export_scrollview = ScrollView(size_hint=(1, 1), do_scroll_y=True)
+
+        projects = project_manager.get_projects()
         for project in sorted(projects):
-            load_button = Button(text=project,size_hint_y=None, height=40)
+            load_button = Button(text=project, size_hint_y=None, height=40)
             load_buttoncallback = partial(start_main_software, project, False)
             load_button.bind(on_release=load_buttoncallback)
             load_button_grid.add_widget(load_button)
 
-            continue_button = Button(text=project,size_hint_y=None, height=40)
+            continue_button = Button(text=project, size_hint_y=None, height=40)
             continue_buttoncallback = partial(start_main_software, project, True)
             continue_button.bind(on_release=continue_buttoncallback)
             continue_button_grid.add_widget(continue_button)
+
+            export_button = Button(text=project, size_hint_y=None, height=40)
+            export_buttoncallback = partial(export_project, project)
+            export_button.bind(on_release=export_buttoncallback)
+            export_button_grid.add_widget(export_button)
 
         load_scrollview.add_widget(load_button_grid)
         load_screen.children[0].add_widget(load_scrollview)
@@ -109,5 +128,9 @@ class SetupApp(App):
         continue_scrollview.add_widget(continue_button_grid)
         continue_screen.children[0].add_widget(continue_scrollview)
         continue_screen.children[0].add_widget(get_go_back_button())
+
+        export_scrollview.add_widget(export_button_grid)
+        export_screen.children[0].add_widget(export_scrollview)
+        export_screen.children[0].add_widget(get_go_back_button())
 
         return kv

@@ -3,6 +3,7 @@ WindowManager:
     NewProjectWindow:
     ContinueProjectWindow:
     LoadProjectWindow:
+    ExportProjectWindow:
 
 <MainWindow>:
     name: "main"
@@ -34,6 +35,9 @@ WindowManager:
 
         Button:
             text: "Export project (NOT FUNCTIONAL)"
+            on_release:
+                app.root.current = "export_project"
+                root.manager.transition.direction = "left"
 
         Button:
             text: "Exit"
@@ -119,6 +123,18 @@ WindowManager:
         size_hiny_y: None
         height: sum(x.height for x in self.children)
         spacing: 10
+
+
+<ExportProjectWindow>:
+    name: "export_project"
+
+    GridLayout:
+        cols: 1
+        padding: [200,100,200,100]
+        size_hiny_y: None
+        height: sum(x.height for x in self.children)
+        spacing: 10
+
 
 
 
