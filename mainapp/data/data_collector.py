@@ -34,8 +34,7 @@ def update(project_name):
 
     database = create_engine('sqlite:///storage/databases/{}.db'.format(project_name))
     chunksize = 1000
-    project_name = project_name
-    resistivity_table = "{}_{}".format(project_name, DataType.Resistivity.value)
+    resistivity_table = "{}_RAW".format(DataType.Resistivity.value)
     database_table = resistivity_table
 
     # Data for data collector report

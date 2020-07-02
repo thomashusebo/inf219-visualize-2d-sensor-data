@@ -10,7 +10,7 @@ class DataManager:
     def __init__(self, project_name):
         self.database = create_engine('sqlite:///storage/databases/{}.db'.format(project_name))
         self.project_name = project_name
-        self.resistivity_table = "{}_{}".format(project_name, DataType.Resistivity.value)
+        self.resistivity_table = "{}_RAW".format(DataType.Resistivity.value)
 
     @staticmethod
     def get_heatmap_data(self, timestamp="", live=False):
