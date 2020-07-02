@@ -105,7 +105,8 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
             title='Resistivity (Ohm)',
             rangemode='tozero',
             linecolor='black',
-            gridcolor='LightGrey'
+            gridcolor='LightGrey',
+            fixedrange=True
         ),
         plot_bgcolor='white',
         dragmode='pan'
