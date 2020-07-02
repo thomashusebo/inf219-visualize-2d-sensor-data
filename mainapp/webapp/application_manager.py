@@ -1,14 +1,14 @@
 from mainapp.webapp.apps.live_app import LiveApp
 from mainapp.webapp.apps.compare_app import CompareApp
 from mainapp.webapp.apps.temporal_app import TemporalApp
-from mainapp.webapp.data_manager import DataManager
+from mainapp.webapp.dataretriever import DataRetriever
 import webbrowser as wb
 
 apps = []
 
 
 def setupAppsOn(server, project_name):
-    live_data = DataManager(project_name)
+    live_data = DataRetriever(project_name)
     setup(
         app=LiveApp(url='/liveapp/', load_on_server_start=True),
         server=server,

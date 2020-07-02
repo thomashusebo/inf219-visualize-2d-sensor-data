@@ -12,16 +12,21 @@ from mainapp.webapp.figures import heatmap
 from mainapp.webapp.colors import color_manager
 
 # stylesheet = None
+from mainapp.webapp.log_manager import LogManager
 from storage.project_manager import ProjectManager
 
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 log = ""
-encrypted_project_password = hashlib.sha256("passord123".encode()).hexdigest()
 database_manager = ProjectManager()
+log_manager = None
 
 
 class LiveApp(AbstractApp):
     def setupOn(self, server, data_manager, project_name):
+        global log_manager, log
+        log_manager = LogManager(project_name)
+        log = log_manager.retrieve_log()
+
         live_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
         live_app.layout = html.Div([
             # Page Header
@@ -138,17 +143,16 @@ class LiveApp(AbstractApp):
             ]
         )
         def update_output(n_clicks, log_entry, password):
-            global encrypted_project_password
             global log
 
             if log_entry is "":
                 return [dcc.Markdown(log), "", "Enter project password...", ""]
 
             if password is not None:
-                #encrypted_password = hashlib.sha256(password.encode()).hexdigest()
-                #if encrypted_password == encrypted_project_password:
                 if database_manager.verfiy_password(project_name, password):
-                    log += '\n --- \n **' + datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y") + '** \n\n' + log_entry
+                    timestamp = datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y")
+                    log_manager.insert_log_entry(timestamp, log_entry)
+                    log = log_manager.retrieve_log()
                 else:
                     return [dcc.Markdown(log), log_entry, "Incorrect password...", ""]
 

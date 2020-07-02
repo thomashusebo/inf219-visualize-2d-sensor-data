@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from mainapp.data.data_types import DataType
 
 
-class DataManager:
+class DataRetriever:
     def __init__(self, project_name):
         self.database = create_engine('sqlite:///storage/databases/{}.db'.format(project_name))
         self.project_name = project_name
