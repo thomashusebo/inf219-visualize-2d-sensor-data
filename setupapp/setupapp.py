@@ -7,12 +7,12 @@ from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.properties import ObjectProperty
 from kivy.uix.scrollview import ScrollView
 
-from storage.database_manager import DatabaseManager
+from storage.project_manager import ProjectManager
 from bcrypt import hashpw, gensalt
 import numpy as np
 
 active_project = ''
-database_manager = DatabaseManager()
+database_manager = ProjectManager()
 datacollection = False
 
 

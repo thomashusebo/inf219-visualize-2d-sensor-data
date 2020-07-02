@@ -1,10 +1,9 @@
-from bcrypt import checkpw, hashpw
+from bcrypt import checkpw
 from pandas import read_sql_query
-
 from sqlalchemy import create_engine, MetaData, Column, Table, String
 
 
-class DatabaseManager():
+class ProjectManager():
     def __init__(self):
         self.__master_database = "/storage/databases/master.db"
         db_engine = create_engine('sqlite://' + self.__master_database)

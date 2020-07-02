@@ -12,12 +12,12 @@ from mainapp.webapp.figures import heatmap
 from mainapp.webapp.colors import color_manager
 
 # stylesheet = None
-from storage.database_manager import DatabaseManager
+from storage.project_manager import ProjectManager
 
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 log = ""
 encrypted_project_password = hashlib.sha256("passord123".encode()).hexdigest()
-database_manager = DatabaseManager()
+database_manager = ProjectManager()
 
 
 class LiveApp(AbstractApp):
