@@ -6,7 +6,7 @@ from mainapp.instrument_simulator import simulate_instrument_csv
 shutdown_path = '/shutdown'
 
 
-def shutdown_server():
+def shutdown_software():
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')

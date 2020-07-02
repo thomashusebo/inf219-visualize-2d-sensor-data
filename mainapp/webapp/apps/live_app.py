@@ -7,7 +7,6 @@ import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 
 from mainapp.webapp.apps.abstract_app import AbstractApp
-from mainapp.termination.termination import shutdown_path, shutdown_server
 from mainapp.webapp.figures import heatmap
 from mainapp.webapp.colors import color_manager
 
@@ -32,9 +31,7 @@ class LiveApp(AbstractApp):
             # Page Header
             html.Div([
                 html.H1('Live View'),
-                dcc.Location(id='url', refresh=False),
-                html.Div(id="hidden_div"),
-                dcc.Link('Shutdown server', href=shutdown_path),
+                html.A('Shutdown Server', href='/settings'),
 
                 # Time
                 html.Div([
@@ -94,13 +91,6 @@ class LiveApp(AbstractApp):
                 className='seven columns'
             ),
         ])
-
-        @live_app.callback(dash.dependencies.Output("hidden_div", "children"),
-                           [dash.dependencies.Input('url', 'pathname')])
-        def shutdown(pathname):
-            if pathname == shutdown_path:
-                shutdown_server()
-                return dcc.Location(pathname="/", id="someid_doesnt_matter")
 
         # Define callbacks
         @live_app.callback(

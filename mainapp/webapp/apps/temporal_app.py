@@ -10,7 +10,7 @@ from dash.dependencies import Output, Input, State
 from mainapp.webapp.figures import heatmap, linechart
 from mainapp.webapp.colors import color_manager
 from mainapp.webapp.apps.abstract_app import AbstractApp
-from mainapp.termination.termination import shutdown_path, shutdown_server
+from mainapp.termination.termination import shutdown_path, shutdown_software
 
 # stylesheet = None
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -29,9 +29,7 @@ class TemporalApp(AbstractApp):
         temporal_app.layout = html.Div([
             # Page header
             html.H1('Temporal View'),
-            dcc.Location(id='url', refresh=False),
-            html.Div(id="hidden_div"),
-            dcc.Link('Shutdown server', href=shutdown_path),
+            html.A('Shutdown Server', href='/settings'),
 
             # Title
             html.Div([
@@ -102,13 +100,6 @@ class TemporalApp(AbstractApp):
                 labelStyle={'display': 'inline-block'}
             )
         ])
-
-        @temporal_app.callback(Output("hidden_div", "children"),
-                               [Input('url', 'pathname')])
-        def shutdown(pathname):
-            if pathname == shutdown_path:
-                shutdown_server()
-                return dcc.Location(pathname="/", id="someid_doesnt_matter")
 
         @temporal_app.callback(Output(component_id='live-clock', component_property='children'),
                                [Input('time-updater', 'n_intervals')])
