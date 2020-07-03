@@ -16,8 +16,15 @@ from storage.project_manager import ProjectManager
 
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 log = ""
-database_manager = ProjectManager()
+project_manager = ProjectManager()
 log_manager = None
+puzzlebox = {
+    'background-color': '#edf5ff',
+    'padding': '0.5%',
+    'border': 0,
+    'margin': '0.1%',
+    'min-width': 400,
+}
 
 
 class LiveApp(AbstractApp):
@@ -27,70 +34,119 @@ class LiveApp(AbstractApp):
         log = log_manager.retrieve_log()
 
         live_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
-        live_app.layout = html.Div([
-            # Page Header
-            html.Div([
-                html.H1('Live View'),
-                html.A('Shutdown Server', href='/settings'),
-
-                # Time
-                html.Div([
-                    html.Div(id='live-clock'),
-                    dcc.Interval(
-                        id='interval-component',
-                        interval=1 * 1000,  # milliseconds
-                        n_intervals=0
-                    )
-                ]),
-            ]),
-
-            # Log
-            html.Div([
-                dcc.Markdown(
-                    children='''##### Log'''),
+        live_app.layout = html.Div(
+            style={
+                'padding-left': '10%',
+                'padding-right': '10%',
+            },
+            children = [
+                # Page Header
                 html.Div(
-                    id='log',
-                    style={'whiteSpace': 'pre-line'},
-                    children=dcc.Markdown(log)),
-                dcc.Textarea(
-                    id='log-entry',
-                    style={'width': '100%', 'height': 50},
-                    placeholder='Enter log entry...'
+                    className='row',
+                    children=[
+                        html.Div(
+                            children=[
+                                html.H1('Live View',
+                                        className='six columns',
+                                        style=puzzlebox),
+                                html.Div(
+                                    className='six columns',
+                                    style={
+                                        **puzzlebox,
+                                        **{
+                                            'text-align':'right',
+                                        },
+                                    },
+                                    children=[
+                                        html.A('Shutdown Server', href='/settings'),
+                                        html.Div(id='live-clock'),
+                                        dcc.Interval(
+                                            id='interval-component',
+                                            interval=1 * 1000,  # milliseconds
+                                            n_intervals=0
+                                        ),
+                                    ]
+                                ),
+                            ]
+                        ),
+                    ]
                 ),
-                dcc.Input(
-                    id="project-password",
-                    type='password',
-                    placeholder="Enter project password...",
-                ),
-                html.Button('Submit', id='submit-log-entry', n_clicks=0),
 
-            ],
-                className='four columns'
-            ),
-
-            # Heatmap
-            html.Div([
-                dcc.Graph(id='heatmap',
-                          config={
-                              "displaylogo": False,
-                              "modeBarButtonsToRemove": ['zoom2d']
-                          },
-                          ),
-                dcc.RadioItems(
-                    id='map_chooser',
-                    options=[
-                        {'label': 'Heatmap', 'value': 'heatmap'},
-                        {'label': 'Contour', 'value': 'contour'},
-                        {'label': 'Surface', 'value': 'surface'}
+                # Log
+                html.Div(
+                    className='six columns',
+                    style=puzzlebox,
+                    children=[
+                        dcc.Markdown(
+                            children='''##### Log'''),
+                        html.Div(
+                            id='log',
+                            style={
+                                'padding-left': '1%',
+                                'padding-right': '-1%',
+                                'margin-bottom': '1%',
+                                'background-color': 'white',
+                                'width': '100%',
+                                'height': 400,
+                                # Make area scrollable
+                                'overflow-x': 'hidden',
+                                'overflow-y': 'auto',
+                                'text-align': 'justify',
+                                # Keep scroll at bottom:
+                                'display': 'flex',
+                                'flex-direction': 'column-reverse',
+                            },
+                            children=dcc.Markdown(log)),
+                        dcc.Textarea(
+                            id='log-entry',
+                            style={'width': '100%', 'height': 50},
+                            placeholder='Enter log entry...'
+                        ),
+                        dcc.Input(
+                            id="project-password",
+                            type='password',
+                            placeholder="Enter project password...",
+                            style={'width': '50%'}
+                        ),
+                        html.Button('Submit', id='submit-log-entry', n_clicks=0),
                     ],
-                    value='heatmap',
-                    className='seven columns',
-                    labelStyle={'display': 'inline-block'}
-                )
-            ],
-                className='seven columns'
-            ),
-        ])
+                ),
+
+                # Heatmap
+                html.Div(
+                    className='six columns',
+                    style=puzzlebox,
+                    children=[
+                        dcc.Graph(
+                            id='heatmap',
+                            config={
+                                "displaylogo": False,
+                                "modeBarButtonsToRemove": [
+                                    'zoom2d',
+                                    'pan2d',
+                                    'select2d',
+                                    'zoomIn2d',
+                                    'zoomOut2d',
+                                    'autoScale2d',
+                                    'resetScale2d',
+                                    'toggleSpikelines',
+                                ]
+                            },
+                        ),
+                        dcc.RadioItems(
+                            id='map_chooser',
+                            options=[
+                                {'label': 'Heatmap', 'value': 'heatmap'},
+                                {'label': 'Contour', 'value': 'contour'},
+                                {'label': 'Surface', 'value': 'surface'}
+                            ],
+                            value='heatmap',
+                            labelStyle={'display': 'inline-block'}
+                        )
+                    ],
+                ),
+            ]
+        )
 
         # Define callbacks
         @live_app.callback(
@@ -139,7 +195,7 @@ class LiveApp(AbstractApp):
                 return [dcc.Markdown(log), "", "Enter project password...", ""]
 
             if password is not None:
-                if database_manager.verify_password(project_name, password):
+                if project_manager.verify_password(project_name, password):
                     timestamp = datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y")
                     log_manager.insert_log_entry(timestamp, log_entry)
                     log = log_manager.retrieve_log()

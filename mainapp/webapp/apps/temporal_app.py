@@ -56,23 +56,41 @@ class TemporalApp(AbstractApp):
 
             # Heatmap
             html.Div([
-                dcc.Graph(id='heatmap',
-                          config={
-                              "displaylogo": False,
-                              "modeBarButtonsToRemove": ['zoom2d']
-                          },
-                          ),
+                dcc.Graph(
+                    id='heatmap',
+                    config={
+                        "displaylogo": False,
+                        "modeBarButtonsToRemove": [
+                            'zoom2d',
+                            'pan2d',
+                            'select2d',
+                            'zoomIn2d',
+                            'zoomOut2d',
+                            'autoScale2d',
+                            'resetScale2d',
+                            'toggleSpikelines',
+                        ]
+                    },
+                ),
             ],
                 className='five columns'
             ),
 
             # Line chart
             html.Div([
-                dcc.Graph(id='linechart',
-                          config={
-                              "displaylogo": False,
-                              "modeBarButtonsToRemove": []
-                          }),
+                dcc.Graph(
+                    id='linechart',
+                    config={
+                        "displaylogo": False,
+                        "modeBarButtonsToRemove": [
+                            'zoom2d',
+                            'lasso2d',
+                            'select2d',
+                            'autoScale2d',
+                            'toggleSpikelines',
+                        ]
+                    }
+                ),
             ],
                 className='six columns'
             ),
@@ -95,7 +113,7 @@ class TemporalApp(AbstractApp):
                     {'label': 'Contour', 'value': 'contour'},
                     {'label': 'Surface', 'value': 'surface'}
                 ],
-                value='contour',
+                value='heatmap',
                 className='seven columns',
                 labelStyle={'display': 'inline-block'}
             )
