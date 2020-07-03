@@ -14,19 +14,59 @@ class SettingsApp(AbstractApp):
 
     def setupOn(self, server, data_manager, project_name):
         settings_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
-        settings_app.layout = html.Div([
-            html.Div([
-                html.Div(id='hidden_div'),
-                html.H3('Do you want to shutdown the visualization tool?'),
-                dcc.Input(
-                    id="project-password",
-                    type='password',
-                    placeholder="Enter project password...",
-                    value=""
+        settings_app.layout = html.Div(
+            style={
+                'padding-top': '10%'
+            },
+            children=[
+                html.Div(
+                    className='six columns offset-by-three',
+                    style={
+                        'background-color': '#edf5ff',
+                        'padding-top': '3%',
+                        'padding-bottom': '5%',
+                        'padding-left': '5%',
+                        'padding-right': '5%',
+                    },
+                    children=[
+                        html.Div(id='hidden_div'),
+                        html.Div(
+                            className='row',
+                            children=[
+                                html.Div([
+                                    html.H3(
+                                        style={
+                                          'padding': '0%'
+                                        },
+                                        children='Do you want to shutdown the visualization tool?',
+                                    ),
+                                ])
+                            ],
+                        ),
+                        html.Div(
+                            className='row',
+                            children=[
+                                dcc.Input(
+                                    id="project-password",
+                                    type='password',
+                                    placeholder="Enter project password...",
+                                    value=""
+                                ),
+                                html.Button(
+                                    children='Shutdown',
+                                    id='shutdown',
+                                    n_clicks=0,
+                                    style={
+                                        'background-color': 'red',
+                                        'color': 'white'
+                                    }
+                                ),
+                            ],
+                        )
+                    ],
                 ),
-                html.Button('Shutdown', id='shutdown', n_clicks=0),
-            ])
-        ])
+            ]
+        )
 
         @settings_app.callback([Output('hidden_div', 'children'),
                                 Output('project-password', 'value'),
@@ -41,4 +81,3 @@ class SettingsApp(AbstractApp):
                     return [dcc.Location(pathname="/", id="someid_doesnt_matter"), "", "Shutting down..."]
                 else:
                     return [None, "", "Incorrect password..."]
-
