@@ -49,7 +49,6 @@ class SettingsApp(AbstractApp):
                                     id="project-password",
                                     type='password',
                                     placeholder="Enter project password...",
-                                    value=""
                                 ),
                                 html.Button(
                                     children='Shutdown',
@@ -67,14 +66,16 @@ class SettingsApp(AbstractApp):
             ]
         )
 
-        @settings_app.callback([Output('project-password', 'value'),
-                                Output('project-password', 'placeholder')
-                                ],
-                               [Input('shutdown', 'n_clicks')],
-                               [State('project-password', 'value')])
+        @settings_app.callback(
+            [
+                Output('project-password', 'value'),
+                Output('project-password', 'placeholder')
+            ],
+            [Input('shutdown', 'n_clicks')],
+            [State('project-password', 'value')])
         def stop_software(n_clicks, password):
             value="",
-            placeholder = "Enter password...",
+            placeholder = "Enter password..."
             if n_clicks > 0:
                 if ProjectManager().verify_password(project_name, password):
                     shutdown_software()
