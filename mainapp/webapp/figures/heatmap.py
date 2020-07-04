@@ -53,14 +53,21 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
         dragmode='lasso',
         xaxis=dict(
             range=[-0.5, width-0.5],
-            constrain='domain'
+            constrain='domain',
+            side='top',
+            tickmode='array',
+            tickvals=list(range(width))
+
         ),
         yaxis=dict(
             range=[-0.5, height-0.5],
+            autorange='reversed',
             scaleanchor="x",
             scaleratio=1,
             constrain='domain',
             automargin=True,
+            tickmode='array',
+            tickvals=list(range(height))
         ),
         margin=dict(
             l=15,
