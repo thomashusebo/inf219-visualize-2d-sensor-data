@@ -59,7 +59,7 @@ class LiveApp(AbstractApp):
                                     ),
                                     className='six columns',
                                     style={
-                                        'padding-top': '2%',
+                                        'padding-top': '0.5%',
                                         'border': 0,
                                         'margin': '0.1%',
                                         'background-color': 'white'
@@ -69,7 +69,7 @@ class LiveApp(AbstractApp):
                                     className='six columns',
                                     style={
                                         'padding-top': '2%',
-                                        'padding-right': '2%',
+                                        'padding-right': '0.5%',
                                         'border': 0,
                                         'margin': '0.1%',
                                         'text-align': 'right',

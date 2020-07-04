@@ -29,7 +29,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
             ))
 
             linechart_fig.add_trace(go.Scatter(
-                name='{} standard deviation(s)'.format(i),
+                name='{} sigma'.format(i),
                 x=x,
                 y=means + i * var,
                 mode='lines',
@@ -58,7 +58,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
     # Add central values to the plot
     if data.shape[1] > 1:
         if data.shape[1] == 2:
-            trace_name = 'Coordinate [{:d},{:d}]'.format(coordinates[0]['x'], coordinates[0]['y'])
+            trace_name = '[{:d},{:d}]'.format(coordinates[0]['x'], coordinates[0]['y'])
         else:
             trace_name = 'Average'
 
@@ -111,12 +111,12 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
         margin=dict(
             l=15,
             r=0,
-            t=5,
+            t=15,
             b=5,
             pad=0
         ),
         plot_bgcolor='white',
-        dragmode='pan',
+        dragmode=False,
         height=250,
     )
 
