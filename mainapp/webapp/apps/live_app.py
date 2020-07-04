@@ -36,7 +36,6 @@ class LiveApp(AbstractApp):
         global log_manager, log
         log_manager = LogManager(project_name)
         log = log_manager.retrieve_log()
-
         live_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
         live_app.layout = html.Div(
             style={
@@ -263,6 +262,7 @@ class LiveApp(AbstractApp):
             [
                 Output('log', 'children'),
                 Output('log-entry', 'value'),
+                Output('log-entry', 'placeholder'),
                 Output('project-password', 'placeholder'),
                 Output('project-password', 'value')
             ],
@@ -274,18 +274,29 @@ class LiveApp(AbstractApp):
                 State('project-password', 'value')
             ]
         )
-        def update_output(n_clicks, log_entry, password):
+        def update_log(n_clicks, log_entry, password):
             global log
+            log_entry_value = log_entry
+            log_entry_placeholder = "Write log entry..."
+            password_value = ""
+            password_placeholder = "Enter password..."
 
-            if log_entry is "":
-                return [dcc.Markdown(log), "", "Enter project password...", ""]
-
-            if password is not None:
-                if project_manager.verify_password(project_name, password):
-                    timestamp = datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y")
-                    log_manager.insert_log_entry(timestamp, log_entry)
-                    log = log_manager.retrieve_log()
+            if n_clicks > 0:
+                if log_entry is "" or log_entry is None:
+                    log_entry_placeholder = "Cannot submit empty log entry..."
                 else:
-                    return [dcc.Markdown(log), log_entry, "Incorrect password...", ""]
-
-            return [dcc.Markdown(log), "", "Enter project password", ""]
+                    if password is not None:
+                        if project_manager.verify_password(project_name, password):
+                            timestamp = datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y")
+                            log_manager.insert_log_entry(timestamp, log_entry)
+                            log = log_manager.retrieve_log()
+                            log_entry_value = ""
+                        else:
+                            password_placeholder = "Incorrect password...."
+            return [
+                dcc.Markdown(log),
+                log_entry_value,
+                log_entry_placeholder,
+                password_placeholder,
+                password_value
+            ]
