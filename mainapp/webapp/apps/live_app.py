@@ -156,17 +156,40 @@ class LiveApp(AbstractApp):
                             ],
                             value='heatmap',
                             labelStyle={'display': 'inline-block'}
-                        )
+                        ),
+                        # Line chart
+                        html.Div([
+                            dcc.Graph(
+                                id='linechart',
+                                config={
+                                    "displaylogo": False,
+                                    "modeBarButtonsToRemove": [
+                                        'zoom2d',
+                                        'lasso2d',
+                                        'select2d',
+                                        'autoScale2d',
+                                        'toggleSpikelines',
+                                    ]
+                                }
+                            ),
+                        ],
+                            className='six columns'
+                        ),
                     ],
                 ),
             ]
         )
 
-        # Define callbacks
+        @live_app.callback(
+            [Output(component_id='live-clock', component_property='children')],
+            [Input(component_id='interval-component', component_property='n_intervals')]
+        )
+        def update_clock(n):
+            return html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+
         @live_app.callback(
             [
                 Output(component_id='heatmap', component_property='figure'),
-                Output(component_id='live-clock', component_property='children')
             ],
             [
                 Input('interval-component', 'n_intervals'),
@@ -184,7 +207,6 @@ class LiveApp(AbstractApp):
 
             return [
                 heatmapFig,
-                html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
             ]
 
         @live_app.callback(
