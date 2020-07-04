@@ -172,6 +172,7 @@ class TemporalApp(AbstractApp):
                 timestamp = click_data_linechart['points'][0]['x']
             toc = time.process_time()
             timing['evaluate timestamp'] = toc-tic
+
             # Collect map data
             tic = time.process_time()
             latest_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp, live=live_mode)

@@ -8,7 +8,7 @@ import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 
 from mainapp.webapp.apps.abstract_app import AbstractApp
-from mainapp.webapp.figures import heatmap
+from mainapp.webapp.figures import heatmap, linechart
 from mainapp.webapp.colors import color_manager
 
 # stylesheet = None
@@ -91,7 +91,7 @@ class LiveApp(AbstractApp):
                     className='six columns',
                     style=puzzlebox,
                     children=[
-                        #'''dcc.Markdown(
+                        # '''dcc.Markdown(
                         #    children='''##### Log'''),'''
                         html.Div(
                             id='log',
@@ -190,23 +190,43 @@ class LiveApp(AbstractApp):
         @live_app.callback(
             [
                 Output(component_id='heatmap', component_property='figure'),
+                Output(component_id='linechart', component_property='figure')
             ],
             [
                 Input('interval-component', 'n_intervals'),
+                Input('heatmap', 'selectedData'),
+                Input('heatmap', 'clickData'),
                 Input('map_chooser', 'value')
             ])
-        def updateFigures(nIntervals, plot_type):
-            # Collect data
-            last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
+        def updateFigures(nIntervals, selected_cells_heatmap, clicked_cell_heatmap, plot_type):
 
             # Define colormap
             colorScale = color_manager.getColorScale()
+            default_coordinate = {'x': 0, 'y': 0}
+
+            # Choose coordinate
+            coordinates = [default_coordinate]
+            if clicked_cell_heatmap is not None:
+                coordinate = clicked_cell_heatmap['points'][0]
+                coordinates = [coordinate]
+            if selected_cells_heatmap is not None:
+                if len(selected_cells_heatmap['points']) > 0:
+                    coordinates = selected_cells_heatmap['points']
+
+            # Collect data
+            last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
+            last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
+
+            timeline = {'start': last_timestamp - datetime.timedelta(minutes=1),
+                        'end': last_timestamp + datetime.timedelta(seconds=2)}
+            linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, None, background_color)
-
+            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, coordinates, background_color)
+            lineChartFig = linechart.getLineChart(linechart_data, last_timestamp, coordinates, colorScale, timeline)
             return [
                 heatmapFig,
+                lineChartFig
             ]
 
         @live_app.callback(
