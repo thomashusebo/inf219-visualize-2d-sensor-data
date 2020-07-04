@@ -29,7 +29,6 @@ class SettingsApp(AbstractApp):
                         'padding-right': '5%',
                     },
                     children=[
-                        html.Div(id='hidden_div'),
                         html.Div(
                             className='row',
                             children=[
@@ -68,16 +67,18 @@ class SettingsApp(AbstractApp):
             ]
         )
 
-        @settings_app.callback([Output('hidden_div', 'children'),
-                                Output('project-password', 'value'),
+        @settings_app.callback([Output('project-password', 'value'),
                                 Output('project-password', 'placeholder')
                                 ],
                                [Input('shutdown', 'n_clicks')],
                                [State('project-password', 'value')])
         def stop_software(n_clicks, password):
+            value="",
+            placeholder = "Enter password...",
             if n_clicks > 0:
                 if ProjectManager().verify_password(project_name, password):
                     shutdown_software()
-                    return [dcc.Location(pathname="/", id="someid_doesnt_matter"), "", "Shutting down..."]
+                    placeholder = "Shutting down..."
                 else:
-                    return [None, "", "Incorrect password..."]
+                    placeholder= "Incorrect password..."
+            return [value, placeholder]
