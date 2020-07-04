@@ -2,7 +2,7 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
 
-def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None):
+def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, background_color='white'):
     get_figure = {
         'heatmap': go.Heatmap,
         'contour': go.Contour,
@@ -69,8 +69,8 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None):
             b=0,
             pad=0
         ),
-        plot_bgcolor='white',
-        paper_bgcolor='white',
+        plot_bgcolor=background_color,
+        paper_bgcolor=background_color,
         autosize=True,
         height=300,
     )

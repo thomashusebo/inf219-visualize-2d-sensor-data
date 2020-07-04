@@ -1,3 +1,4 @@
+import base64
 import datetime
 import hashlib
 
@@ -18,8 +19,11 @@ stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 log = ""
 project_manager = ProjectManager()
 log_manager = None
+logo = 'assets/fluidflower-logo.png'
+encoded_logo = base64.b64encode(open(logo, 'rb').read()).decode('ascii')
+background_color = '#f0f0f0'
 puzzlebox = {
-    'background-color': '#edf5ff',
+    'background-color': background_color,
     'padding': '0.5%',
     'border': 0,
     'margin': '0.1%',
@@ -39,22 +43,36 @@ class LiveApp(AbstractApp):
                 'padding-left': '10%',
                 'padding-right': '10%',
             },
-            children = [
+            children=[
                 # Page Header
                 html.Div(
                     className='row',
                     children=[
                         html.Div(
                             children=[
-                                html.H1('Live View',
-                                        className='six columns',
-                                        style=puzzlebox),
+                                html.Div(
+                                    html.Img(
+                                        src='data:image/png;base64,{}'.format(encoded_logo),
+                                        style={
+                                            'width': '40%',
+                                            'height': 'auto',
+                                        }
+                                    ),
+                                    className='six columns',
+                                    style={**puzzlebox,
+                                           **{'background-color': 'white'}}
+                                ),
+
+                                # html.H1('Live View',
+                                #        className='six columns',
+                                #        style=puzzlebox),
                                 html.Div(
                                     className='six columns',
                                     style={
                                         **puzzlebox,
                                         **{
-                                            'text-align':'right',
+                                            'text-align': 'right',
+                                            'background-color': 'white'
                                         },
                                     },
                                     children=[
@@ -166,7 +184,7 @@ class LiveApp(AbstractApp):
             colorScale = color_manager.getColorScale()
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, None, background_color)
 
             return [
                 heatmapFig,
