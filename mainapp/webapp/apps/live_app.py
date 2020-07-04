@@ -59,26 +59,25 @@ class LiveApp(AbstractApp):
                                         }
                                     ),
                                     className='six columns',
-                                    style={**puzzlebox,
-                                           **{'background-color': 'white'}}
+                                    style={
+                                        'padding-top': '2%',
+                                        'border': 0,
+                                        'margin': '0.1%',
+                                        'background-color': 'white'
+                                    },
                                 ),
                                 html.Div(
                                     className='six columns',
                                     style={
-                                        **puzzlebox,
-                                        **{
-                                            'text-align': 'right',
-                                            'background-color': 'white'
-                                        },
+                                        'padding-top': '2%',
+                                        'padding-right': '2%',
+                                        'border': 0,
+                                        'margin': '0.1%',
+                                        'text-align': 'right',
+                                        'background-color': 'white'
                                     },
                                     children=[
-                                        html.A('Shutdown Server', href='/settings'),
-                                        html.Div(id='live-clock'),
-                                        dcc.Interval(
-                                            id='interval-component',
-                                            interval=1 * 1000,  # milliseconds
-                                            n_intervals=0
-                                        ),
+                                        dcc.Link(html.Button('Settings'), href='/settings', refresh=True),
                                     ]
                                 ),
                             ]
@@ -101,7 +100,7 @@ class LiveApp(AbstractApp):
                                 'margin-bottom': '1%',
                                 'background-color': 'white',
                                 'width': '100%',
-                                'height': 400,
+                                'height': 450,
                                 # Make area scrollable
                                 'overflow-x': 'hidden',
                                 'overflow-y': 'auto',
@@ -113,7 +112,7 @@ class LiveApp(AbstractApp):
                             children=dcc.Markdown(log)),
                         dcc.Textarea(
                             id='log-entry',
-                            style={'width': '100%', 'height': 50},
+                            style={'width': '100%', 'height': 87},
                             placeholder='Enter log entry...'
                         ),
                         dcc.Input(
@@ -157,26 +156,57 @@ class LiveApp(AbstractApp):
                             value='heatmap',
                             labelStyle={'display': 'inline-block'}
                         ),
-                        # Line chart
-                        html.Div([
-                            dcc.Graph(
-                                id='linechart',
-                                config={
-                                    "displaylogo": False,
-                                    "modeBarButtonsToRemove": [
-                                        'zoom2d',
-                                        'lasso2d',
-                                        'select2d',
-                                        'autoScale2d',
-                                        'toggleSpikelines',
-                                    ]
-                                }
-                            ),
-                        ],
-                            className='six columns'
+                    ],
+                ),
+
+                # Line chart
+                html.Div(
+                    className='six columns',
+                    style=puzzlebox,
+                    children=[
+                        dcc.Graph(
+                            id='linechart',
+                            config={
+                                "displaylogo": False,
+                                "modeBarButtonsToRemove": [
+                                    'zoom2d',
+                                    'pan2d',
+                                    'lasso2d',
+                                    'select2d',
+                                    'zoomIn2d',
+                                    'zoomOut2d',
+                                    'autoScale2d',
+                                    'toggleSpikelines',
+                                ]
+                            }
                         ),
                     ],
                 ),
+                html.Div(
+                    className='six columns',
+                    style={**puzzlebox,
+                           **{'background-color': 'white'}},
+                    children=html.Span(""),
+                ),
+                html.Div(
+                    className='six columns',
+                    style={
+                        'padding-top': '0.1%',
+                        'padding-right': '2%',
+                        'border': 0,
+                        'margin': '0.1%',
+                        'text-align': 'right',
+                        'background-color': 'white'
+                    },
+                    children=[
+                        html.Div(id='live-clock'),
+                        dcc.Interval(
+                            id='interval-component',
+                            interval=1 * 1000,  # milliseconds
+                            n_intervals=0
+                        ),
+                    ]
+                )
             ]
         )
 
@@ -185,7 +215,7 @@ class LiveApp(AbstractApp):
             [Input(component_id='interval-component', component_property='n_intervals')]
         )
         def update_clock(n):
-            return html.Span(datetime.datetime.now().strftime("%H:%M:%S")),
+            return dcc.Markdown(datetime.datetime.now().strftime("%H:%M:%S")),
 
         @live_app.callback(
             [

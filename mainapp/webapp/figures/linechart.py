@@ -108,8 +108,16 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
             gridcolor='LightGrey',
             fixedrange=True
         ),
+        margin=dict(
+            l=15,
+            r=0,
+            t=5,
+            b=5,
+            pad=0
+        ),
         plot_bgcolor='white',
-        dragmode='pan'
+        dragmode='pan',
+        height=250,
     )
 
     return linechart_fig
