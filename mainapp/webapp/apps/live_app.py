@@ -62,10 +62,6 @@ class LiveApp(AbstractApp):
                                     style={**puzzlebox,
                                            **{'background-color': 'white'}}
                                 ),
-
-                                # html.H1('Live View',
-                                #        className='six columns',
-                                #        style=puzzlebox),
                                 html.Div(
                                     className='six columns',
                                     style={
@@ -95,8 +91,8 @@ class LiveApp(AbstractApp):
                     className='six columns',
                     style=puzzlebox,
                     children=[
-                        dcc.Markdown(
-                            children='''##### Log'''),
+                        #'''dcc.Markdown(
+                        #    children='''##### Log'''),'''
                         html.Div(
                             id='log',
                             style={

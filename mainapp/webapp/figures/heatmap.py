@@ -35,7 +35,7 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
             z=data,
             colorscale=colorScale,
             colorbar=dict(
-                len=0.8,
+                len=1
             ),
         ),
     )
@@ -56,7 +56,13 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
             constrain='domain',
             side='top',
             tickmode='array',
-            tickvals=list(range(width))
+            tickvals=[x-0.5 for x in list(range(width+1))],
+            ticktext=["{:.1f}".format(0.2*x) for x in range(width+1)],
+            tickangle=-45,
+            showgrid=False,
+            showline=False,
+            zeroline=False,
+            title="meter",
 
         ),
         yaxis=dict(
@@ -67,7 +73,12 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
             constrain='domain',
             automargin=True,
             tickmode='array',
-            tickvals=list(range(height))
+            tickvals=[x-0.5 for x in list(range(height+1))],
+            ticktext=["{:.1f}".format(0.2*x) for x in range(height+1)],
+            showgrid=False,
+            showline=False,
+            zeroline=False,
+            title="meter",
         ),
         margin=dict(
             l=15,
