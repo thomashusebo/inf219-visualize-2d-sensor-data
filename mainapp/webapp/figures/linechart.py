@@ -95,6 +95,8 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
 
     #Add colorbar to plot
     if color_range['min'] is not None and color_range['max'] is not None:
+        min = color_range['min']
+        max = color_range['max']
         width_of_line = (color_range['max'] - color_range['min']) / len(colorScale)
         for i in range(len(colorScale)):
             linechart_fig.add_shape(
@@ -103,9 +105,9 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
                     xref="paper",
                     yref="y",
                     x0=0,
-                    y0= color_range['min'] + i*width_of_line if i > 0 else 0,
+                    y0= min + i*width_of_line if i > 0 else 0 if min <= max else 12000,
                     x1=1,
-                    y1=color_range['min'] + (i+1)*width_of_line if i < len(colorScale)-1 else 12000,
+                    y1=min + (i+1)*width_of_line if i < len(colorScale)-1 else 12000 if min <= max else 0,
                     fillcolor=colorScale[i][1],
                     opacity=0.6,
                     layer="below",
