@@ -1,5 +1,6 @@
 import base64
 import datetime
+import time
 
 import dash
 import dash_html_components as html
@@ -266,6 +267,7 @@ class LiveApp(AbstractApp):
             ]
         )
         def updateFigures(_, selected_cells_heatmap, clicked_cell_heatmap, plot_type, col_min, col_max, linechart_data):
+            tic = time.process_time()
             # Define colormap
             colorScale = color_manager.getColorScale()
             color_range = {'min': col_min, 'max': col_max}
@@ -284,7 +286,7 @@ class LiveApp(AbstractApp):
             last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
             last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
 
-            timeline = {'start': last_timestamp - datetime.timedelta(minutes=1),
+            timeline = {'start': last_timestamp - datetime.timedelta(minutes=60),
                         'end': last_timestamp + datetime.timedelta(seconds=2)}
             if linechart_data:
                 if 'xaxis.range[0]' in linechart_data:
@@ -297,6 +299,8 @@ class LiveApp(AbstractApp):
             heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, coordinates, 'white',
                                             color_range)
             lineChartFig = linechart.getLineChart(linechart_data, last_timestamp, coordinates, colorScale, timeline, color_range)
+            toc = time.process_time()
+            print("Time to update figures: {}".format(toc-tic))
             return [
                 heatmapFig,
                 lineChartFig
