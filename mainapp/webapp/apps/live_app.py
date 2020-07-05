@@ -260,14 +260,16 @@ class LiveApp(AbstractApp):
                 Input('map_chooser', 'value'),
                 Input('color-low', 'value'),
                 Input('color-high', 'value'),
-            ])
-        def updateFigures(_, selected_cells_heatmap, clicked_cell_heatmap, plot_type, col_min, col_max):
+            ],
+            [
+                State('linechart', 'relayoutData'),
+            ]
+        )
+        def updateFigures(_, selected_cells_heatmap, clicked_cell_heatmap, plot_type, col_min, col_max, linechart_data):
             # Define colormap
             colorScale = color_manager.getColorScale()
             color_range = {'min': col_min, 'max': col_max}
             default_coordinate = {'x': 0, 'y': 0}
-
-            print(color_range)
 
             # Choose coordinate
             coordinates = [default_coordinate]
@@ -284,6 +286,11 @@ class LiveApp(AbstractApp):
 
             timeline = {'start': last_timestamp - datetime.timedelta(minutes=1),
                         'end': last_timestamp + datetime.timedelta(seconds=2)}
+            if linechart_data:
+                if 'xaxis.range[0]' in linechart_data:
+                    start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], "%Y-%m-%d %H:%M:%S")
+                    end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], "%Y-%m-%dT%H:%M:%S")
+                    timeline['start'] = last_timestamp - (end-start)
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
 
             # Update figures

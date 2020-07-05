@@ -94,7 +94,6 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
         ))
 
     #Add colorbar to plot
-    print(colorScale)
     if color_range['min'] is not None and color_range['max'] is not None:
         width_of_line = (color_range['max'] - color_range['min']) / len(colorScale)
         for i in range(len(colorScale)):
@@ -119,7 +118,14 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
             range=[timeline['start'], timeline['end']],
             type="date",
             linecolor='black',
-            gridcolor='LightGrey'
+            gridcolor='LightGrey',
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1, label="1m", step="minute", stepmode="backward"),
+                    dict(count=1, label="1h", step="hour", stepmode="backward"),
+                    dict(count=1, label="1d", step="day", stepmode="backward"),
+                ])
+            )
         ),
         yaxis=dict(
             title='Resistivity (Ohm)',
@@ -131,7 +137,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
         margin=dict(
             l=15,
             r=0,
-            t=15,
+            t=30,
             b=5,
             pad=0
         ),
