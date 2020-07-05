@@ -28,6 +28,11 @@ class NewProjectWindow(Screen):
     def start_new_project(self):
         project_name = self.project_name.text
         salt = gensalt()
+        min_length = 4
+        if len(self.password.text) < min_length:
+            self.status_label.text = 'Passwords had less than {} characters \n' \
+                                     'Please use a longer password'.format(min_length, project_name)
+            return
         password = hashpw(self.password.text.encode('utf-8'), salt)
         confirm_password = hashpw(self.confirm_password.text.encode('utf-8'), salt)
 
