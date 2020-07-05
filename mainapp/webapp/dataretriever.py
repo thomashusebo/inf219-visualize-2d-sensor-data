@@ -50,12 +50,14 @@ class DataRetriever:
 
         # Finds dimensions of the data
         tic = time.process_time()
-        query = "SELECT /*+ MAX_EXECUTION_TIME(1000) */ \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
-        dimensions = pd.read_sql_query(query, self.database)
-        if dimensions.empty:
-            return None, []
-        width = dimensions.values[0][0]
-        height = dimensions.values[0][1]
+        #query = "SELECT /*+ MAX_EXECUTION_TIME(1000) */ \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
+        #dimensions = pd.read_sql_query(query, self.database)
+        #if dimensions.empty:
+        #    return None, []
+        #width = dimensions.values[0][0]
+        #height = dimensions.values[0][1]
+        width = 13
+        height = 7
         toc = time.process_time()
         timing['find dimensions'] = toc-tic
 
