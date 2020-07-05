@@ -8,6 +8,6 @@ def start(project_name):
     application_manager.setupAppsOn(server, project_name)
     application_manager.openAllApps()
 
-    server.run(host='0.0.0.0', debug=False)
+    server.run(debug=False)
 
     return "Server shut off"

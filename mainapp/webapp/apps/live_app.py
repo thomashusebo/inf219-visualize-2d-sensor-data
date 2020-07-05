@@ -1,6 +1,5 @@
 import base64
 import datetime
-import hashlib
 
 import dash
 import dash_html_components as html
@@ -39,8 +38,8 @@ class LiveApp(AbstractApp):
         live_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
         live_app.layout = html.Div(
             style={
-                'padding-left': '10%',
-                'padding-right': '10%',
+                'padding-left': '2%',
+                'padding-right': '2%',
             },
             children=[
                 # Page Header
@@ -62,7 +61,7 @@ class LiveApp(AbstractApp):
                                         'padding-top': '0.5%',
                                         'border': 0,
                                         'margin': '0.1%',
-                                        'background-color': 'white'
+                                        'background-color': 'white',
                                     },
                                 ),
                                 html.Div(
@@ -86,11 +85,13 @@ class LiveApp(AbstractApp):
 
                 # Log
                 html.Div(
-                    className='six columns',
-                    style=puzzlebox,
+                    className='five columns',
+                    style={**puzzlebox,
+                           **{'width': '{}%'.format(5 / 12 * 100)}},
                     children=[
-                        # '''dcc.Markdown(
-                        #    children='''##### Log'''),'''
+                        dcc.Markdown(
+                            children='''##### Project: {}'''.format(project_name)
+                        ),
                         html.Div(
                             id='log',
                             style={
@@ -99,7 +100,7 @@ class LiveApp(AbstractApp):
                                 'margin-bottom': '1%',
                                 'background-color': 'white',
                                 'width': '100%',
-                                'height': 450,
+                                'height': 400,
                                 # Make area scrollable
                                 'overflow-x': 'hidden',
                                 'overflow-y': 'auto',
@@ -125,43 +126,75 @@ class LiveApp(AbstractApp):
                 ),
 
                 # Heatmap
-                html.Div(
-                    className='six columns',
-                    style=puzzlebox,
-                    children=[
-                        dcc.Graph(
-                            id='heatmap',
-                            config={
-                                "displaylogo": False,
-                                "modeBarButtonsToRemove": [
-                                    'zoom2d',
-                                    'pan2d',
-                                    'select2d',
-                                    'zoomIn2d',
-                                    'zoomOut2d',
-                                    'autoScale2d',
-                                    'resetScale2d',
-                                    'toggleSpikelines',
-                                ]
-                            },
-                        ),
-                        dcc.RadioItems(
-                            id='map_chooser',
-                            options=[
-                                {'label': 'Heatmap', 'value': 'heatmap'},
-                                {'label': 'Contour', 'value': 'contour'},
-                                {'label': 'Surface', 'value': 'surface'}
-                            ],
-                            value='heatmap',
-                            labelStyle={'display': 'inline-block'}
-                        ),
-                    ],
-                ),
+                html.Div([
+                    html.Div(
+                        className='six columns',
+                        style={**puzzlebox,
+                               **{'width': '{}%'.format(6 / 12 * 100)}},
+                        children=[
+                            dcc.Graph(
+                                id='heatmap',
+                                config={
+                                    "displaylogo": False,
+                                    "modeBarButtonsToRemove": [
+                                        'zoom2d',
+                                        'pan2d',
+                                        'select2d',
+                                        'zoomIn2d',
+                                        'zoomOut2d',
+                                        'autoScale2d',
+                                        'resetScale2d',
+                                        'toggleSpikelines',
+                                    ]
+                                },
+                            ),
+                            dcc.RadioItems(
+                                id='map_chooser',
+                                className='six columns',
+                                options=[
+                                    {'label': 'Heatmap', 'value': 'heatmap'},
+                                    {'label': 'Contour', 'value': 'contour'},
+                                ],
+                                value='heatmap',
+                                labelStyle={'display': 'inline-block'}
+                            ),
+                        ],
+                    ),
+                    html.Div(
+                        className='one columns',
+                        style={**puzzlebox,
+                               **{'min-width': None,
+                                  'width': '{}%'.format(1/12*100-0.1*6)}},
+                        children=[
+                            dcc.Input(
+                                id="color-high",
+                                type='number',
+                                placeholder='Max val',
+                                style={
+                                    'width': '100%',
+                                    'margin-bottom': 100
+                                },
+                                value=12000,
+                            ),
+                            dcc.Input(
+                                id="color-low",
+                                type='number',
+                                placeholder= 'Min val',
+                                style={
+                                    'width': '100%',
+                                    'margin-top': 100
+                                },
+                                value=0,
+                            ),
+                        ]
+                    ),
+                ]),
 
                 # Line chart
                 html.Div(
-                    className='six columns',
-                    style=puzzlebox,
+                    className='seven columns',
+                    style={**puzzlebox,
+                           **{'width': '{}%'.format(7 / 12 * 100-0.1*4)}},
                     children=[
                         dcc.Graph(
                             id='linechart',
@@ -191,7 +224,6 @@ class LiveApp(AbstractApp):
                     className='six columns',
                     style={
                         'padding-top': '0.1%',
-                        'padding-right': '2%',
                         'border': 0,
                         'margin': '0.1%',
                         'text-align': 'right',
@@ -213,7 +245,7 @@ class LiveApp(AbstractApp):
             [Output(component_id='live-clock', component_property='children')],
             [Input(component_id='interval-component', component_property='n_intervals')]
         )
-        def update_clock(n):
+        def update_clock(_):
             return dcc.Markdown(datetime.datetime.now().strftime("%H:%M:%S")),
 
         @live_app.callback(
@@ -225,13 +257,17 @@ class LiveApp(AbstractApp):
                 Input('interval-component', 'n_intervals'),
                 Input('heatmap', 'selectedData'),
                 Input('heatmap', 'clickData'),
-                Input('map_chooser', 'value')
+                Input('map_chooser', 'value'),
+                Input('color-low', 'value'),
+                Input('color-high', 'value'),
             ])
-        def updateFigures(nIntervals, selected_cells_heatmap, clicked_cell_heatmap, plot_type):
-
+        def updateFigures(_, selected_cells_heatmap, clicked_cell_heatmap, plot_type, col_min, col_max):
             # Define colormap
             colorScale = color_manager.getColorScale()
+            color_range = {'min': col_min, 'max': col_max}
             default_coordinate = {'x': 0, 'y': 0}
+
+            print(color_range)
 
             # Choose coordinate
             coordinates = [default_coordinate]
@@ -251,8 +287,9 @@ class LiveApp(AbstractApp):
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, coordinates, 'white')
-            lineChartFig = linechart.getLineChart(linechart_data, last_timestamp, coordinates, colorScale, timeline)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, coordinates, 'white',
+                                            color_range)
+            lineChartFig = linechart.getLineChart(linechart_data, last_timestamp, coordinates, colorScale, timeline, color_range)
             return [
                 heatmapFig,
                 lineChartFig

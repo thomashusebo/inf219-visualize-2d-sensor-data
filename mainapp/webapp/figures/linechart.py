@@ -1,8 +1,7 @@
 import plotly.graph_objects as go
-import plotly.express as px
 
 
-def getLineChart(data, timestamp, coordinates, colorScale, timeline):
+def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range):
     if len(data) < 1: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
@@ -69,13 +68,13 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
             mode='lines+markers',
             line=dict(
                 color='#292929',
-                width=1
+                width=1,
             ),
             marker=dict(
                 color='#292929',
-                size=3
+                size=5,
             ),
-            showlegend=True
+            showlegend=True,
         ))
 
     # Add vertical line representing selected timestamp
@@ -93,6 +92,27 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline):
                 width=2
             ),
         ))
+
+    #Add colorbar to plot
+    print(colorScale)
+    if color_range['min'] is not None and color_range['max'] is not None:
+        width_of_line = (color_range['max'] - color_range['min']) / len(colorScale)
+        for i in range(len(colorScale)):
+            linechart_fig.add_shape(
+                dict(
+                    type="rect",
+                    xref="paper",
+                    yref="y",
+                    x0=0,
+                    y0= color_range['min'] + i*width_of_line if i > 0 else 0,
+                    x1=1,
+                    y1=color_range['min'] + (i+1)*width_of_line if i < len(colorScale)-1 else 12000,
+                    fillcolor=colorScale[i][1],
+                    opacity=0.6,
+                    layer="below",
+                    line_width=0,
+                )
+            )
 
     linechart_fig.update_layout(
         xaxis=dict(
