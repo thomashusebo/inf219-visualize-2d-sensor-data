@@ -24,8 +24,6 @@ class LogManager:
         log = ''''''
         query = 'SELECT * FROM "log"'
         log_entries = read_sql_query(query, self.database)
-        filename = 'export/{}_{}_{}.csv'.format('now', 'test', 'log')
-        log_entries.to_csv(filename, index=False)
         for i in range(log_entries.shape[0]):
             entry = log_entries['entry'][i]
             if entry is None: entry = ""
