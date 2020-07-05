@@ -268,12 +268,13 @@ class LiveApp(AbstractApp):
         )
         def updateFigures(_, selected_cells_heatmap, clicked_cell_heatmap, plot_type, col_min, col_max, linechart_data):
             tic = time.process_time()
+
             # Define colormap
             colorScale = color_manager.getColorScale()
             color_range = {'min': col_min, 'max': col_max}
-            default_coordinate = {'x': 0, 'y': 0}
 
             # Choose coordinate
+            default_coordinate = {'x': 0, 'y': 0}
             coordinates = [default_coordinate]
             if clicked_cell_heatmap is not None:
                 coordinate = clicked_cell_heatmap['points'][0]
