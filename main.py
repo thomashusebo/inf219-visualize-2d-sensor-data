@@ -8,8 +8,9 @@ def main():
 
     if setupapp.active_project is not "":
         multiprocess_manager.start(project_name=setupapp.active_project,
-                                   datacollection = setupapp.datacollection,
-                                   instrument_simulator=simulate_instrument_csv)
+                                   datacollection=setupapp.datacollection,
+                                   instrument_simulator=simulate_instrument_csv
+        )
 
 
 if __name__ == '__main__':
