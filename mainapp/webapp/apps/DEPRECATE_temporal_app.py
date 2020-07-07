@@ -182,8 +182,9 @@ class TemporalApp(AbstractApp):
             # Check current timeline in linechart and keep zoom level
             tic = time.process_time()
             timeline = default_timeline
+            latest_timestamp = datetime.datetime.strptime(latest_timestamp, "%Y-%m-%d %H:%M:%S")
             if live_mode and latest_timestamp is not None:
-                latest_timestamp = datetime.datetime.strptime(latest_timestamp, "%Y-%m-%d %H:%M:%S")
+
                 timeline = {'start': latest_timestamp - datetime.timedelta(minutes=1), 'end':latest_timestamp+datetime.timedelta(seconds=2)}
                 timestamp = latest_timestamp
             if relayout_data:
@@ -192,6 +193,10 @@ class TemporalApp(AbstractApp):
             toc = time.process_time()
             timing['final say in timestamp and timeline'] = toc-tic
 
+            timeline = {'start': latest_timestamp - datetime.timedelta(minutes=60),
+                        'end': latest_timestamp + datetime.timedelta(seconds=2)}
+            color_range = {'min': 0, 'max':12000}
+
             # Collect linechart data
             tic = time.process_time()
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
@@ -199,12 +204,12 @@ class TemporalApp(AbstractApp):
 
             # Update figures
             tic = time.process_time()
-            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type, coordinates)
+            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, map_type, coordinates, 'white', color_range)
             toc = time.process_time()
             timing['update map fig'] = toc-tic
 
             tic = time.process_time()
-            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline)
+            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline, color_range)
             toc= time.process_time()
             timing['update line fig'] = toc-tic
             timing['full time'] = toc - first_tic

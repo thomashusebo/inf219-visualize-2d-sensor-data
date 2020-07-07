@@ -66,7 +66,7 @@ class DataRetriever:
         return last_timestamp, heatmap_data.values[0].reshape(height, width)
 
     @staticmethod
-    def get_linechart_data(self, coordinates, timeline):
+    def get_linechart_data(self, coordinates, timeline, get_all=False):
         """
         :param self:
         :param coordinate: dict
@@ -83,10 +83,14 @@ class DataRetriever:
         for coordinate in coordinates:
             columns += "".join(",\"[{:02d},{:02d}]\"".format(coordinate['x'],coordinate['y']))
 
+        query = 'SELECT {} FROM {} WHERE "time" BETWEEN \"{}\" AND \"{}\"'.format(
+            columns, table, timeline['start'], timeline['end'])
+        if get_all:
+            query = 'SELECT {} FROM {}'.format(
+            columns, table)
         try:
             linechart_data = pd.read_sql_query(
-                'SELECT {} FROM {} WHERE "time" BETWEEN \"{}\" AND \"{}\"'.format(
-                    columns, table, timeline['start'], timeline['end']),
+                query,
                 self.database)
         except sqlalchemy.exc.OperationalError:
             return pd.DataFrame()

@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 
 
-def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range):
+def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range, dragmode=False, quick_select_range=True):
     if len(data) < 1: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
@@ -115,20 +115,24 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
                 )
             )
 
+    range_selector = None
+    if quick_select_range:
+        range_selector = dict(
+            buttons=list([
+                dict(count=1, label="1m", step="minute", stepmode="backward"),
+                dict(count=1, label="1h", step="hour", stepmode="backward"),
+                dict(count=1, label="1d", step="day", stepmode="backward"),
+                dict(count=7, label="1w", step="day", stepmode="backward")
+            ])
+        )
+
     linechart_fig.update_layout(
         xaxis=dict(
             range=[timeline['start'], timeline['end']],
             type="date",
             linecolor='black',
             gridcolor='LightGrey',
-            rangeselector=dict(
-                buttons=list([
-                    dict(count=1, label="1m", step="minute", stepmode="backward"),
-                    dict(count=1, label="1h", step="hour", stepmode="backward"),
-                    dict(count=1, label="1d", step="day", stepmode="backward"),
-                    dict(count=7, label="1w", step="day", stepmode="backward")
-                ])
-            )
+            rangeselector=range_selector
         ),
         yaxis=dict(
             title='Resistivity (Ohm)',
@@ -145,7 +149,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
             pad=0
         ),
         plot_bgcolor='white',
-        dragmode=False,
+        dragmode=dragmode,
         height=250,
     )
 

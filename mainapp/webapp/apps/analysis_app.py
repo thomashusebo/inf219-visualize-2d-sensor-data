@@ -6,6 +6,7 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
+from dash.exceptions import PreventUpdate
 
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.webapp.figures import heatmap, linechart
@@ -31,13 +32,13 @@ puzzlebox = {
 }
 
 
-class LiveApp(AbstractApp):
+class AnalysisApp(AbstractApp):
     def setupOn(self, server, data_manager, project_name):
         global log_manager, log
         log_manager = LogManager(project_name)
         log = log_manager.retrieve_log()
-        live_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
-        live_app.layout = html.Div(
+        analysis_app = dash.Dash(__name__, server=server, url_base_pathname=self.url, external_stylesheets=stylesheet)
+        analysis_app.layout = html.Div(
             style={
                 'padding-left': '2%',
                 'padding-right': '2%',
@@ -59,6 +60,7 @@ class LiveApp(AbstractApp):
                                     ),
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '0.5%',
                                         'border': 0,
                                         'margin': '0.1%',
@@ -68,6 +70,7 @@ class LiveApp(AbstractApp):
                                 html.Div(
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '2%',
                                         'padding-right': '0.5%',
                                         'border': 0,
@@ -76,13 +79,13 @@ class LiveApp(AbstractApp):
                                         'background-color': 'white'
                                     },
                                     children=[
-                                        html.H1('Monitor'),
+                                        html.H1('Explore'),
                                     ]
                                 ),
-
                                 html.Div(
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '2%',
                                         'padding-right': '0.5%',
                                         'border': 0,
@@ -103,41 +106,14 @@ class LiveApp(AbstractApp):
                 html.Div(
                     className='five columns',
                     style={**puzzlebox,
-                           **{'width': '{}%'.format(5 / 12 * 100)}},
+                           **{
+                               'width': '{}%'.format(5 / 12 * 100),
+                               'height': 600
+                           }},
                     children=[
                         dcc.Markdown(
                             children='''##### Project: {}'''.format(project_name)
                         ),
-                        html.Div(
-                            id='log',
-                            style={
-                                'padding-left': '1%',
-                                'padding-right': '-1%',
-                                'margin-bottom': '1%',
-                                'background-color': 'white',
-                                'width': '100%',
-                                'height': 400,
-                                # Make area scrollable
-                                'overflow-x': 'hidden',
-                                'overflow-y': 'auto',
-                                'text-align': 'justify',
-                                # Keep scroll at bottom:
-                                'display': 'flex',
-                                'flex-direction': 'column-reverse',
-                            },
-                            children=dcc.Markdown(log)),
-                        dcc.Textarea(
-                            id='log-entry',
-                            style={'width': '100%', 'height': 87},
-                            placeholder='Enter log entry...'
-                        ),
-                        dcc.Input(
-                            id="project-password",
-                            type='password',
-                            placeholder="Enter project password...",
-                            style={'width': '50%'}
-                        ),
-                        html.Button('Submit', id='submit-log-entry', n_clicks=0),
                     ],
                 ),
 
@@ -188,7 +164,7 @@ class LiveApp(AbstractApp):
                                 placeholder='Max val',
                                 style={
                                     'width': '100%',
-                                    'margin-bottom': 100
+                                    'margin-bottom': 96
                                 },
                                 value=12000,
                             ),
@@ -198,10 +174,32 @@ class LiveApp(AbstractApp):
                                 placeholder= 'Min val',
                                 style={
                                     'width': '100%',
-                                    'margin-top': 100
+                                    'margin-top': 96
                                 },
                                 value=0,
                             ),
+                        ]
+                    ),
+                    html.Div(
+                        className='one columns',
+                        style={**puzzlebox,
+                               **{
+                                   'background-color': 'white',
+                                   'min-width': None,
+                                   'width': '{}%'.format(1 / 12 * 100 - 0.1 * 6)}},
+                        children=[
+                            html.Button(
+                                'Refresh',
+                                id = 'refresh',
+                                style={
+                                    'background-color': 'white',
+                                    'padding': '0.5%',
+                                    'margin': '0.1%',
+                                    'color': 'blue',
+                                    'width': '100%',
+                                    'text-align': 'center',
+                                }
+                            )
                         ]
                     ),
                 ]),
@@ -217,12 +215,8 @@ class LiveApp(AbstractApp):
                             config={
                                 "displaylogo": False,
                                 "modeBarButtonsToRemove": [
-                                    'zoom2d',
-                                    'pan2d',
                                     'lasso2d',
                                     'select2d',
-                                    'zoomIn2d',
-                                    'zoomOut2d',
                                     'autoScale2d',
                                     'toggleSpikelines',
                                 ]
@@ -257,32 +251,35 @@ class LiveApp(AbstractApp):
             ]
         )
 
-        @live_app.callback(
+        @analysis_app.callback(
             [Output(component_id='live-clock', component_property='children')],
             [Input(component_id='interval-component', component_property='n_intervals')]
         )
         def update_clock(_):
             return dcc.Markdown(datetime.datetime.now().strftime("%H:%M:%S")),
 
-        @live_app.callback(
+        @analysis_app.callback(
             [
                 Output(component_id='heatmap', component_property='figure'),
                 Output(component_id='linechart', component_property='figure')
             ],
             [
-                Input('interval-component', 'n_intervals'),
                 Input('heatmap', 'selectedData'),
                 Input('heatmap', 'clickData'),
+                Input('linechart', 'clickData'),
                 Input('map_chooser', 'value'),
                 Input('color-low', 'value'),
                 Input('color-high', 'value'),
+                Input('refresh', 'n_clicks')
             ],
             [
                 State('linechart', 'relayoutData'),
             ]
         )
-        def updateFigures(_, selected_cells_heatmap, clicked_cell_heatmap, plot_type, col_min, col_max, linechart_data):
+        def updateFigures(selected_cells_heatmap, clicked_cell_heatmap, linechart_click_data, plot_type, col_min, col_max, _, linechart_data):
             tic = time.process_time()
+
+            default_timestamp = "2020-07-07 22:45:30" # TODO find in smarter way
 
             # Define colormap
             colorScale = color_manager.getColorScale()
@@ -298,31 +295,47 @@ class LiveApp(AbstractApp):
                 if len(selected_cells_heatmap['points']) > 0:
                     coordinates = selected_cells_heatmap['points']
 
+            # Check for timestamp
+            timestamp = default_timestamp
+            if linechart_click_data:
+                timestamp = linechart_click_data['points'][0]['x']
+
+            try:
+                timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                # Illegal date chosen
+                raise PreventUpdate
+
+
             # Collect data
-            last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
+            last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp, live=False)
             last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
 
-            timeline = {'start': last_timestamp - datetime.timedelta(minutes=60),
-                        'end': last_timestamp + datetime.timedelta(seconds=2)}
+            timeline = {'start': timestamp - datetime.timedelta(minutes=60),
+                        'end': timestamp + datetime.timedelta(seconds=2)}
             if linechart_data:
+                if 'xaxis.range[0]' in linechart_data:
+                    timeline = {'start': linechart_data['xaxis.range[0]'], 'end': linechart_data['xaxis.range[1]']}
+
+            '''if linechart_data:
                 if 'xaxis.range[0]' in linechart_data:
                     start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], "%Y-%m-%d %H:%M:%S")
                     end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], "%Y-%m-%dT%H:%M:%S")
-                    timeline['start'] = last_timestamp - (end-start)
-            linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
+                    timeline['start'] = timestamp - (end-start)'''
+            linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline, get_all=True)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, coordinates, 'white',
+            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, plot_type, coordinates, 'white',
                                             color_range)
-            lineChartFig = linechart.getLineChart(linechart_data, last_timestamp, coordinates, colorScale, timeline, color_range)
+            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline, color_range, dragmode='pan', quick_select_range=False)
             toc = time.process_time()
-            print("Time to update figures: {}".format(toc-tic))
+            print("Time to update figures (Analysis): {}".format(toc-tic))
             return [
                 heatmapFig,
                 lineChartFig
             ]
 
-        @live_app.callback(
+        @analysis_app.callback(
             [
                 Output('log', 'children'),
                 Output('log-entry', 'value'),
