@@ -40,6 +40,7 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
             colorbar=dict(
                 len=1
             ),
+            #contours_coloring='heatmap'
         ),
     )
 

@@ -25,18 +25,16 @@ class DataRetriever:
         return data for given heatmap if it exists.
         """
 
-        # For now, there is only one table to choose from
         timing = {}
         first_tic = time.process_time()
-        table = self.resistivity_table
 
-        timing['live'] = live
+        # For now, there is only one table to choose from
+        table = self.resistivity_table
 
         if timestamp is "" and not live:
             Exception("Illegal heatmap retrieval. No timestamp and not live")
 
         # Selects for which timestamp to show a heatmap
-        tic = time.process_time()
         try:
             last_timestamp = pd.read_sql_query("SELECT MAX(\"time\") FROM {}".format(table),
                                                self.database).values[0][0]
@@ -45,35 +43,24 @@ class DataRetriever:
 
         if live:
             timestamp = last_timestamp
-        toc = time.process_time()
-        timing['find timestamp'] = toc-tic
 
         # Finds dimensions of the data
-        tic = time.process_time()
-        #query = "SELECT /*+ MAX_EXECUTION_TIME(1000) */ \"width\",\"height\" FROM {} WHERE \"time\"=\"{}\"".format(table, timestamp)
-        #dimensions = pd.read_sql_query(query, self.database)
-        #if dimensions.empty:
-        #    return None, []
-        #width = dimensions.values[0][0]
-        #height = dimensions.values[0][1]
         width = 13
         height = 7
-        toc = time.process_time()
-        timing['find dimensions'] = toc-tic
-
 
         # Collects a DataFrame of the heatmap
-        tic = time.process_time()
-        columns = "".join(["\"[{:02d},{:02d}]\",".format(x, y) for y in range(height) for x in range(width)])[:-1]
+        column_list = ["\"[{:02d},{:02d}]\"".format(x, y) for y in range(height) for x in range(width)]
+        columns = ",".join(column_list)
         sql_query = 'SELECT /*+ MAX_EXECUTION_TIME(1000) */ {} FROM {} WHERE time = \"{}\"'.format(
             columns,
             table,
             timestamp)
         heatmap_data = pd.read_sql_query(sql_query, self.database)
+        heatmap_data.columns = column_list
         toc = time.process_time()
-        timing['collect data'] = toc-tic
         timing['complete time'] = toc-first_tic
-        print("Collect map data: {}".format(timing))
+
+        # print("Collect map data: {}".format(timing))
 
         # Return a numpy array of the heatmap, reshaped to width and height of the data
         return last_timestamp, heatmap_data.values[0].reshape(height, width)
@@ -95,9 +82,6 @@ class DataRetriever:
         columns = "\"time\""
         for coordinate in coordinates:
             columns += "".join(",\"[{:02d},{:02d}]\"".format(coordinate['x'],coordinate['y']))
-
-        #columns = "".join(["\"[{:02d},{:02d}]\",".format(x, y) for y in range(height) for x in range(width)])[:-1]
-        #columns = "\"time\",\"[{:02d},{:02d}]\"".format(coordinate['x'], coordinate['y'])
 
         try:
             linechart_data = pd.read_sql_query(
