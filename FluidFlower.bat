@@ -1,2 +1,2 @@
 ECHO Starting FluidFlower...
-pipenv run python main.py
+python -m pipenv run python main.py
