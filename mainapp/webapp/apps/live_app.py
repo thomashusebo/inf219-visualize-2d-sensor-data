@@ -303,7 +303,7 @@ class LiveApp(AbstractApp):
             last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
 
             timeline = {'start': last_timestamp - datetime.timedelta(minutes=60),
-                        'end': last_timestamp + datetime.timedelta(seconds=2)}
+                        'end': last_timestamp + datetime.timedelta(seconds=0)}
             if linechart_data:
                 if 'xaxis.range[0]' in linechart_data:
                     start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], "%Y-%m-%d %H:%M:%S")
@@ -316,7 +316,7 @@ class LiveApp(AbstractApp):
                                             color_range)
             lineChartFig = linechart.getLineChart(linechart_data, last_timestamp, coordinates, colorScale, timeline, color_range)
             toc = time.process_time()
-            print("Time to update figures: {}".format(toc-tic))
+            print("Time to update figures(Live): {}".format(toc-tic))
             return [
                 heatmapFig,
                 lineChartFig

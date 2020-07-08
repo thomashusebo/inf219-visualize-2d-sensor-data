@@ -49,6 +49,8 @@ WindowManager:
     project_name: project_name
     password: password
     confirm_password: confirm_password
+    pixel_height: pixel_height
+    pixel_width: pixel_width
     status_label: my_status_label
 
     GridLayout:
@@ -89,6 +91,28 @@ WindowManager:
             TextInput:
                 id: confirm_password
                 password: True
+                multiline: False
+
+        GridLayout:
+            cols: 2
+
+            Label:
+                text: "Pixel height"
+
+            TextInput:
+                id: pixel_height
+                input_filter: 'int'
+                multiline: False
+
+        GridLayout:
+            cols: 2
+
+            Label:
+                text: "Pixel width"
+
+            TextInput:
+                id: pixel_width
+                input_filter: 'int'
                 multiline: False
 
         Button:

@@ -2,14 +2,17 @@ import time
 
 import pandas as pd
 import sqlalchemy
+from pandas import DataFrame
 from sqlalchemy import create_engine
 from mainapp.data.data_types import DataType
+from storage.project_manager import ProjectManager
 
 
 class DataRetriever:
     def __init__(self, project_name):
         self.database = create_engine('sqlite:///storage/databases/{}.db'.format(project_name))
         self.project_name = project_name
+        self.height, self.width = ProjectManager().get_dimensions(self.project_name)
         self.resistivity_table = "{}_RAW".format(DataType.Resistivity.value)
 
     @staticmethod
@@ -24,7 +27,6 @@ class DataRetriever:
             Returns a numpy array of heatmap. If live, will return the latest data. If a timestamp is given, will
         return data for given heatmap if it exists.
         """
-
         timing = {}
         first_tic = time.process_time()
 
@@ -35,21 +37,13 @@ class DataRetriever:
             Exception("Illegal heatmap retrieval. No timestamp and not live")
 
         # Selects for which timestamp to show a heatmap
-        try:
-            last_timestamp = pd.read_sql_query("SELECT MAX(\"time\") FROM {}".format(table),
-                                               self.database).values[0][0]
-        except sqlalchemy.exc.OperationalError:
-            return None,[]
+        last_timestamp = ProjectManager().get_last_timestamp(self.project_name)
 
         if live:
             timestamp = last_timestamp
 
-        # Finds dimensions of the data
-        width = 13
-        height = 7
-
-        # Collects a DataFrame of the heatmap
-        column_list = ["\"[{:02d},{:02d}]\"".format(x, y) for y in range(height) for x in range(width)]
+     # Collects a DataFrame of the heatmap
+        column_list = ["\"[{:02d},{:02d}]\"".format(x, y) for y in range(self.height) for x in range(self.width)]
         columns = ",".join(column_list)
         sql_query = 'SELECT /*+ MAX_EXECUTION_TIME(1000) */ {} FROM {} WHERE time = \"{}\"'.format(
             columns,
@@ -60,10 +54,13 @@ class DataRetriever:
         toc = time.process_time()
         timing['complete time'] = toc-first_tic
 
-        # print("Collect map data: {}".format(timing))
+        #print("Collect map data: {}".format(timing))
 
         # Return a numpy array of the heatmap, reshaped to width and height of the data
-        return last_timestamp, heatmap_data.values[0].reshape(height, width)
+        outdata = DataFrame()
+        if not heatmap_data.empty:
+            outdata = heatmap_data.values[0].reshape(self.height, self.width)
+        return last_timestamp, outdata
 
     @staticmethod
     def get_linechart_data(self, coordinates, timeline, get_all=False):

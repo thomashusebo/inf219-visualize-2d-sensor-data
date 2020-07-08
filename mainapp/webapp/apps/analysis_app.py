@@ -279,7 +279,7 @@ class AnalysisApp(AbstractApp):
         def updateFigures(selected_cells_heatmap, clicked_cell_heatmap, linechart_click_data, plot_type, col_min, col_max, _, linechart_data):
             tic = time.process_time()
 
-            default_timestamp = "2020-07-07 22:45:30" # TODO find in smarter way
+            default_timestamp = project_manager.get_last_timestamp(project_name)
 
             # Define colormap
             colorScale = color_manager.getColorScale()
@@ -312,7 +312,7 @@ class AnalysisApp(AbstractApp):
             last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
 
             timeline = {'start': timestamp - datetime.timedelta(minutes=60),
-                        'end': timestamp + datetime.timedelta(seconds=2)}
+                        'end': timestamp + datetime.timedelta(minutes=2)}
             if linechart_data:
                 if 'xaxis.range[0]' in linechart_data:
                     timeline = {'start': linechart_data['xaxis.range[0]'], 'end': linechart_data['xaxis.range[1]']}

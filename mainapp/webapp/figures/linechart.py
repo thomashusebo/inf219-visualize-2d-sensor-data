@@ -72,7 +72,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
             ),
             marker=dict(
                 color='#292929',
-                size=5,
+                size=3,
             ),
             showlegend=True,
         ))

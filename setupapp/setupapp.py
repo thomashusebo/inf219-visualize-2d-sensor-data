@@ -27,6 +27,8 @@ class NewProjectWindow(Screen):
 
     def start_new_project(self):
         project_name = self.project_name.text
+        height = int(self.pixel_height.text)
+        width = int(self.pixel_width.text)
         salt = gensalt()
         min_length = 4
         if len(self.password.text) < min_length:
@@ -41,7 +43,13 @@ class NewProjectWindow(Screen):
                                      'Please try again'.format(project_name)
             return
 
-        if project_manager.try_to_add_new_project_name(project_name, password):
+        if height < 0 or height > 99 or width < 0 or width > 99:
+            self.status_label.text = 'Pixels height/width must be in [0,99] \n' \
+                                     'Please try again'.format(project_name)
+            return
+
+
+        if project_manager.try_to_add_new_project_name(project_name, password, height, width):
             global active_project, datacollection
             active_project = project_name
             datacollection = True

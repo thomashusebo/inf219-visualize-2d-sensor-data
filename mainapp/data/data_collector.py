@@ -3,6 +3,7 @@ import time
 import pandas as pd
 from sqlalchemy import create_engine
 from mainapp.data.data_types import DataType
+from storage.project_manager import ProjectManager
 
 
 def tell_to_stop():
@@ -26,6 +27,7 @@ def clean_up_stopping_dir(stopping_dir, stopping_file):
 
 
 def update(project_name):
+    project_manager = ProjectManager()
     incoming_data_dir = os.getcwd() + '\\incoming_data'
 
     stopping_dir = os.getcwd() + '\\mainapp\\termination\\stop_dir'
@@ -65,6 +67,10 @@ def update(project_name):
                         return "DataCollector Stopped \n " + str(collection_statistics)
                     df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
                     df.to_sql(database_table, database, if_exists='append')
+
+                    last_timestamp = df['time'].max()
+                    project_manager.update_timestamp(project_name, last_timestamp)
+
                     toc = time.process_time()
                     collection_statistics['Chunks of last file read: '] += chunksize
                     collection_statistics['Time until last chunk: '] = toc-tic
@@ -73,7 +79,9 @@ def update(project_name):
                 collection_statistics['Time until last chunk: '] = 0
                 collection_statistics['Chunks of last file read: '] = 0
                 collection_statistics['Files read: '] += 1
+
                 os.remove(file_dir)
+
                 toc = time.process_time()
                 collection_statistics['Time to read and delete last file'] = toc-tic
 
