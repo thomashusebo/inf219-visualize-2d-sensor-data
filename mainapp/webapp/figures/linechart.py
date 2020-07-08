@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 
 
-def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range, dragmode=False, quick_select_range=True):
+def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range, dragmode=False, quick_select_range=True, calibration_time=None):
     if len(data) < 1: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
@@ -37,7 +37,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
                 fillcolor=fill_color,
                 fill='tonexty'))
 
-    # Add induvidual traces to the plot
+    # Add individual traces to the plot
     '''ys = data.shape[1]
     for y in range(1, ys):
         y = data.iloc[:, y].values
@@ -81,6 +81,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
     linechart_fig.add_shape(
         # Line Vertical
         dict(
+            name='selected timestamp',
             type="line",
             yref='paper',
             x0=timestamp,
@@ -89,9 +90,27 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
             y1=1,
             line=dict(
                 color="black",
-                width=2
+                width=5
             ),
         ))
+
+    # Add vertical line representing selected calibration
+    if calibration_time is not None:
+        linechart_fig.add_shape(
+            # Line Vertical
+            dict(
+                name='calibration time',
+                type="line",
+                yref='paper',
+                x0=calibration_time,
+                y0=0,
+                x1=calibration_time,
+                y1=1,
+                line=dict(
+                    color="green",
+                    width=5
+                ),
+            ))
 
     #Add colorbar to plot
     if color_range['min'] is not None and color_range['max'] is not None:

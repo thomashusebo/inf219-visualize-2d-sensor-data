@@ -16,7 +16,7 @@ class DataRetriever:
         self.resistivity_table = "{}_RAW".format(DataType.Resistivity.value)
 
     @staticmethod
-    def get_heatmap_data(self, timestamp="", live=False):
+    def get_heatmap_data(self, timestamp="", live=False, as_row=False):
         """
         :param self:
         :param timestamp: str
@@ -35,6 +35,10 @@ class DataRetriever:
 
         if timestamp is "" and not live:
             Exception("Illegal heatmap retrieval. No timestamp and not live")
+
+        if not self.database.dialect.has_table(self.database, table):
+            # No data yet
+            return None, pd.DataFrame()
 
         # Selects for which timestamp to show a heatmap
         last_timestamp = ProjectManager().get_last_timestamp(self.project_name)
@@ -60,6 +64,9 @@ class DataRetriever:
         outdata = DataFrame()
         if not heatmap_data.empty:
             outdata = heatmap_data.values[0].reshape(self.height, self.width)
+
+        if as_row:
+            outdata = heatmap_data
         return last_timestamp, outdata
 
     @staticmethod

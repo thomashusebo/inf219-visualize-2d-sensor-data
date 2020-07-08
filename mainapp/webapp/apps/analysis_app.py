@@ -1,6 +1,7 @@
 import base64
 import datetime
 import time
+import numpy as np
 
 import dash
 import dash_html_components as html
@@ -8,6 +9,7 @@ import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
 
+from mainapp.webapp import calibrator
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.webapp.figures import heatmap, linechart
 from mainapp.webapp.colors import color_manager
@@ -54,7 +56,7 @@ class AnalysisApp(AbstractApp):
                                     html.Img(
                                         src='data:image/png;base64,{}'.format(encoded_logo),
                                         style={
-                                            'width': '40%',
+                                            'width': '55%',
                                             'height': 'auto',
                                         }
                                     ),
@@ -102,20 +104,70 @@ class AnalysisApp(AbstractApp):
                     ]
                 ),
 
-                # Log
+                # Project name
                 html.Div(
                     className='five columns',
                     style={**puzzlebox,
                            **{
                                'width': '{}%'.format(5 / 12 * 100),
-                               'height': 600
                            }},
                     children=[
-                        dcc.Markdown(
-                            children='''##### Project: {}'''.format(project_name)
+                        html.Div(
+                            style={**puzzlebox,
+                                   **{
+                                       'width': '100%',
+                                   }},
+                            children=[
+                                dcc.Markdown(
+                                    children='''### Project: {}'''.format(project_name)
+                                ),
+                            ]
                         ),
-                    ],
+
+                        # Calibration
+                        html.Div(
+                            style={**puzzlebox,
+                                   **{
+                                       'width': '100%',
+                                       'height': 500
+                                   }},
+                            children=[
+                                dcc.Markdown(
+                                    '--- \n\n'
+                                    '##### Add new Calibration'
+                                ),
+                                dcc.Markdown(
+                                    'Selected timestamp: None',
+                                    id='display-selected-timestamp',
+                                ),
+                                dcc.Input(
+                                    id='calibration-name',
+                                    maxLength=25,
+                                    style={
+                                        'width': '50%',
+                                    },
+                                    placeholder='Enter descriptive name...'
+                                ),
+                                dcc.Input(
+                                    id="project-password",
+                                    type='password',
+                                    placeholder="Enter project password...",
+                                    style={'width': '50%'}
+                                ),
+                                dcc.Store(id='selected-timestamp'),
+                                html.Button('Add New Calibration', id='submit-new-calibration', n_clicks=0),
+                            ],
+                        ),
+                        dcc.Dropdown(
+                            id='calibration-dropdown',
+                            options=[
+                                {'label': 'None', 'value': None},
+                            ],
+                            value=None
+                        )
+                    ]
                 ),
+
 
                 # Heatmap
                 html.Div([
@@ -171,7 +223,7 @@ class AnalysisApp(AbstractApp):
                             dcc.Input(
                                 id="color-low",
                                 type='number',
-                                placeholder= 'Min val',
+                                placeholder='Min val',
                                 style={
                                     'width': '100%',
                                     'margin-top': 96
@@ -190,7 +242,7 @@ class AnalysisApp(AbstractApp):
                         children=[
                             html.Button(
                                 'Refresh',
-                                id = 'refresh',
+                                id='refresh',
                                 style={
                                     'background-color': 'white',
                                     'padding': '0.5%',
@@ -252,6 +304,54 @@ class AnalysisApp(AbstractApp):
         )
 
         @analysis_app.callback(
+            [
+                Output(component_id='calibration-name', component_property='placeholder'),
+                Output(component_id='calibration-name', component_property='value'),
+                Output(component_id='project-password', component_property='placeholder'),
+                Output(component_id='project-password', component_property='value'),
+                Output(component_id='calibration-dropdown', component_property='options')
+            ],
+            [
+                Input(component_id='submit-new-calibration', component_property='n_clicks')
+            ],
+
+            [
+                State(component_id='selected-timestamp', component_property='data'),
+                State(component_id='calibration-name', component_property='value'),
+                State(component_id='project-password', component_property='value')
+            ]
+        )
+        def add_calibration(n_clicks, timestamp, calibration_name, password):
+            name_value = calibration_name
+            name_placeholder = "Enter descriptive name..."
+            password_value = ""
+            password_placeholder = "Enter project password..."
+            options = [{'label': 'None', 'value': None}]
+
+            if timestamp is None and n_clicks > 0:
+                password_placeholder = "Must choose a timestamp from linechart"
+            else:
+                if password is not None:
+                    if project_manager.verify_password(project_name, password):
+                        calibrator.add_calibration(project_name, calibration_name, timestamp)
+                        name_value = ""
+                    else:
+                        password_placeholder = "Incorrect password..."
+
+            calibrations = calibrator.get_all_calibration_times(project_name)
+            if calibrations is not None:
+                for _, row in calibrations.iterrows():
+                    options.append({'label': row['calibrationname'], 'value': row['time']})
+
+            return [
+                name_placeholder,
+                name_value,
+                password_placeholder,
+                password_value,
+                options
+            ]
+
+        @analysis_app.callback(
             [Output(component_id='live-clock', component_property='children')],
             [Input(component_id='interval-component', component_property='n_intervals')]
         )
@@ -261,7 +361,9 @@ class AnalysisApp(AbstractApp):
         @analysis_app.callback(
             [
                 Output(component_id='heatmap', component_property='figure'),
-                Output(component_id='linechart', component_property='figure')
+                Output(component_id='linechart', component_property='figure'),
+                Output(component_id='display-selected-timestamp', component_property='children'),
+                Output(component_id='selected-timestamp', component_property='data')
             ],
             [
                 Input('heatmap', 'selectedData'),
@@ -270,16 +372,15 @@ class AnalysisApp(AbstractApp):
                 Input('map_chooser', 'value'),
                 Input('color-low', 'value'),
                 Input('color-high', 'value'),
-                Input('refresh', 'n_clicks')
+                Input('refresh', 'n_clicks'),
+                Input('calibration-dropdown', 'value')
             ],
             [
                 State('linechart', 'relayoutData'),
             ]
         )
-        def updateFigures(selected_cells_heatmap, clicked_cell_heatmap, linechart_click_data, plot_type, col_min, col_max, _, linechart_data):
+        def updateFigures(selected_cells_heatmap, clicked_cell_heatmap, linechart_click_data, plot_type, col_min, col_max, _, calibration_time, linechart_data):
             tic = time.process_time()
-
-            default_timestamp = project_manager.get_last_timestamp(project_name)
 
             # Define colormap
             colorScale = color_manager.getColorScale()
@@ -296,15 +397,14 @@ class AnalysisApp(AbstractApp):
                     coordinates = selected_cells_heatmap['points']
 
             # Check for timestamp
-            timestamp = default_timestamp
+            timestamp = project_manager.get_last_timestamp(project_name)
+            selected_timestamp = None
             if linechart_click_data:
-                timestamp = linechart_click_data['points'][0]['x']
+                timestamp = selected_timestamp = linechart_click_data['points'][0]['x']
 
-            try:
-                timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
-            except ValueError:
-                # Illegal date chosen
-                raise PreventUpdate
+            if timestamp is None:
+                raise PreventUpdate("No timestamp found")
+            timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
 
 
             # Collect data
@@ -319,56 +419,20 @@ class AnalysisApp(AbstractApp):
 
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline, get_all=True)
 
+            # Calibrate
+            if calibration_time is not None:
+                heatmap_calibration = calibrator.get_map_calibration_data(project_name, calibration_time)
+                heatmap_data = np.subtract(heatmap_data, heatmap_calibration)
+
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, plot_type, coordinates, 'white',
                                             color_range)
-            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline, color_range, dragmode='pan', quick_select_range=False)
+            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline, color_range, dragmode='pan', quick_select_range=False, calibration_time=calibration_time)
             toc = time.process_time()
             print("Time to update figures (Analysis): {}".format(toc-tic))
             return [
                 heatmapFig,
-                lineChartFig
-            ]
-
-        @analysis_app.callback(
-            [
-                Output('log', 'children'),
-                Output('log-entry', 'value'),
-                Output('log-entry', 'placeholder'),
-                Output('project-password', 'placeholder'),
-                Output('project-password', 'value')
-            ],
-            [
-                Input('submit-log-entry', 'n_clicks'),
-            ],
-            [
-                State('log-entry', 'value'),
-                State('project-password', 'value')
-            ]
-        )
-        def update_log(n_clicks, log_entry, password):
-            global log
-            log_entry_value = log_entry
-            log_entry_placeholder = "Write log entry..."
-            password_value = ""
-            password_placeholder = "Enter password..."
-
-            if n_clicks > 0:
-                if log_entry is "" or log_entry is None:
-                    log_entry_placeholder = "Cannot submit empty log entry..."
-                else:
-                    if password is not None:
-                        if project_manager.verify_password(project_name, password):
-                            timestamp = datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y")
-                            log_manager.insert_log_entry(timestamp, log_entry)
-                            log = log_manager.retrieve_log()
-                            log_entry_value = ""
-                        else:
-                            password_placeholder = "Incorrect password...."
-            return [
-                dcc.Markdown(log),
-                log_entry_value,
-                log_entry_placeholder,
-                password_placeholder,
-                password_value
+                lineChartFig,
+                'Selected timestamp: {}'.format(selected_timestamp),
+                selected_timestamp
             ]

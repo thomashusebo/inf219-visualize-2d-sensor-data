@@ -53,7 +53,7 @@ class LiveApp(AbstractApp):
                                     html.Img(
                                         src='data:image/png;base64,{}'.format(encoded_logo),
                                         style={
-                                            'width': '40%',
+                                            'width': '55%',
                                             'height': 'auto',
                                         }
                                     ),
