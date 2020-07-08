@@ -19,7 +19,7 @@ def setupAppsOn(server, project_name):
     )
 
     setup(
-        app=AnalysisApp(url='/analysis/', load_on_server_start=True),
+        app=AnalysisApp(url='/explore/', load_on_server_start=True),
         server=server,
         data_manager=live_data,
         project_name=project_name

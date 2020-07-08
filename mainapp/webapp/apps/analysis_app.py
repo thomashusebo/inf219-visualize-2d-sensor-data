@@ -317,11 +317,6 @@ class AnalysisApp(AbstractApp):
                 if 'xaxis.range[0]' in linechart_data:
                     timeline = {'start': linechart_data['xaxis.range[0]'], 'end': linechart_data['xaxis.range[1]']}
 
-            '''if linechart_data:
-                if 'xaxis.range[0]' in linechart_data:
-                    start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], "%Y-%m-%d %H:%M:%S")
-                    end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], "%Y-%m-%dT%H:%M:%S")
-                    timeline['start'] = timestamp - (end-start)'''
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline, get_all=True)
 
             # Update figures
