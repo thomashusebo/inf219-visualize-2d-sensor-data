@@ -623,7 +623,8 @@ class AnalysisApp(AbstractApp):
                 figure_height=150,
                 title='Raw data',
                 axis_name=False,
-                allow_lasso=False
+                allow_lasso=False,
+                label_axis=False
             )
             calibrated_fig = heatmap.getMap(
                 calibrated_data,
@@ -645,7 +646,8 @@ class AnalysisApp(AbstractApp):
                 figure_height=150,
                 title='Calibration data',
                 axis_name=False,
-                allow_lasso=False
+                allow_lasso=False,
+                label_axis=False
             )
             lineChartFig = linechart.getLineChart(
                 linechart_data,

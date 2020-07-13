@@ -14,7 +14,8 @@ def getMap(
         figure_height=300,
         title="",
         axis_name=True,
-        allow_lasso=True):
+        allow_lasso=True,
+        label_axis=True):
 
     half_cell_size = 0.5
 
@@ -59,11 +60,23 @@ def getMap(
     if coordinates:
         for coordinate in coordinates:
             map_fig.add_shape(
-                type="rect",
+                type='rect',
                 x0=coordinate['x'] - half_cell_size,
                 y0=coordinate['y'] - half_cell_size,
                 x1=coordinate['x'] + half_cell_size,
                 y1=coordinate['y'] + half_cell_size)
+
+    # Add border around map
+    map_fig.add_shape(
+        type='rect',
+        x0=0 - half_cell_size,
+        y0=0 - half_cell_size,
+        x1=width - half_cell_size,
+        y1=height - half_cell_size,
+        line=dict(
+            width=4
+        )
+    )
 
     if axis_name:
         axis_title='meter'
@@ -90,6 +103,7 @@ def getMap(
             showline=False,
             zeroline=False,
             title=axis_title,
+            visible=label_axis,
 
         ),
         yaxis=dict(
@@ -106,6 +120,7 @@ def getMap(
             showline=False,
             zeroline=False,
             title=axis_title,
+            visible=label_axis
         ),
         margin=dict(
             l=15,

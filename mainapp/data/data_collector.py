@@ -71,8 +71,7 @@ def update(project_name):
                     # Removed redundant whitespaces of current instrument
                     df['time'] = df['time'].str[1:-1]
                     df.replace(0.0, np.nan)
-                    df= df.replace({0.0: np.nan})
-                    print(type(df['[01,00]'][0]))
+                    df = df.replace({0.0: np.nan})
 
                     df.to_sql(database_table, database, if_exists='append')
 
