@@ -8,6 +8,10 @@ class ProjectManager():
     def __init__(self):
         self.__master_database = "/storage/databases/master.db"
         db_engine = create_engine('sqlite://' + self.__master_database)
+        self.__create_project_overview(db_engine)
+
+    @staticmethod
+    def __create_project_overview(db_engine):
         if not db_engine.dialect.has_table(db_engine, "projects"):
             meta = MetaData()
             Table(
