@@ -9,7 +9,9 @@ def getHeatMap(
         coordinates=None,
         background_color='white',
         custom_color_range=None,
-        figure_height=300):
+        figure_height=300,
+        title="",
+        axis_name=True):
 
     half_cell_size = 0.5
     cell_length_meter = 0.2
@@ -64,7 +66,12 @@ def getHeatMap(
                 x1=coordinate['x'] + half_cell_size,
                 y1=coordinate['y'] + half_cell_size)
 
+    if axis_name:
+        axis_title='meter'
+    else:
+        axis_title=None
     heatmap_fig.update_layout(
+        title=title,
         dragmode='lasso',
         xaxis=dict(
             range=[half_cell_size, width - half_cell_size],
@@ -77,7 +84,7 @@ def getHeatMap(
             showgrid=False,
             showline=False,
             zeroline=False,
-            title="meter",
+            title=axis_title,
 
         ),
         yaxis=dict(
@@ -93,12 +100,12 @@ def getHeatMap(
             showgrid=False,
             showline=False,
             zeroline=False,
-            title="meter",
+            title=axis_title,
         ),
         margin=dict(
             l=15,
             r=0,
-            t=0,
+            t=25,
             b=0,
             pad=0
         ),

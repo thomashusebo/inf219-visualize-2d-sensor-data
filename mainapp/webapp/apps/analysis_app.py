@@ -143,7 +143,7 @@ class AnalysisApp(AbstractApp):
                             style={**puzzlebox,
                                    **{
                                        'width': '100%',
-                                       'height': 500
+                                       'height': 375
                                    }},
                             children=[
                                 dcc.Markdown(
@@ -188,7 +188,8 @@ class AnalysisApp(AbstractApp):
                     html.Div(
                         className='six columns',
                         style={**puzzlebox,
-                               **{'width': '{}%'.format(3 / 12 * 100 - 0.2)}},
+                               **{'width': '{}%'.format(2 / 12 * 100 - 0.2),
+                                  'min-width':None}},
                         children=[
                             dcc.Graph(
                                 id='raw_map',
@@ -211,7 +212,16 @@ class AnalysisApp(AbstractApp):
                     html.Div(
                         className='six columns',
                         style={**puzzlebox,
-                               **{'width': '{}%'.format(3 / 12 * 100 - 0.2)}},
+                               **{'width': '{}%'.format(2 / 12 * 100 - 0.2),
+                                  'min-width':None}},
+                        children=[
+                        ]
+                    ),
+                    html.Div(
+                        className='six columns',
+                        style={**puzzlebox,
+                               **{'width': '{}%'.format(2 / 12 * 100 - 0.2),
+                                  'min-width':None}},
                         children=[
                             dcc.Graph(
                                 id='calibration_map',
@@ -278,7 +288,7 @@ class AnalysisApp(AbstractApp):
                                     'width': '100%',
                                     'margin-bottom': 96
                                 },
-                                value=12000,
+                                value=10000,
                             ),
                             dcc.Input(
                                 id="color-low",
@@ -288,7 +298,7 @@ class AnalysisApp(AbstractApp):
                                     'width': '100%',
                                     'margin-top': 96
                                 },
-                                value=0,
+                                value=-10000,
                             ),
                         ]
                     ),
@@ -320,7 +330,7 @@ class AnalysisApp(AbstractApp):
                 html.Div(
                     className='seven columns',
                     style={**puzzlebox,
-                           **{'width': '{}%'.format(7 / 12 * 100-0.1*4)}},
+                           **{'width': '{}%'.format(12 / 12 * 100-0.2)}},
                     children=[
                         dcc.Graph(
                             id='linechart',
@@ -456,6 +466,8 @@ class AnalysisApp(AbstractApp):
             # Define colormap
             colorScale = color_manager.getColorScale('red-white-blue')
             color_range = {'min': col_min, 'max': col_max}
+            meta_color_scale = color_manager.getColorScale('green-yellow')
+            meta_color_range = {'min': 0, 'max': 12000}
 
             # Choose coordinate
             default_coordinate = {'x': 0, 'y': 0}
@@ -506,12 +518,14 @@ class AnalysisApp(AbstractApp):
             raw_fig = heatmap.getHeatMap(
                 heatmap_data,
                 timestamp,
-                colorScale,
+                meta_color_scale,
                 plot_type,
                 coordinates,
                 'white',
-                color_range,
-                figure_height=150
+                meta_color_range,
+                figure_height=150,
+                title='Raw data',
+                axis_name=False
             )
             calibrated_fig = heatmap.getHeatMap(
                 calibrated_data,
@@ -523,14 +537,16 @@ class AnalysisApp(AbstractApp):
                 color_range,
             )
             calibration_fig = heatmap.getHeatMap(
-                calibration_data,
-                calibration_time,
-                colorScale,
-                plot_type,
-                coordinates,
-                'white',
-                color_range,
-                figure_height=150
+                data=calibration_data,
+                timestamp=calibration_time,
+                colorScale=meta_color_scale,
+                figure_type=plot_type,
+                coordinates=coordinates,
+                background_color='white',
+                custom_color_range=meta_color_range,
+                figure_height=150,
+                title='Calibration data',
+                axis_name=False
             )
             lineChartFig = linechart.getLineChart(
                 linechart_data,
