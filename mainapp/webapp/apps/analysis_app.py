@@ -10,7 +10,7 @@ from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
 from pandas import DataFrame
 
-from mainapp.app_settings import datetime_format
+from mainapp.app_settings import datetime_format, default_color_range_min, default_color_type, default_color_range_max
 from mainapp.webapp import calibrator
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.webapp.figures import heatmap, linechart
@@ -258,7 +258,7 @@ class AnalysisApp(AbstractApp):
                                     'width': '100%',
                                     'margin-bottom': 17
                                 },
-                                value=10000,
+                                value=default_color_range_max,
                             ),
                             dcc.Dropdown(
                                 id='meta-color',
@@ -271,7 +271,7 @@ class AnalysisApp(AbstractApp):
                                     {'label': 'RedWhiteBlue', 'value': 'red-white-blue'},
                                     {'label': 'RedYellowBlue', 'value': 'red-yellow-blue'},
                                 ],
-                                value='red-white-blue'
+                                value=default_color_type
                             ),
                             dcc.Input(
                                 id="meta-color-low",
@@ -281,7 +281,7 @@ class AnalysisApp(AbstractApp):
                                     'width': '100%',
                                     'margin-top': 17
                                 },
-                                value=-10000,
+                                value=default_color_range_min,
                             ),
                         ]
                     ),
@@ -332,7 +332,7 @@ class AnalysisApp(AbstractApp):
                                     'width': '100%',
                                     'margin-bottom': 78
                                 },
-                                value=10000,
+                                value=default_color_range_max,
                             ),
                             dcc.Dropdown(
                                 id='color-type',
@@ -346,7 +346,7 @@ class AnalysisApp(AbstractApp):
                                     {'label': 'RedYellowBlue', 'value': 'red-yellow-blue'},
 
                                 ],
-                                value='red-white-blue'
+                                value=default_color_type
                             ),
                             dcc.Input(
                                 id="color-low",
@@ -356,7 +356,7 @@ class AnalysisApp(AbstractApp):
                                     'width': '100%',
                                     'margin-top': 78
                                 },
-                                value=-10000,
+                                value=default_color_range_min,
                             ),
                         ]
                     ),
@@ -626,6 +626,7 @@ class AnalysisApp(AbstractApp):
                 dragmode='pan',
                 quick_select_range=False,
                 calibration_time=calibration_time,
+                show_legend=True
             )
             toc = time.process_time()
             print("Time to update figures (Analysis): {}".format(toc-tic))

@@ -1,5 +1,7 @@
 import plotly.graph_objects as go
 
+from mainapp.app_settings import cell_length_meter
+
 
 def getMap(
         data,
@@ -15,7 +17,6 @@ def getMap(
         allow_lasso=True):
 
     half_cell_size = 0.5
-    cell_length_meter = 0.2
 
     get_figure = {
         'heatmap': go.Heatmap,

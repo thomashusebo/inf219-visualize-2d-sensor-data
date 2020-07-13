@@ -1,7 +1,19 @@
 import plotly.graph_objects as go
 
+from mainapp.app_settings import cell_length_meter
 
-def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range, dragmode=False, quick_select_range=True, calibration_time=None):
+
+def getLineChart(
+        data,
+        timestamp,
+        coordinates,
+        colorScale,
+        timeline,
+        color_range,
+        dragmode=False,
+        quick_select_range=True,
+        calibration_time=None,
+        show_legend=False):
     if len(data) < 1: return {
         'data': [],
         'layout': go.Layout(title=go.layout.Title(text='No data found'))
@@ -15,7 +27,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
     var = data.iloc[:, 1:].transpose().std().transpose()
 
     # Add continuous error bars to the plot
-    error_colors = ['#d9d9d9', '#bdbdbd', '#969696']
+    '''error_colors = ['#d9d9d9', '#bdbdbd', '#969696']
     for i in reversed(range(1, 4)):
         fill_color = error_colors[i-1]
         if data.shape[1] > 2:
@@ -35,27 +47,29 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
                 marker=dict(color="#444"),
                 line=dict(width=1, color='black'),
                 fillcolor=fill_color,
-                fill='tonexty'))
+                fill='tonexty'))'''
 
     # Add individual traces to the plot
-    '''ys = data.shape[1]
+    ys = data.shape[1]
     for y in range(1, ys):
+        coord = coordinates[y-1]
         y = data.iloc[:, y].values
         linechart_fig.add_trace(go.Scatter(
+            name='[{:2d},{:2d}]'.format(coord['x'], coord['y']),
             x=x,
             y=y,
             mode='lines+markers',
             line=dict(
                 width=1,
-                color='#f0f0f0'),
+                color='#292929'),
             marker=dict(
                 size=2,
-                color='#f0f0f0'),
-            showlegend=False
-        ))'''
+                color='#292929'),
+            showlegend=show_legend
+        ))
 
     # Add central values to the plot
-    if data.shape[1] > 1:
+    '''if data.shape[1] > 1:
         if data.shape[1] == 2:
             trace_name = '[{:d},{:d}]'.format(coordinates[0]['x'], coordinates[0]['y'])
         else:
@@ -75,8 +89,7 @@ def getLineChart(data, timestamp, coordinates, colorScale, timeline, color_range
                 size=3,
             ),
             showlegend=True,
-        ))
-
+        ))'''
     # Add vertical line representing selected timestamp
     linechart_fig.add_shape(
         # Line Vertical
