@@ -19,12 +19,15 @@ For more information, see the [wiki](https://github.com/thomashusebo/inf219-visu
 1. Install python 3.7.6
 2. Install dependencies 
 
-Either:
-- Install pipenv
-- Run batch script FluidFlower.bat
+Recommended:
+> - Install pipenv
+> - Run batch script FluidFlower.batThe batch script creates a virtual environment based on the pip files. 
 
-Or:
-Manually install dependencies from requirements.txt or pip files. 
+> If this is the first time to set up, this will install all nececarry dependencies. The batch scipt also creates subdirectories ignored by git.
+
+Not recommended:
+> - Manually install dependencies from requirements.txt or pip files. 
+> - Manually add directories ignored by git (see batch file)
 
 3. Start software: FluidFlower.bat or run main.py
 
