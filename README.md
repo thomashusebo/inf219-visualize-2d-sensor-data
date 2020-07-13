@@ -26,7 +26,10 @@ Either:
 Or:
 Manually install dependencies from requirements.txt or pip files. 
 
-3. Run main.py or FluidFlower.bat
+3. Start software: FluidFlower.bat or run main.py
+
+## File format
+See [wiki/File-Format](https://github.com/thomashusebo/inf219-visualize-2d-sensor-data/wiki/File-Format)
 
 ## Prototype
 Before the corona lockdown, a prototype of the software where working (though with manually feeding input to a 
