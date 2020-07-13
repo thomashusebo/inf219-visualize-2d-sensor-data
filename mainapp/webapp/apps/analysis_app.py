@@ -391,7 +391,16 @@ class AnalysisApp(AbstractApp):
                 State('linechart', 'relayoutData'),
             ]
         )
-        def updateFigures(selected_cells_heatmap, clicked_cell_heatmap, linechart_click_data, plot_type, col_min, col_max, _, calibration_time, linechart_data):
+        def updateFigures(
+                selected_cells_heatmap,
+                clicked_cell_heatmap,
+                linechart_click_data,
+                plot_type,
+                col_min,
+                col_max,
+                _,
+                calibration_time,
+                linechart_data):
             tic = time.process_time()
 
             # Define colormap
@@ -429,7 +438,11 @@ class AnalysisApp(AbstractApp):
                 if 'xaxis.range[0]' in linechart_data:
                     timeline = {'start': linechart_data['xaxis.range[0]'], 'end': linechart_data['xaxis.range[1]']}
 
-            linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline, get_all=True)
+            linechart_data = data_manager.get_linechart_data(
+                data_manager,
+                coordinates=coordinates,
+                timeline=timeline,
+                get_all=True)
 
             # Calibrate
             calibration_data = None

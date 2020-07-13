@@ -317,7 +317,14 @@ class LiveApp(AbstractApp):
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, coordinates, 'white',
                                             color_range)
-            lineChartFig = linechart.getLineChart(linechart_data, last_timestamp, coordinates, colorScale, timeline, color_range)
+            lineChartFig = linechart.getLineChart(
+                linechart_data,
+                last_timestamp,
+                coordinates,
+                colorScale,
+                timeline,
+                color_range
+            )
             toc = time.process_time()
             print("Time to update figures(Live): {}".format(toc-tic))
             return [
