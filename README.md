@@ -17,7 +17,8 @@ For more information, see the [wiki](https://github.com/thomashusebo/inf219-visu
 
 ## Installation
 1. Install python 3.7.6
-2. Install dependencies: 
+1. Clone repository
+1. Install dependencies: 
 
 Recommended:
 > - Install pipenv
@@ -29,7 +30,7 @@ Not recommended:
 > - Manually install dependencies from requirements.txt or pip files. 
 > - Manually add directories ignored by git (see batch file)
 
-3. Start software: FluidFlower.bat or run main.py
+4. Start software: FluidFlower.bat or run main.py
 
 ## File format
 See [wiki/File-Format](https://github.com/thomashusebo/inf219-visualize-2d-sensor-data/wiki/File-Format)
