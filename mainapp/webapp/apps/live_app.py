@@ -311,7 +311,7 @@ class LiveApp(AbstractApp):
             if linechart_data:
                 if 'xaxis.range[0]' in linechart_data:
                     start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], datetime_format)
-                    end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], datetime_format)
+                    end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], "%Y-%m-%dT%H:%M:%S")
                     timeline['start'] = last_timestamp - (end-start)
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
 
