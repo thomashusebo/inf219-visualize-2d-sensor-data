@@ -39,11 +39,11 @@ def calibrate_map(heatmap_data, calibration_data):
 
 
 def calibrate_line_data(linechart_data, calibration_data, coordinates):
-    add = [""]
+    calibration = [""]
     for coord in coordinates:
-        add.append(-calibration_data[coord['x'], coord['y']])
+        calibration.append(-calibration_data[coord['x'], coord['y']])
 
-    return linechart_data+add
+    return linechart_data+calibration
 
 
 class AnalysisApp(AbstractApp):
