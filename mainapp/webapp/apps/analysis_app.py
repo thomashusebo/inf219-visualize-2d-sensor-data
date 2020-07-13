@@ -9,6 +9,7 @@ import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
 
+from mainapp.app_settings import datetime_format
 from mainapp.webapp import calibrator
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.webapp.figures import heatmap, linechart
@@ -425,12 +426,12 @@ class AnalysisApp(AbstractApp):
 
             if timestamp is None:
                 raise PreventUpdate("No timestamp found")
-            timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+            timestamp = datetime.datetime.strptime(timestamp, datetime_format)
 
 
             # Collect data
             last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp, live=False)
-            last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
+            last_timestamp = datetime.datetime.strptime(last_timestamp, datetime_format)
 
             timeline = {'start': timestamp - datetime.timedelta(minutes=60),
                         'end': timestamp + datetime.timedelta(minutes=2)}

@@ -7,6 +7,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 
+from mainapp.app_settings import datetime_format
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.webapp.figures import heatmap, linechart
 from mainapp.webapp.colors import color_manager
@@ -303,14 +304,14 @@ class LiveApp(AbstractApp):
 
             # Collect data
             last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
-            last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
+            last_timestamp = datetime.datetime.strptime(last_timestamp, datetime_format)
 
             timeline = {'start': last_timestamp - datetime.timedelta(minutes=60),
                         'end': last_timestamp + datetime.timedelta(seconds=0)}
             if linechart_data:
                 if 'xaxis.range[0]' in linechart_data:
-                    start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], "%Y-%m-%d %H:%M:%S")
-                    end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], "%Y-%m-%dT%H:%M:%S")
+                    start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], datetime_format)
+                    end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], datetime_format)
                     timeline['start'] = last_timestamp - (end-start)
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
 
