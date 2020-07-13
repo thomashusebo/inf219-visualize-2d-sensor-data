@@ -79,9 +79,9 @@ def getMap(
         title=title,
         dragmode=drag_mode,
         xaxis=dict(
-            range=[-half_cell_size, width - half_cell_size],
+            range=[-half_cell_size, width + half_cell_size],
             constrain='domain',
-            # side='top',
+            side='top',
             tickmode='array',
             tickvals=[x - half_cell_size for x in list(range(width + 1))],
             ticktext=["{:.1f}".format(cell_length_meter * x) for x in range(width + 1)],
@@ -93,8 +93,8 @@ def getMap(
 
         ),
         yaxis=dict(
-            range=[-half_cell_size, height - half_cell_size],
-            # autorange='reversed',
+            range=[-half_cell_size, height + half_cell_size],
+            autorange='reversed',
             scaleanchor="x",
             scaleratio=1,
             constrain='domain',

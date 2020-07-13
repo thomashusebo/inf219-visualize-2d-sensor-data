@@ -48,6 +48,26 @@ def calibrate_line_data(linechart_data, calibration_data, coordinates):
     return linechart_data+calibration
 
 
+def update_coordinates(previous_coordinates, clicked_cell_heatmap):
+    default_coordinate = {'x': 0, 'y': 0}
+    if len(previous_coordinates) == 0:
+        coordinates = [default_coordinate]
+    else:
+        coordinates = previous_coordinates
+
+    if clicked_cell_heatmap is not None:
+        clicked_coordinate = clicked_cell_heatmap['points'][0]
+        found = False
+        for coord in coordinates:
+            if coord['x'] == clicked_coordinate['x'] and coord['y'] == clicked_coordinate['y']:
+                coordinates.remove(coord)
+                found = True
+        if not found:
+            coordinates.append(clicked_coordinate)
+
+    return coordinates
+
+
 class AnalysisApp(AbstractApp):
     def setupOn(self, server, data_manager, project_name):
         global log_manager, log
@@ -383,6 +403,10 @@ class AnalysisApp(AbstractApp):
                         ]
                     ),
                 ]),
+                dcc.Store(
+                    id='coordinates',
+                    data=[]
+                ),
 
                 # Line chart
                 html.Div(
@@ -488,6 +512,20 @@ class AnalysisApp(AbstractApp):
 
         @analysis_app.callback(
             [
+                Output('coordinates', 'data')
+            ],
+            [
+                Input('heatmap', 'clickData')
+            ],
+            [
+                State('coordinates', 'data')
+            ]
+        )
+        def update_chosen_coordinates(clicked_cell_heatmap, coordinates):
+            return [update_coordinates(coordinates, clicked_cell_heatmap)]
+
+        @analysis_app.callback(
+            [
                 Output(component_id='heatmap', component_property='figure'),
                 Output(component_id='linechart', component_property='figure'),
                 Output(component_id='display-selected-timestamp', component_property='children'),
@@ -496,7 +534,6 @@ class AnalysisApp(AbstractApp):
                 Output(component_id='calibration_map', component_property='figure'),
             ],
             [
-                Input('heatmap', 'selectedData'),
                 Input('heatmap', 'clickData'),
                 Input('linechart', 'clickData'),
                 Input('map_chooser', 'value'),
@@ -507,14 +544,15 @@ class AnalysisApp(AbstractApp):
                 Input('meta-color', 'value'),
                 Input('meta-color-low', 'value'),
                 Input('meta-color-high', 'value'),
-                Input('color-type', 'value')
+                Input('color-type', 'value'),
+                Input('coordinates', 'modified_timestamp'),
             ],
             [
                 State('linechart', 'relayoutData'),
+                State('coordinates', 'data')
             ]
         )
         def updateFigures(
-                selected_cells_heatmap,
                 clicked_cell_heatmap,
                 linechart_click_data,
                 plot_type,
@@ -526,7 +564,10 @@ class AnalysisApp(AbstractApp):
                 meta_col_min,
                 meta_col_max,
                 color_type,
-                linechart_data):
+                __,
+                linechart_data,
+                coordinates):
+
             tic = time.process_time()
 
             # Define colormap
@@ -534,16 +575,6 @@ class AnalysisApp(AbstractApp):
             color_range = {'min': col_min, 'max': col_max}
             meta_color_scale = color_manager.getColorScale(meta_color)
             meta_color_range = {'min': meta_col_min, 'max': meta_col_max}
-
-            # Choose coordinate
-            default_coordinate = {'x': 0, 'y': 0}
-            coordinates = [default_coordinate]
-            if clicked_cell_heatmap is not None:
-                coordinate = clicked_cell_heatmap['points'][0]
-                coordinates = [coordinate]
-            if selected_cells_heatmap is not None:
-                if len(selected_cells_heatmap['points']) > 0:
-                    coordinates = selected_cells_heatmap['points']
 
             # Check for timestamp
             timestamp = project_manager.get_last_timestamp(project_name)
@@ -636,5 +667,5 @@ class AnalysisApp(AbstractApp):
                 'Selected timestamp: {}'.format(selected_timestamp),
                 selected_timestamp,
                 raw_fig,
-                calibration_fig
+                calibration_fig,
             ]
