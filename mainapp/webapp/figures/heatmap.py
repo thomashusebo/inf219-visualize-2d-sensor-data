@@ -24,17 +24,9 @@ def getMap(
     }
 
     map_fig = go.Figure()
-
-    if len(data) == 0:
-        return {
-            'data': [],
-            'layout': go.Layout(
-                title=go.layout.Title(text=title+': No data found'),
-                height=figure_height
-            )
-        }
-
     height, width = data.shape
+
+    # Adds a point in center of each cell
     map_fig.add_trace(
         go.Scatter(
             x=[i for i in range(width) for j in range(height)],
@@ -46,6 +38,8 @@ def getMap(
             )
         )
     )
+
+    # Adds heatmap or contour
     map_fig.add_trace(
         get_figure[figure_type](
             z=data,
@@ -59,6 +53,8 @@ def getMap(
             # contours_coloring='heatmap'
         ),
     )
+
+    # Add rectangles for each coordinate
     if coordinates:
         for coordinate in coordinates:
             map_fig.add_shape(
