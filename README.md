@@ -23,7 +23,7 @@ Recommended:
 > - Install pipenv
 > - Run batch script FluidFlower.bat 
 
-> The batch file will create a virtual environment based on the pip files. If this is the first time to set up, this will install all nececarry dependencies. The batch script also creates subdirectories ignored by git.
+> The batch file will create a virtual environment based on the pip files. If this is the first time to set up, this will install all necessary dependencies. The batch script also creates subdirectories ignored by git.
 
 Not recommended:
 > - Manually install dependencies from requirements.txt or pip files. 
