@@ -316,7 +316,7 @@ class LiveApp(AbstractApp):
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(
+            heatmapFig = heatmap.getMap(
                 data=heatmap_data,
                 timestamp=last_timestamp,
                 colorScale=colorScale,

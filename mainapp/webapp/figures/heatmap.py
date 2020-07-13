@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 
 
-def getHeatMap(
+def getMap(
         data,
         timestamp,
         colorScale,
@@ -23,7 +23,7 @@ def getHeatMap(
         'surface': go.Surface
     }
 
-    heatmap_fig = go.Figure()
+    map_fig = go.Figure()
 
     if len(data) == 0:
         return {
@@ -34,8 +34,39 @@ def getHeatMap(
             )
         }
 
-    heatmap_fig, height, width = add_traces(colorScale, coordinates, custom_color_range, data, figure_type, get_figure,
-                               half_cell_size, heatmap_fig)
+    height, width = data.shape
+    map_fig.add_trace(
+        go.Scatter(
+            x=[i for i in range(width) for j in range(height)],
+            y=[j for i in range(width) for j in range(height)],
+            mode='markers',
+            marker=dict(
+                size=2,
+                color='black'
+            )
+        )
+    )
+    map_fig.add_trace(
+        get_figure[figure_type](
+            z=data,
+            colorscale=colorScale,
+            zauto=not any([custom_color_range[x] for x in custom_color_range]),
+            zmax=custom_color_range['max'],
+            zmin=custom_color_range['min'],
+            colorbar=dict(
+                len=1
+            ),
+            # contours_coloring='heatmap'
+        ),
+    )
+    if coordinates:
+        for coordinate in coordinates:
+            map_fig.add_shape(
+                type="rect",
+                x0=coordinate['x'] - half_cell_size,
+                y0=coordinate['y'] - half_cell_size,
+                x1=coordinate['x'] + half_cell_size,
+                y1=coordinate['y'] + half_cell_size)
 
     if axis_name:
         axis_title='meter'
@@ -47,7 +78,7 @@ def getHeatMap(
     else:
         drag_mode = False
 
-    heatmap_fig.update_layout(
+    map_fig.update_layout(
         title=title,
         dragmode=drag_mode,
         xaxis=dict(
@@ -92,41 +123,5 @@ def getHeatMap(
         height=figure_height,
     )
 
-    return heatmap_fig
+    return map_fig
 
-
-def add_traces(colorScale, coordinates, custom_color_range, data, figure_type, get_figure, half_cell_size, heatmap_fig):
-    height, width = data.shape
-    heatmap_fig.add_trace(
-        go.Scatter(
-            x=[i for i in range(width) for j in range(height)],
-            y=[j for i in range(width) for j in range(height)],
-            mode='markers',
-            marker=dict(
-                size=2,
-                color='black'
-            )
-        )
-    )
-    heatmap_fig.add_trace(
-        get_figure[figure_type](
-            z=data,
-            colorscale=colorScale,
-            zauto=not any([custom_color_range[x] for x in custom_color_range]),
-            zmax=custom_color_range['max'],
-            zmin=custom_color_range['min'],
-            colorbar=dict(
-                len=1
-            ),
-            # contours_coloring='heatmap'
-        ),
-    )
-    if coordinates:
-        for coordinate in coordinates:
-            heatmap_fig.add_shape(
-                type="rect",
-                x0=coordinate['x'] - half_cell_size,
-                y0=coordinate['y'] - half_cell_size,
-                x1=coordinate['x'] + half_cell_size,
-                y1=coordinate['y'] + half_cell_size)
-    return heatmap_fig, height, width

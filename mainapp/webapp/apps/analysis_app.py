@@ -581,7 +581,7 @@ class AnalysisApp(AbstractApp):
                 linechart_data = calibrate_line_data(linechart_data, calibration_data, coordinates)
 
             # Update figures
-            raw_fig = heatmap.getHeatMap(
+            raw_fig = heatmap.getMap(
                 heatmap_data,
                 timestamp,
                 meta_color_scale,
@@ -594,7 +594,7 @@ class AnalysisApp(AbstractApp):
                 axis_name=False,
                 allow_lasso=False
             )
-            calibrated_fig = heatmap.getHeatMap(
+            calibrated_fig = heatmap.getMap(
                 calibrated_data,
                 timestamp,
                 colorScale,
@@ -603,7 +603,7 @@ class AnalysisApp(AbstractApp):
                 'white',
                 color_range,
             )
-            calibration_fig = heatmap.getHeatMap(
+            calibration_fig = heatmap.getMap(
                 data=calibration_data,
                 timestamp=calibration_time,
                 colorScale=meta_color_scale,
