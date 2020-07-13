@@ -7,6 +7,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 
+from mainapp.app_settings import datetime_format
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.webapp.figures import heatmap, linechart
 from mainapp.webapp.colors import color_manager
@@ -53,12 +54,13 @@ class LiveApp(AbstractApp):
                                     html.Img(
                                         src='data:image/png;base64,{}'.format(encoded_logo),
                                         style={
-                                            'width': '40%',
+                                            'width': '55%',
                                             'height': 'auto',
                                         }
                                     ),
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '0.5%',
                                         'border': 0,
                                         'margin': '0.1%',
@@ -68,6 +70,7 @@ class LiveApp(AbstractApp):
                                 html.Div(
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '2%',
                                         'padding-right': '0.5%',
                                         'border': 0,
@@ -83,6 +86,7 @@ class LiveApp(AbstractApp):
                                 html.Div(
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '2%',
                                         'padding-right': '0.5%',
                                         'border': 0,
@@ -120,7 +124,7 @@ class LiveApp(AbstractApp):
                                 # Make area scrollable
                                 'overflow-x': 'hidden',
                                 'overflow-y': 'auto',
-                                'text-align': 'justify',
+                                'text-align': 'left',
                                 # Keep scroll at bottom:
                                 'display': 'flex',
                                 'flex-direction': 'column-reverse',
@@ -281,11 +285,11 @@ class LiveApp(AbstractApp):
                 State('linechart', 'relayoutData'),
             ]
         )
-        def updateFigures(_, selected_cells_heatmap, clicked_cell_heatmap, plot_type, col_min, col_max, linechart_data):
+        def updateFigures(_, selected_cells_heatmap, clicked_cell_heatmap, plot_type, col_min, col_max, linechart_layout_data):
             tic = time.process_time()
 
             # Define colormap
-            colorScale = color_manager.getColorScale()
+            colorScale = color_manager.getColorScale('red-white-blue')
             color_range = {'min': col_min, 'max': col_max}
 
             # Choose coordinate
@@ -300,23 +304,40 @@ class LiveApp(AbstractApp):
 
             # Collect data
             last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, live=True)
-            last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
+            last_timestamp = datetime.datetime.strptime(last_timestamp, datetime_format)
 
             timeline = {'start': last_timestamp - datetime.timedelta(minutes=60),
-                        'end': last_timestamp + datetime.timedelta(seconds=2)}
-            if linechart_data:
-                if 'xaxis.range[0]' in linechart_data:
-                    start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], "%Y-%m-%d %H:%M:%S")
-                    end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], "%Y-%m-%dT%H:%M:%S")
+                        'end': last_timestamp + datetime.timedelta(seconds=0)}
+            if linechart_layout_data:
+                if 'xaxis.range[0]' in linechart_layout_data:
+                    start = datetime.datetime.strptime(linechart_layout_data['xaxis.range[0]'], datetime_format)
+                    end = datetime.datetime.strptime(linechart_layout_data['xaxis.range[1]'], "%Y-%m-%dT%H:%M:%S")
                     timeline['start'] = last_timestamp - (end-start)
-            linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline)
+            linechart_data = data_manager.get_linechart_data(
+                data_manager,
+                coordinates=coordinates,
+                timeline=timeline)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, last_timestamp, colorScale, plot_type, coordinates, 'white',
-                                            color_range)
-            lineChartFig = linechart.getLineChart(linechart_data, last_timestamp, coordinates, colorScale, timeline, color_range)
+            heatmapFig = heatmap.getMap(
+                data=heatmap_data,
+                timestamp=last_timestamp,
+                colorScale=colorScale,
+                figure_type=plot_type,
+                coordinates=coordinates,
+                background_color='white',
+                custom_color_range=color_range
+            )
+            lineChartFig = linechart.getLineChart(
+                linechart_data,
+                last_timestamp,
+                coordinates,
+                colorScale,
+                timeline,
+                color_range
+            )
             toc = time.process_time()
-            print("Time to update figures: {}".format(toc-tic))
+            print("Time to update figures(Live): {}".format(toc-tic))
             return [
                 heatmapFig,
                 lineChartFig

@@ -1,24 +1,35 @@
 import plotly.graph_objects as go
 
+from mainapp.app_settings import cell_length_meter
 
-def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, background_color='white',
-               custom_color_range=None):
+
+def getMap(
+        data,
+        timestamp,
+        colorScale,
+        figure_type,
+        coordinates=None,
+        background_color='white',
+        custom_color_range=None,
+        figure_height=300,
+        title="",
+        axis_name=True,
+        allow_lasso=True,
+        label_axis=True):
+
+    half_cell_size = 0.5
+
     get_figure = {
         'heatmap': go.Heatmap,
         'contour': go.Contour,
         'surface': go.Surface
     }
 
-    if len(data) == 0: return {
-        'data': [],
-        'layout': go.Layout(title=go.layout.Title(text='No data found'))
-    }
-
-    heatmap_fig = go.Figure()
-
+    map_fig = go.Figure()
     height, width = data.shape
 
-    heatmap_fig.add_trace(
+    # Adds a point in center of each cell
+    map_fig.add_trace(
         go.Scatter(
             x=[i for i in range(width) for j in range(height)],
             y=[j for i in range(width) for j in range(height)],
@@ -30,7 +41,8 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
         )
     )
 
-    heatmap_fig.add_trace(
+    # Adds heatmap or contour
+    map_fig.add_trace(
         get_figure[figure_type](
             z=data,
             colorscale=colorScale,
@@ -40,61 +52,88 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
             colorbar=dict(
                 len=1
             ),
-            #contours_coloring='heatmap'
+            # contours_coloring='heatmap'
         ),
     )
 
+    # Add rectangles for each coordinate
     if coordinates:
         for coordinate in coordinates:
-            heatmap_fig.add_shape(
-                type="rect",
-                x0=coordinate['x'] - 0.5,
-                y0=coordinate['y'] - 0.5,
-                x1=coordinate['x'] + 0.5,
-                y1=coordinate['y'] + 0.5)
+            map_fig.add_shape(
+                type='rect',
+                x0=coordinate['x'] - half_cell_size,
+                y0=coordinate['y'] - half_cell_size,
+                x1=coordinate['x'] + half_cell_size,
+                y1=coordinate['y'] + half_cell_size)
 
-    heatmap_fig.update_layout(
-        dragmode='lasso',
+    # Add border around map
+    map_fig.add_shape(
+        type='rect',
+        x0=0 - half_cell_size,
+        y0=0 - half_cell_size,
+        x1=width - half_cell_size,
+        y1=height - half_cell_size,
+        line=dict(
+            width=4
+        )
+    )
+
+    if axis_name:
+        axis_title='meter'
+    else:
+        axis_title=None
+
+    if allow_lasso:
+        drag_mode = 'lasso'
+    else:
+        drag_mode = False
+
+    map_fig.update_layout(
+        title=title,
+        dragmode=drag_mode,
         xaxis=dict(
-            range=[-0.5, width - 0.5],
+            range=[-half_cell_size, width + half_cell_size],
             constrain='domain',
-            # side='top',
+            side='top',
             tickmode='array',
-            tickvals=[x - 0.5 for x in list(range(width + 1))],
-            ticktext=["{:.1f}".format(0.2 * x) for x in range(width + 1)],
+            tickvals=[x - half_cell_size for x in list(range(width + 1))],
+            ticktext=["{:.1f}".format(cell_length_meter * x) for x in range(width + 1)],
             tickangle=-45,
             showgrid=False,
             showline=False,
             zeroline=False,
-            title="meter",
+            title=axis_title,
+            visible=label_axis,
 
         ),
         yaxis=dict(
-            range=[-0.5, height - 0.5],
-            # autorange='reversed',
+            range=[-half_cell_size, height + half_cell_size],
+            autorange='reversed',
             scaleanchor="x",
             scaleratio=1,
             constrain='domain',
             automargin=True,
             tickmode='array',
-            tickvals=[x - 0.5 for x in list(range(height + 1))],
-            ticktext=["{:.1f}".format(0.2 * x) for x in range(height + 1)],
+            tickvals=[x - half_cell_size for x in list(range(height + 1))],
+            ticktext=["{:.1f}".format(cell_length_meter * x) for x in range(height + 1)],
             showgrid=False,
             showline=False,
             zeroline=False,
-            title="meter",
+            title=axis_title,
+            visible=label_axis
         ),
         margin=dict(
             l=15,
             r=0,
-            t=0,
+            t=25,
             b=0,
             pad=0
         ),
         plot_bgcolor=background_color,
         paper_bgcolor=background_color,
         autosize=True,
-        height=300,
+        height=figure_height,
     )
 
-    return heatmap_fig
+    return map_fig
+

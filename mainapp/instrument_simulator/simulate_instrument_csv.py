@@ -3,6 +3,8 @@ import os
 import time
 import pandas as pd
 
+from mainapp.app_settings import datetime_format
+
 
 def tell_to_stop():
     f = open("mainapp/termination/stop_dir/stop_instrument_simulator.txt", 'w')
@@ -49,7 +51,7 @@ def run(measurements_per_second=None):
     # Produce individual measurements
     for i in range(df.shape[0]):
         out_df = pd.DataFrame(data=df.iloc[[i]])
-        out_df.at[i,'time'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        out_df.at[i,'time'] = datetime.datetime.now().strftime(datetime_format)
         filename = dir_temp + "/data{:09d}.csv".format(i)
         out_df.to_csv(filename, index=False)
 

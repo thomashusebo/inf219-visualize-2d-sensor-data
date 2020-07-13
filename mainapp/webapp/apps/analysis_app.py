@@ -1,13 +1,17 @@
 import base64
 import datetime
 import time
+import numpy as np
 
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
+from pandas import DataFrame
 
+from mainapp.app_settings import datetime_format, default_color_range_min, default_color_type, default_color_range_max
+from mainapp.webapp import calibrator
 from mainapp.webapp.apps.abstract_app import AbstractApp
 from mainapp.webapp.figures import heatmap, linechart
 from mainapp.webapp.colors import color_manager
@@ -32,6 +36,38 @@ puzzlebox = {
 }
 
 
+def calibrate_map(heatmap_data, calibration_data):
+    return np.subtract(heatmap_data, calibration_data)
+
+
+def calibrate_line_data(linechart_data, calibration_data, coordinates):
+    calibration = [""]
+    for coord in coordinates:
+        calibration.append(-calibration_data[coord['y'],coord['x']])
+
+    return linechart_data+calibration
+
+
+def update_coordinates(previous_coordinates, clicked_cell_heatmap):
+    default_coordinate = {'x': 0, 'y': 0}
+    if len(previous_coordinates) == 0:
+        coordinates = [default_coordinate]
+    else:
+        coordinates = previous_coordinates
+
+    if clicked_cell_heatmap is not None:
+        clicked_coordinate = clicked_cell_heatmap['points'][0]
+        found = False
+        for coord in coordinates:
+            if coord['x'] == clicked_coordinate['x'] and coord['y'] == clicked_coordinate['y']:
+                coordinates.remove(coord)
+                found = True
+        if not found:
+            coordinates.append(clicked_coordinate)
+
+    return coordinates
+
+
 class AnalysisApp(AbstractApp):
     def setupOn(self, server, data_manager, project_name):
         global log_manager, log
@@ -54,7 +90,7 @@ class AnalysisApp(AbstractApp):
                                     html.Img(
                                         src='data:image/png;base64,{}'.format(encoded_logo),
                                         style={
-                                            'width': '40%',
+                                            'width': '55%',
                                             'height': 'auto',
                                         }
                                     ),
@@ -102,23 +138,173 @@ class AnalysisApp(AbstractApp):
                     ]
                 ),
 
-                # Log
+                # Project name
                 html.Div(
                     className='five columns',
                     style={**puzzlebox,
                            **{
                                'width': '{}%'.format(5 / 12 * 100),
-                               'height': 600
                            }},
                     children=[
-                        dcc.Markdown(
-                            children='''##### Project: {}'''.format(project_name)
+                        html.Div(
+                            style={**puzzlebox,
+                                   **{
+                                       'width': '100%',
+                                   }},
+                            children=[
+                                dcc.Markdown(
+                                    children='''### Project: {}'''.format(project_name)
+                                ),
+                            ]
                         ),
-                    ],
+
+                        # Calibration
+                        html.Div(
+                            style={**puzzlebox,
+                                   **{
+                                       'width': '100%',
+                                       'height': 412
+                                   }},
+                            children=[
+                                dcc.Markdown(
+                                    '--- \n\n'
+                                    '##### Add new Calibration'
+                                ),
+                                dcc.Markdown(
+                                    'Selected timestamp: None',
+                                    id='display-selected-timestamp',
+                                ),
+                                dcc.Input(
+                                    id='calibration-name',
+                                    maxLength=25,
+                                    style={
+                                        'width': '50%',
+                                    },
+                                    placeholder='Enter descriptive name...'
+                                ),
+                                dcc.Input(
+                                    id="project-password",
+                                    type='password',
+                                    placeholder="Enter project password...",
+                                    style={'width': '50%'}
+                                ),
+                                dcc.Store(id='selected-timestamp'),
+                                html.Button('Add New Calibration', id='submit-new-calibration', n_clicks=0),
+                            ],
+                        ),
+                    ]
                 ),
+
 
                 # Heatmap
                 html.Div([
+                    html.Div(
+                        className='six columns',
+                        style={**puzzlebox,
+                               **{'width': '{}%'.format(2 / 12 * 100 - 0.2),
+                                  'min-width':None}},
+                        children=[
+                            dcc.Graph(
+                                id='raw_map',
+                                config={
+                                    "displaylogo": False,
+                                    "modeBarButtonsToRemove": [
+                                        'zoom2d',
+                                        'pan2d',
+                                        'select2d',
+                                        'lasso2d',
+                                        'zoomIn2d',
+                                        'zoomOut2d',
+                                        'autoScale2d',
+                                        'resetScale2d',
+                                        'toggleSpikelines',
+                                    ]
+                                }
+                            )
+                        ]
+                    ),
+                    html.Div(
+                        className='six columns',
+                        style={**puzzlebox,
+                               **{'width': '{}%'.format(2 / 12 * 100 - 0.2),
+                                  'min-width':None}},
+                        children=[
+                            dcc.Dropdown(
+                                id='calibration-dropdown',
+                                placeholder='Select calibration...',
+                                options=[
+                                    {'label': 'None', 'value': None},
+                                ],
+                                value=None
+                            )
+                        ]
+                    ),
+                    html.Div(
+                        className='six columns',
+                        style={**puzzlebox,
+                               **{'width': '{}%'.format(2 / 12 * 100 - 0.2),
+                                  'min-width':None}},
+                        children=[
+                            dcc.Graph(
+                                id='calibration_map',
+                                config={
+                                    "displaylogo": False,
+                                    "modeBarButtonsToRemove": [
+                                        'zoom2d',
+                                        'pan2d',
+                                        'lasso2d',
+                                        'select2d',
+                                        'zoomIn2d',
+                                        'zoomOut2d',
+                                        'autoScale2d',
+                                        'resetScale2d',
+                                        'toggleSpikelines',
+                                    ]
+                                }
+                            )
+                        ]
+                    ),
+                    html.Div(
+                        className='one columns',
+                        style={**puzzlebox,
+                               **{'min-width': None,
+                                  'width': '{}%'.format(1 / 12 * 100 - 0.1 * 6)}},
+                        children=[
+                            dcc.Input(
+                                id="meta-color-high",
+                                type='number',
+                                placeholder='Max val',
+                                style={
+                                    'width': '100%',
+                                    'margin-bottom': 17
+                                },
+                                value=default_color_range_max,
+                            ),
+                            dcc.Dropdown(
+                                id='meta-color',
+                                placeholder='Select color-range...',
+                                options=[
+                                    {'label': 'GreenYellow', 'value': 'green-yellow'},
+                                    {'label': 'GreenPurple', 'value': 'green-purple'},
+                                    {'label': 'GreenPink', 'value': 'green-pink'},
+                                    {'label': 'PurpleOrange', 'value': 'purple-orange'},
+                                    {'label': 'RedWhiteBlue', 'value': 'red-white-blue'},
+                                    {'label': 'RedYellowBlue', 'value': 'red-yellow-blue'},
+                                ],
+                                value=default_color_type
+                            ),
+                            dcc.Input(
+                                id="meta-color-low",
+                                type='number',
+                                placeholder='Min val',
+                                style={
+                                    'width': '100%',
+                                    'margin-top': 17
+                                },
+                                value=default_color_range_min,
+                            ),
+                        ]
+                    ),
                     html.Div(
                         className='six columns',
                         style={**puzzlebox,
@@ -164,19 +350,33 @@ class AnalysisApp(AbstractApp):
                                 placeholder='Max val',
                                 style={
                                     'width': '100%',
-                                    'margin-bottom': 96
+                                    'margin-bottom': 78
                                 },
-                                value=12000,
+                                value=default_color_range_max,
+                            ),
+                            dcc.Dropdown(
+                                id='color-type',
+                                placeholder='Select color-range...',
+                                options=[
+                                    {'label': 'GreenYellow', 'value': 'green-yellow'},
+                                    {'label': 'GreenPurple', 'value': 'green-purple'},
+                                    {'label': 'GreenPink', 'value': 'green-pink'},
+                                    {'label': 'PurpleOrange', 'value': 'purple-orange'},
+                                    {'label': 'RedWhiteBlue', 'value': 'red-white-blue'},
+                                    {'label': 'RedYellowBlue', 'value': 'red-yellow-blue'},
+
+                                ],
+                                value=default_color_type
                             ),
                             dcc.Input(
                                 id="color-low",
                                 type='number',
-                                placeholder= 'Min val',
+                                placeholder='Min val',
                                 style={
                                     'width': '100%',
-                                    'margin-top': 96
+                                    'margin-top': 78
                                 },
-                                value=0,
+                                value=default_color_range_min,
                             ),
                         ]
                     ),
@@ -190,7 +390,7 @@ class AnalysisApp(AbstractApp):
                         children=[
                             html.Button(
                                 'Refresh',
-                                id = 'refresh',
+                                id='refresh',
                                 style={
                                     'background-color': 'white',
                                     'padding': '0.5%',
@@ -203,12 +403,16 @@ class AnalysisApp(AbstractApp):
                         ]
                     ),
                 ]),
+                dcc.Store(
+                    id='coordinates',
+                    data=[]
+                ),
 
                 # Line chart
                 html.Div(
                     className='seven columns',
                     style={**puzzlebox,
-                           **{'width': '{}%'.format(7 / 12 * 100-0.1*4)}},
+                           **{'width': '{}%'.format(12 / 12 * 100-0.2)}},
                     children=[
                         dcc.Graph(
                             id='linechart',
@@ -252,6 +456,54 @@ class AnalysisApp(AbstractApp):
         )
 
         @analysis_app.callback(
+            [
+                Output(component_id='calibration-name', component_property='placeholder'),
+                Output(component_id='calibration-name', component_property='value'),
+                Output(component_id='project-password', component_property='placeholder'),
+                Output(component_id='project-password', component_property='value'),
+                Output(component_id='calibration-dropdown', component_property='options')
+            ],
+            [
+                Input(component_id='submit-new-calibration', component_property='n_clicks')
+            ],
+
+            [
+                State(component_id='selected-timestamp', component_property='data'),
+                State(component_id='calibration-name', component_property='value'),
+                State(component_id='project-password', component_property='value')
+            ]
+        )
+        def add_calibration(n_clicks, timestamp, calibration_name, password):
+            name_value = calibration_name
+            name_placeholder = "Enter descriptive name..."
+            password_value = ""
+            password_placeholder = "Enter project password..."
+            options = [{'label': 'None', 'value': None}]
+
+            if timestamp is None and n_clicks > 0:
+                password_placeholder = "Must choose a timestamp from linechart"
+            else:
+                if password is not None:
+                    if project_manager.verify_password(project_name, password):
+                        calibrator.add_calibration(project_name, calibration_name, timestamp)
+                        name_value = ""
+                    else:
+                        password_placeholder = "Incorrect password..."
+
+            calibrations = calibrator.get_all_calibration_times(project_name)
+            if calibrations is not None:
+                for _, row in calibrations.iterrows():
+                    options.append({'label': row['calibrationname'], 'value': row['time']})
+
+            return [
+                name_placeholder,
+                name_value,
+                password_placeholder,
+                password_value,
+                options
+            ]
+
+        @analysis_app.callback(
             [Output(component_id='live-clock', component_property='children')],
             [Input(component_id='interval-component', component_property='n_intervals')]
         )
@@ -260,120 +512,162 @@ class AnalysisApp(AbstractApp):
 
         @analysis_app.callback(
             [
-                Output(component_id='heatmap', component_property='figure'),
-                Output(component_id='linechart', component_property='figure')
+                Output('coordinates', 'data')
             ],
             [
-                Input('heatmap', 'selectedData'),
+                Input('heatmap', 'clickData')
+            ],
+            [
+                State('coordinates', 'data')
+            ]
+        )
+        def update_chosen_coordinates(clicked_cell_heatmap, coordinates):
+            return [update_coordinates(coordinates, clicked_cell_heatmap)]
+
+        @analysis_app.callback(
+            [
+                Output(component_id='heatmap', component_property='figure'),
+                Output(component_id='linechart', component_property='figure'),
+                Output(component_id='display-selected-timestamp', component_property='children'),
+                Output(component_id='selected-timestamp', component_property='data'),
+                Output(component_id='raw_map', component_property='figure'),
+                Output(component_id='calibration_map', component_property='figure'),
+            ],
+            [
                 Input('heatmap', 'clickData'),
                 Input('linechart', 'clickData'),
                 Input('map_chooser', 'value'),
                 Input('color-low', 'value'),
                 Input('color-high', 'value'),
-                Input('refresh', 'n_clicks')
+                Input('refresh', 'n_clicks'),
+                Input('calibration-dropdown', 'value'),
+                Input('meta-color', 'value'),
+                Input('meta-color-low', 'value'),
+                Input('meta-color-high', 'value'),
+                Input('color-type', 'value'),
+                Input('coordinates', 'modified_timestamp'),
             ],
             [
                 State('linechart', 'relayoutData'),
+                State('coordinates', 'data')
             ]
         )
-        def updateFigures(selected_cells_heatmap, clicked_cell_heatmap, linechart_click_data, plot_type, col_min, col_max, _, linechart_data):
+        def updateFigures(
+                clicked_cell_heatmap,
+                linechart_click_data,
+                plot_type,
+                col_min,
+                col_max,
+                _,
+                calibration_time,
+                meta_color,
+                meta_col_min,
+                meta_col_max,
+                color_type,
+                __,
+                linechart_data,
+                coordinates):
+
             tic = time.process_time()
 
-            default_timestamp = "2020-07-07 22:45:30" # TODO find in smarter way
-
             # Define colormap
-            colorScale = color_manager.getColorScale()
+            colorScale = color_manager.getColorScale(color_type)
             color_range = {'min': col_min, 'max': col_max}
-
-            # Choose coordinate
-            default_coordinate = {'x': 0, 'y': 0}
-            coordinates = [default_coordinate]
-            if clicked_cell_heatmap is not None:
-                coordinate = clicked_cell_heatmap['points'][0]
-                coordinates = [coordinate]
-            if selected_cells_heatmap is not None:
-                if len(selected_cells_heatmap['points']) > 0:
-                    coordinates = selected_cells_heatmap['points']
+            meta_color_scale = color_manager.getColorScale(meta_color)
+            meta_color_range = {'min': meta_col_min, 'max': meta_col_max}
 
             # Check for timestamp
-            timestamp = default_timestamp
+            timestamp = project_manager.get_last_timestamp(project_name)
+            selected_timestamp = None
             if linechart_click_data:
-                timestamp = linechart_click_data['points'][0]['x']
+                timestamp = selected_timestamp = linechart_click_data['points'][0]['x']
 
-            try:
-                timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
-            except ValueError:
-                # Illegal date chosen
-                raise PreventUpdate
+            if timestamp is None:
+                raise PreventUpdate("No timestamp found")
+            timestamp = datetime.datetime.strptime(timestamp, datetime_format)
 
 
             # Collect data
             last_timestamp, heatmap_data = data_manager.get_heatmap_data(data_manager, timestamp=timestamp, live=False)
-            last_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%d %H:%M:%S")
+            last_timestamp = datetime.datetime.strptime(last_timestamp, datetime_format)
 
             timeline = {'start': timestamp - datetime.timedelta(minutes=60),
-                        'end': timestamp + datetime.timedelta(seconds=2)}
+                        'end': timestamp + datetime.timedelta(minutes=2)}
             if linechart_data:
                 if 'xaxis.range[0]' in linechart_data:
                     timeline = {'start': linechart_data['xaxis.range[0]'], 'end': linechart_data['xaxis.range[1]']}
 
-            '''if linechart_data:
-                if 'xaxis.range[0]' in linechart_data:
-                    start = datetime.datetime.strptime(linechart_data['xaxis.range[0]'], "%Y-%m-%d %H:%M:%S")
-                    end = datetime.datetime.strptime(linechart_data['xaxis.range[1]'], "%Y-%m-%dT%H:%M:%S")
-                    timeline['start'] = timestamp - (end-start)'''
-            linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline, get_all=True)
+            linechart_data = data_manager.get_linechart_data(
+                data_manager,
+                coordinates=coordinates,
+                timeline=timeline,
+                get_all=True)
+
+            # Calibrate
+            calibrated_data = heatmap_data
+            calibration_data = DataFrame()
+            if calibration_time is not None:
+                calibration_data = calibrator.get_map_calibration_data(project_name, calibration_time)
+                calibrated_data = calibrate_map(heatmap_data, calibration_data)
+                linechart_data = calibrate_line_data(linechart_data, calibration_data, coordinates)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, plot_type, coordinates, 'white',
-                                            color_range)
-            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline, color_range, dragmode='pan', quick_select_range=False)
+            raw_fig = heatmap.getMap(
+                heatmap_data,
+                timestamp,
+                meta_color_scale,
+                plot_type,
+                coordinates,
+                'white',
+                meta_color_range,
+                figure_height=150,
+                title='Raw data',
+                axis_name=False,
+                allow_lasso=False,
+                label_axis=False
+            )
+            calibrated_fig = heatmap.getMap(
+                calibrated_data,
+                timestamp,
+                colorScale,
+                plot_type,
+                coordinates,
+                'white',
+                color_range,
+            )
+            calibration_fig = heatmap.getMap(
+                data=calibration_data,
+                timestamp=calibration_time,
+                colorScale=meta_color_scale,
+                figure_type=plot_type,
+                coordinates=coordinates,
+                background_color='white',
+                custom_color_range=meta_color_range,
+                figure_height=150,
+                title='Calibration data',
+                axis_name=False,
+                allow_lasso=False,
+                label_axis=False
+            )
+            lineChartFig = linechart.getLineChart(
+                linechart_data,
+                timestamp,
+                coordinates,
+                colorScale,
+                timeline,
+                color_range,
+                dragmode='pan',
+                quick_select_range=False,
+                calibration_time=calibration_time,
+                show_legend=True
+            )
             toc = time.process_time()
             print("Time to update figures (Analysis): {}".format(toc-tic))
             return [
-                heatmapFig,
-                lineChartFig
-            ]
-
-        @analysis_app.callback(
-            [
-                Output('log', 'children'),
-                Output('log-entry', 'value'),
-                Output('log-entry', 'placeholder'),
-                Output('project-password', 'placeholder'),
-                Output('project-password', 'value')
-            ],
-            [
-                Input('submit-log-entry', 'n_clicks'),
-            ],
-            [
-                State('log-entry', 'value'),
-                State('project-password', 'value')
-            ]
-        )
-        def update_log(n_clicks, log_entry, password):
-            global log
-            log_entry_value = log_entry
-            log_entry_placeholder = "Write log entry..."
-            password_value = ""
-            password_placeholder = "Enter password..."
-
-            if n_clicks > 0:
-                if log_entry is "" or log_entry is None:
-                    log_entry_placeholder = "Cannot submit empty log entry..."
-                else:
-                    if password is not None:
-                        if project_manager.verify_password(project_name, password):
-                            timestamp = datetime.datetime.now().strftime("%H:%M:%S %d-%m-%Y")
-                            log_manager.insert_log_entry(timestamp, log_entry)
-                            log = log_manager.retrieve_log()
-                            log_entry_value = ""
-                        else:
-                            password_placeholder = "Incorrect password...."
-            return [
-                dcc.Markdown(log),
-                log_entry_value,
-                log_entry_placeholder,
-                password_placeholder,
-                password_value
+                calibrated_fig,
+                lineChartFig,
+                'Selected timestamp: {}'.format(selected_timestamp),
+                selected_timestamp,
+                raw_fig,
+                calibration_fig,
             ]
