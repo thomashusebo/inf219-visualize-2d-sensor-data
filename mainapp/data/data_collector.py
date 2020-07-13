@@ -1,6 +1,7 @@
 import os
 import time
 import pandas as pd
+import numpy as np
 from sqlalchemy import create_engine
 from mainapp.data.data_types import DataType
 from storage.project_manager import ProjectManager
@@ -66,6 +67,13 @@ def update(project_name):
                     if time_to_stop(stopping_dir, stopping_file):
                         return "DataCollector Stopped \n " + str(collection_statistics)
                     df = df.rename(columns={c: c.replace(' ', '') for c in df.columns})
+
+                    # Removed redundant whitespaces of current instrument
+                    df['time'] = df['time'].str[1:-1]
+                    df.replace(0.0, np.nan)
+                    df= df.replace({0.0: np.nan})
+                    print(type(df['[01,00]'][0]))
+
                     df.to_sql(database_table, database, if_exists='append')
 
                     last_timestamp = df['time'].max()
