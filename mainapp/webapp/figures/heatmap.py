@@ -3,6 +3,9 @@ import plotly.graph_objects as go
 
 def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, background_color='white',
                custom_color_range=None):
+    half_cell_size = 0.5
+    cell_length_meter = 0.2
+
     get_figure = {
         'heatmap': go.Heatmap,
         'contour': go.Contour,
@@ -48,20 +51,20 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
         for coordinate in coordinates:
             heatmap_fig.add_shape(
                 type="rect",
-                x0=coordinate['x'] - 0.5,
-                y0=coordinate['y'] - 0.5,
-                x1=coordinate['x'] + 0.5,
-                y1=coordinate['y'] + 0.5)
+                x0=coordinate['x'] - half_cell_size,
+                y0=coordinate['y'] - half_cell_size,
+                x1=coordinate['x'] + half_cell_size,
+                y1=coordinate['y'] + half_cell_size)
 
     heatmap_fig.update_layout(
         dragmode='lasso',
         xaxis=dict(
-            range=[-0.5, width - 0.5],
+            range=[half_cell_size, width - half_cell_size],
             constrain='domain',
             # side='top',
             tickmode='array',
-            tickvals=[x - 0.5 for x in list(range(width + 1))],
-            ticktext=["{:.1f}".format(0.2 * x) for x in range(width + 1)],
+            tickvals=[x - half_cell_size for x in list(range(width + 1))],
+            ticktext=["{:.1f}".format(cell_length_meter * x) for x in range(width + 1)],
             tickangle=-45,
             showgrid=False,
             showline=False,
@@ -70,15 +73,15 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
 
         ),
         yaxis=dict(
-            range=[-0.5, height - 0.5],
+            range=[half_cell_size, height - half_cell_size],
             # autorange='reversed',
             scaleanchor="x",
             scaleratio=1,
             constrain='domain',
             automargin=True,
             tickmode='array',
-            tickvals=[x - 0.5 for x in list(range(height + 1))],
-            ticktext=["{:.1f}".format(0.2 * x) for x in range(height + 1)],
+            tickvals=[x - half_cell_size for x in list(range(height + 1))],
+            ticktext=["{:.1f}".format(cell_length_meter * x) for x in range(height + 1)],
             showgrid=False,
             showline=False,
             zeroline=False,
