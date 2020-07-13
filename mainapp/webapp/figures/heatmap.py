@@ -1,8 +1,16 @@
 import plotly.graph_objects as go
 
 
-def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, background_color='white',
-               custom_color_range=None):
+def getHeatMap(
+        data,
+        timestamp,
+        colorScale,
+        figure_type,
+        coordinates=None,
+        background_color='white',
+        custom_color_range=None,
+        figure_height=300):
+
     half_cell_size = 0.5
     cell_length_meter = 0.2
 
@@ -97,7 +105,7 @@ def getHeatMap(data, timestamp, colorScale, figure_type, coordinates=None, backg
         plot_bgcolor=background_color,
         paper_bgcolor=background_color,
         autosize=True,
-        height=300,
+        height=figure_height,
     )
 
     return heatmap_fig

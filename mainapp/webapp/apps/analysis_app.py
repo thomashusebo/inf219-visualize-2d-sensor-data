@@ -8,6 +8,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
+from pandas import DataFrame
 
 from mainapp.app_settings import datetime_format
 from mainapp.webapp import calibrator
@@ -184,6 +185,52 @@ class AnalysisApp(AbstractApp):
 
                 # Heatmap
                 html.Div([
+                    html.Div(
+                        className='six columns',
+                        style={**puzzlebox,
+                               **{'width': '{}%'.format(3 / 12 * 100 - 0.2)}},
+                        children=[
+                            dcc.Graph(
+                                id='raw_map',
+                                config={
+                                    "displaylogo": False,
+                                    "modeBarButtonsToRemove": [
+                                        'zoom2d',
+                                        'pan2d',
+                                        'select2d',
+                                        'zoomIn2d',
+                                        'zoomOut2d',
+                                        'autoScale2d',
+                                        'resetScale2d',
+                                        'toggleSpikelines',
+                                    ]
+                                }
+                            )
+                        ]
+                    ),
+                    html.Div(
+                        className='six columns',
+                        style={**puzzlebox,
+                               **{'width': '{}%'.format(3 / 12 * 100 - 0.2)}},
+                        children=[
+                            dcc.Graph(
+                                id='calibration_map',
+                                config={
+                                    "displaylogo": False,
+                                    "modeBarButtonsToRemove": [
+                                        'zoom2d',
+                                        'pan2d',
+                                        'select2d',
+                                        'zoomIn2d',
+                                        'zoomOut2d',
+                                        'autoScale2d',
+                                        'resetScale2d',
+                                        'toggleSpikelines',
+                                    ]
+                                }
+                            )
+                        ]
+                    ),
                     html.Div(
                         className='six columns',
                         style={**puzzlebox,
@@ -376,7 +423,9 @@ class AnalysisApp(AbstractApp):
                 Output(component_id='heatmap', component_property='figure'),
                 Output(component_id='linechart', component_property='figure'),
                 Output(component_id='display-selected-timestamp', component_property='children'),
-                Output(component_id='selected-timestamp', component_property='data')
+                Output(component_id='selected-timestamp', component_property='data'),
+                Output(component_id='raw_map', component_property='figure'),
+                Output(component_id='calibration_map', component_property='figure'),
             ],
             [
                 Input('heatmap', 'selectedData'),
@@ -446,15 +495,43 @@ class AnalysisApp(AbstractApp):
                 get_all=True)
 
             # Calibrate
-            calibration_data = None
+            calibrated_data = heatmap_data
+            calibration_data = DataFrame()
             if calibration_time is not None:
                 calibration_data = calibrator.get_map_calibration_data(project_name, calibration_time)
-                heatmap_data = calibrate_map(heatmap_data, calibration_data)
+                calibrated_data = calibrate_map(heatmap_data, calibration_data)
                 linechart_data = calibrate_line_data(linechart_data, calibration_data, coordinates)
 
             # Update figures
-            heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, plot_type, coordinates, 'white',
-                                            color_range)
+            raw_fig = heatmap.getHeatMap(
+                heatmap_data,
+                timestamp,
+                colorScale,
+                plot_type,
+                coordinates,
+                'white',
+                color_range,
+                figure_height=150
+            )
+            calibrated_fig = heatmap.getHeatMap(
+                calibrated_data,
+                timestamp,
+                colorScale,
+                plot_type,
+                coordinates,
+                'white',
+                color_range,
+            )
+            calibration_fig = heatmap.getHeatMap(
+                calibration_data,
+                calibration_time,
+                colorScale,
+                plot_type,
+                coordinates,
+                'white',
+                color_range,
+                figure_height=150
+            )
             lineChartFig = linechart.getLineChart(
                 linechart_data,
                 timestamp,
@@ -469,8 +546,10 @@ class AnalysisApp(AbstractApp):
             toc = time.process_time()
             print("Time to update figures (Analysis): {}".format(toc-tic))
             return [
-                heatmapFig,
+                calibrated_fig,
                 lineChartFig,
                 'Selected timestamp: {}'.format(selected_timestamp),
-                selected_timestamp
+                selected_timestamp,
+                raw_fig,
+                calibration_fig
             ]
