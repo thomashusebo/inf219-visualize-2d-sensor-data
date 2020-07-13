@@ -43,7 +43,7 @@ def calibrate_map(heatmap_data, calibration_data):
 def calibrate_line_data(linechart_data, calibration_data, coordinates):
     calibration = [""]
     for coord in coordinates:
-        calibration.append(-calibration_data[coord['x'], coord['y']])
+        calibration.append(-calibration_data[coord['y'],coord['x']])
 
     return linechart_data+calibration
 
@@ -143,7 +143,7 @@ class AnalysisApp(AbstractApp):
                             style={**puzzlebox,
                                    **{
                                        'width': '100%',
-                                       'height': 375
+                                       'height': 412
                                    }},
                             children=[
                                 dcc.Markdown(
@@ -172,13 +172,6 @@ class AnalysisApp(AbstractApp):
                                 html.Button('Add New Calibration', id='submit-new-calibration', n_clicks=0),
                             ],
                         ),
-                        dcc.Dropdown(
-                            id='calibration-dropdown',
-                            options=[
-                                {'label': 'None', 'value': None},
-                            ],
-                            value=None
-                        )
                     ]
                 ),
 
@@ -199,6 +192,7 @@ class AnalysisApp(AbstractApp):
                                         'zoom2d',
                                         'pan2d',
                                         'select2d',
+                                        'lasso2d',
                                         'zoomIn2d',
                                         'zoomOut2d',
                                         'autoScale2d',
@@ -215,6 +209,14 @@ class AnalysisApp(AbstractApp):
                                **{'width': '{}%'.format(2 / 12 * 100 - 0.2),
                                   'min-width':None}},
                         children=[
+                            dcc.Dropdown(
+                                id='calibration-dropdown',
+                                placeholder='Select calibration...',
+                                options=[
+                                    {'label': 'None', 'value': None},
+                                ],
+                                value=None
+                            )
                         ]
                     ),
                     html.Div(
@@ -230,6 +232,7 @@ class AnalysisApp(AbstractApp):
                                     "modeBarButtonsToRemove": [
                                         'zoom2d',
                                         'pan2d',
+                                        'lasso2d',
                                         'select2d',
                                         'zoomIn2d',
                                         'zoomOut2d',
@@ -239,6 +242,47 @@ class AnalysisApp(AbstractApp):
                                     ]
                                 }
                             )
+                        ]
+                    ),
+                    html.Div(
+                        className='one columns',
+                        style={**puzzlebox,
+                               **{'min-width': None,
+                                  'width': '{}%'.format(1 / 12 * 100 - 0.1 * 6)}},
+                        children=[
+                            dcc.Input(
+                                id="meta-color-high",
+                                type='number',
+                                placeholder='Max val',
+                                style={
+                                    'width': '100%',
+                                    'margin-bottom': 17
+                                },
+                                value=10000,
+                            ),
+                            dcc.Dropdown(
+                                id='meta-color',
+                                placeholder='Select color-range...',
+                                options=[
+                                    {'label': 'GreenYellow', 'value': 'green-yellow'},
+                                    {'label': 'GreenPurple', 'value': 'green-purple'},
+                                    {'label': 'GreenPink', 'value': 'green-pink'},
+                                    {'label': 'PurpleOrange', 'value': 'purple-orange'},
+                                    {'label': 'RedWhiteBlue', 'value': 'red-white-blue'},
+                                    {'label': 'RedYellowBlue', 'value': 'red-yellow-blue'},
+                                ],
+                                value='red-white-blue'
+                            ),
+                            dcc.Input(
+                                id="meta-color-low",
+                                type='number',
+                                placeholder='Min val',
+                                style={
+                                    'width': '100%',
+                                    'margin-top': 17
+                                },
+                                value=-10000,
+                            ),
                         ]
                     ),
                     html.Div(
@@ -286,9 +330,23 @@ class AnalysisApp(AbstractApp):
                                 placeholder='Max val',
                                 style={
                                     'width': '100%',
-                                    'margin-bottom': 96
+                                    'margin-bottom': 78
                                 },
                                 value=10000,
+                            ),
+                            dcc.Dropdown(
+                                id='color-type',
+                                placeholder='Select color-range...',
+                                options=[
+                                    {'label': 'GreenYellow', 'value': 'green-yellow'},
+                                    {'label': 'GreenPurple', 'value': 'green-purple'},
+                                    {'label': 'GreenPink', 'value': 'green-pink'},
+                                    {'label': 'PurpleOrange', 'value': 'purple-orange'},
+                                    {'label': 'RedWhiteBlue', 'value': 'red-white-blue'},
+                                    {'label': 'RedYellowBlue', 'value': 'red-yellow-blue'},
+
+                                ],
+                                value='red-white-blue'
                             ),
                             dcc.Input(
                                 id="color-low",
@@ -296,7 +354,7 @@ class AnalysisApp(AbstractApp):
                                 placeholder='Min val',
                                 style={
                                     'width': '100%',
-                                    'margin-top': 96
+                                    'margin-top': 78
                                 },
                                 value=-10000,
                             ),
@@ -445,7 +503,11 @@ class AnalysisApp(AbstractApp):
                 Input('color-low', 'value'),
                 Input('color-high', 'value'),
                 Input('refresh', 'n_clicks'),
-                Input('calibration-dropdown', 'value')
+                Input('calibration-dropdown', 'value'),
+                Input('meta-color', 'value'),
+                Input('meta-color-low', 'value'),
+                Input('meta-color-high', 'value'),
+                Input('color-type', 'value')
             ],
             [
                 State('linechart', 'relayoutData'),
@@ -460,14 +522,18 @@ class AnalysisApp(AbstractApp):
                 col_max,
                 _,
                 calibration_time,
+                meta_color,
+                meta_col_min,
+                meta_col_max,
+                color_type,
                 linechart_data):
             tic = time.process_time()
 
             # Define colormap
-            colorScale = color_manager.getColorScale('red-white-blue')
+            colorScale = color_manager.getColorScale(color_type)
             color_range = {'min': col_min, 'max': col_max}
-            meta_color_scale = color_manager.getColorScale('green-yellow')
-            meta_color_range = {'min': 0, 'max': 12000}
+            meta_color_scale = color_manager.getColorScale(meta_color)
+            meta_color_range = {'min': meta_col_min, 'max': meta_col_max}
 
             # Choose coordinate
             default_coordinate = {'x': 0, 'y': 0}
@@ -525,7 +591,8 @@ class AnalysisApp(AbstractApp):
                 meta_color_range,
                 figure_height=150,
                 title='Raw data',
-                axis_name=False
+                axis_name=False,
+                allow_lasso=False
             )
             calibrated_fig = heatmap.getHeatMap(
                 calibrated_data,
@@ -546,7 +613,8 @@ class AnalysisApp(AbstractApp):
                 custom_color_range=meta_color_range,
                 figure_height=150,
                 title='Calibration data',
-                axis_name=False
+                axis_name=False,
+                allow_lasso=False
             )
             lineChartFig = linechart.getLineChart(
                 linechart_data,
