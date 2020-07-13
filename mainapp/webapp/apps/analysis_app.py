@@ -405,7 +405,7 @@ class AnalysisApp(AbstractApp):
             tic = time.process_time()
 
             # Define colormap
-            colorScale = color_manager.getColorScale()
+            colorScale = color_manager.getColorScale('red-white-blue')
             color_range = {'min': col_min, 'max': col_max}
 
             # Choose coordinate
