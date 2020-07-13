@@ -34,6 +34,18 @@ puzzlebox = {
 }
 
 
+def calibrate_map(heatmap_data, calibration_data):
+    return np.subtract(heatmap_data, calibration_data)
+
+
+def calibrate_line_data(linechart_data, calibration_data, coordinates):
+    add = [""]
+    for coord in coordinates:
+        add.append(-calibration_data[coord['x'], coord['y']])
+
+    return linechart_data+add
+
+
 class AnalysisApp(AbstractApp):
     def setupOn(self, server, data_manager, project_name):
         global log_manager, log
@@ -420,14 +432,26 @@ class AnalysisApp(AbstractApp):
             linechart_data = data_manager.get_linechart_data(data_manager, coordinates=coordinates, timeline=timeline, get_all=True)
 
             # Calibrate
+            calibration_data = None
             if calibration_time is not None:
-                heatmap_calibration = calibrator.get_map_calibration_data(project_name, calibration_time)
-                heatmap_data = np.subtract(heatmap_data, heatmap_calibration)
+                calibration_data = calibrator.get_map_calibration_data(project_name, calibration_time)
+                heatmap_data = calibrate_map(heatmap_data, calibration_data)
+                linechart_data = calibrate_line_data(linechart_data, calibration_data, coordinates)
 
             # Update figures
             heatmapFig = heatmap.getHeatMap(heatmap_data, timestamp, colorScale, plot_type, coordinates, 'white',
                                             color_range)
-            lineChartFig = linechart.getLineChart(linechart_data, timestamp, coordinates, colorScale, timeline, color_range, dragmode='pan', quick_select_range=False, calibration_time=calibration_time)
+            lineChartFig = linechart.getLineChart(
+                linechart_data,
+                timestamp,
+                coordinates,
+                colorScale,
+                timeline,
+                color_range,
+                dragmode='pan',
+                quick_select_range=False,
+                calibration_time=calibration_time,
+            )
             toc = time.process_time()
             print("Time to update figures (Analysis): {}".format(toc-tic))
             return [
