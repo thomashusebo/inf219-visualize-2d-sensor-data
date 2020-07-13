@@ -12,16 +12,21 @@ useful.
 
 My project will provide the functionality that enables the user to inspect both the live data, and previous readings in
 an ongoing project.
-## Some challenges
-#### Continous development
--   The physical model, the instrumentation, and my software are all developed simultaneously. 
-    -   This require continuous communication throughout the project across different professions
-    -   A clear definition of what my software should provide, independent of the state of the physical model and 
-    instrumentation. 
-    
-#### Corona crisis
--   March 12. UiB closed as a response to the corona crisis. Due to the nature of the project, the lockdown 
-of the university have had a major impact on progression of the project in the past months.
+
+For more information, see the [wiki](https://github.com/thomashusebo/inf219-visualize-2d-sensor-data/wiki)
+
+## Installation
+1. Install python 3.7.6
+2. Install dependencies 
+
+Either:
+- Install pipenv
+- Run batch script FluidFlower.bat
+
+Or:
+Manually install dependencies from requirements.txt or pip files. 
+
+3. Run main.py or FluidFlower.bat
 
 ## Prototype
 Before the corona lockdown, a prototype of the software where working (though with manually feeding input to a 
@@ -29,6 +34,3 @@ file-creator). The code for the protype is available [here](https://github.com/t
 However, the data and 
 the file-creators are not included. For the curious, here is a [video of the prototype testing](https://vimeo.com/396326719)
 
-## Current master 
-- **12.06.20**: The app has a skeleton structure. Content from the prototype will be added to fill the specifications 
-given by IFT.
