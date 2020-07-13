@@ -59,6 +59,7 @@ class LiveApp(AbstractApp):
                                     ),
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '0.5%',
                                         'border': 0,
                                         'margin': '0.1%',
@@ -68,6 +69,7 @@ class LiveApp(AbstractApp):
                                 html.Div(
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '2%',
                                         'padding-right': '0.5%',
                                         'border': 0,
@@ -83,6 +85,7 @@ class LiveApp(AbstractApp):
                                 html.Div(
                                     className='four columns',
                                     style={
+                                        'width': '{}%'.format(4 / 12 * 100 - 0.2),
                                         'padding-top': '2%',
                                         'padding-right': '0.5%',
                                         'border': 0,
@@ -120,7 +123,7 @@ class LiveApp(AbstractApp):
                                 # Make area scrollable
                                 'overflow-x': 'hidden',
                                 'overflow-y': 'auto',
-                                'text-align': 'justify',
+                                'text-align': 'left',
                                 # Keep scroll at bottom:
                                 'display': 'flex',
                                 'flex-direction': 'column-reverse',
