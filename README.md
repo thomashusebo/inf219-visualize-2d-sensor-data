@@ -13,7 +13,8 @@ useful.
 My project will provide the functionality that enables the user to inspect both the live data, and previous readings in
 an ongoing project.
 
-For more information, see the [wiki](https://github.com/thomashusebo/inf219-visualize-2d-sensor-data/wiki)
+## More information
+See the [wiki](https://github.com/thomashusebo/inf219-visualize-2d-sensor-data/wiki)
 
 ## Installation
 1. Install python 3.7.6
