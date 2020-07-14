@@ -19,19 +19,10 @@ See the [wiki](https://github.com/thomashusebo/inf219-visualize-2d-sensor-data/w
 ## Installation
 1. Install python 3.7.6
 1. Clone repository
-1. Install dependencies: 
-
-Recommended:
-> - Install pipenv
-> - Run batch script FluidFlower.bat 
-
-> The batch file will create a virtual environment based on the pip files. If this is the first time to set up, this will install all necessary dependencies. The batch script also creates subdirectories ignored by git.
-
-Not recommended:
-> - Manually install dependencies from requirements.txt or pip files. 
-> - Manually add directories ignored by git (see batch file)
-
-4. Start software: FluidFlower.bat or run main.py
+1. Install pipenv
+1. Install dependencies: `python -m pipenv install -r requirements.txt`
+1. Start software: FluidFlower.bat
+> The batch file will create a virtual environment based on the pip files. The batch script also creates subdirectories ignored by git.
 
 ## File format
 See [wiki/File-Format](https://github.com/thomashusebo/inf219-visualize-2d-sensor-data/wiki/File-Format)
